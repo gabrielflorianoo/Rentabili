@@ -9,7 +9,8 @@
     "main": "app.js",
     "scripts": {
         "start": "node app.js",
-        "dev": "nodemon app.js",
+        "dev": "nodemon -e js,json app.js",
+        "test:routes": "node tests/test_routes.js",
         "setup": "node setup.js",
         "build": "prisma generate",
         "db:migrate": "prisma migrate dev",
