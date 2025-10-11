@@ -8,6 +8,7 @@ import usersRouter from './routes/users.js';
 import investmentsRouter from './routes/investments.js';
 import transactionsRouter from './routes/transactions.js';
 import walletsRouter from './routes/wallets.js';
+import authRouter from './routes/auth.js';
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use('/users', usersRouter);
 app.use('/investments', investmentsRouter);
 app.use('/transactions', transactionsRouter);
 app.use('/wallets', walletsRouter);
+app.use('/auth', authRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
