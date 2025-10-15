@@ -15,8 +15,10 @@
         "build": "prisma generate",
         "db:migrate": "prisma migrate dev",
         "db:reset": "prisma migrate reset",
-        "db:studio": "prisma studio",
-        "db:seed": "node prisma/seed.js"
+        "db:studio": "prisma studio"
+    },
+    "prisma": {
+        "seed": "node prisma/seed.js"
     },
     "dependencies": {
         "@prisma/client": "^6.11.1",
