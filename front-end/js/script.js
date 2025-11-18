@@ -1,304 +1,319 @@
-// flip do card
-function flipCard() {
-  document.getElementById('innovativeCard').classList.toggle('flipped');
+//virado o card
+function virarCard() {
+  document.getElementById('cardLogin').classList.toggle('virado');
 }
 
-// canvas animado
+//usando o canvas como efeito de fundo
 (function() {
-  const canvas = document.getElementById('animatedLines');
+  const canvas = document.getElementById('bg-effect');
   const ctx = canvas.getContext('2d');
-  let DPR = window.devicePixelRatio || 1;
+  let escala = window.devicePixelRatio || 1;
 
-  function resize() {
-    DPR = window.devicePixelRatio || 1;
-    canvas.width = Math.floor(window.innerWidth * DPR);
-    canvas.height = Math.floor(window.innerHeight * DPR);
+  function ajustarTamanho() {
+    escala = window.devicePixelRatio || 1;
+    canvas.width = Math.floor(window.innerWidth * escala);
+    canvas.height = Math.floor(window.innerHeight * escala);
     canvas.style.width = window.innerWidth + 'px';
     canvas.style.height = window.innerHeight + 'px';
-    ctx.setTransform(DPR, 0, 0, DPR, 0, 0); 
+    ctx.setTransform(escala, 0, 0, escala, 0, 0); 
   }
-  resize();
-  window.addEventListener('resize', resize);
+  ajustarTamanho();
+  window.addEventListener('resize', ajustarTamanho);
 
-  const NUM_LINES = 60;
-  const lines = [];
+  const qtdLinhas = 60;
+  const minhasLinhas = [];
 
-  function resetLine(line) {
-    line.x = Math.random() * (window.innerWidth * 1.5) - window.innerWidth * 0.25;
-    line.y = window.innerHeight + Math.random() * 200 + 20;
-    line.length = 80 + Math.random() * 220;
-    line.speed = 0.6 + Math.random() * 2.4;
-    line.thickness = 1 + Math.random() * 2;
-    line.opacity = 0.15 + Math.random() * 0.35;
-    const base = -Math.PI / 4;
-    line.angle = base + (Math.random() - 0.5) * 0.25;
-    const g = 150 + Math.floor(Math.random() * 105); 
-    line.color = `rgba(0, ${g}, 0, ${line.opacity})`;
-  }
-
-  for (let i = 0; i < NUM_LINES; i++) {
-    const l = {};
-    resetLine(l);
-    l.y += Math.random() * 800;
-    lines.push(l);
+  function criarLinha(l) {
+    l.x = Math.random() * (window.innerWidth * 1.5) - window.innerWidth * 0.25;
+    l.y = window.innerHeight + Math.random() * 200 + 20;
+    l.tamanho = 80 + Math.random() * 220;
+    l.vel = 0.6 + Math.random() * 2.4;
+    l.grossura = 1 + Math.random() * 2;
+    l.transparencia = 0.15 + Math.random() * 0.35;
+    const anguloFixo = -Math.PI / 4;
+    l.angulo = anguloFixo + (Math.random() - 0.5) * 0.25;
+    // sorteia um tom de verde
+    const verde = 150 + Math.floor(Math.random() * 105); 
+    l.cor = `rgba(0, ${verde}, 0, ${l.transparencia})`;
   }
 
-  function animate() {
+//inicializa o array
+  for (let i = 0; i < qtdLinhas; i++) {
+    const obj = {};
+    criarLinha(obj);
+    obj.y += Math.random() * 800;
+    minhasLinhas.push(obj);
+  }
+
+  function desenhar() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
+
+    for (let i = 0; i < minhasLinhas.length; i++) {
+      const linha = minhasLinhas[i];
+
       ctx.beginPath();
-      ctx.strokeStyle = line.color;
-      ctx.lineWidth = line.thickness;
+      ctx.strokeStyle = linha.cor;
+      ctx.lineWidth = linha.grossura;
       ctx.lineCap = 'round';
-      const x1 = line.x;
-      const y1 = line.y;
-      const x2 = x1 + Math.cos(line.angle) * line.length;
-      const y2 = y1 + Math.sin(line.angle) * line.length;
+
+      const x1 = linha.x;
+      const y1 = linha.y;
+      const x2 = x1 + Math.cos(linha.angulo) * linha.tamanho;
+      const y2 = y1 + Math.sin(linha.angulo) * linha.tamanho;
+
       ctx.moveTo(x1, y1);
       ctx.lineTo(x2, y2);
       ctx.stroke();
-      line.y -= line.speed;
-      line.x -= line.speed * 0.9;
+
+      linha.y -= linha.vel;
+      linha.x -= linha.vel * 0.9;
+
       if (y2 < -50 || x2 < -200) {
-        resetLine(line);
-        line.y = window.innerHeight + Math.random() * 300;
+        criarLinha(linha);
+        linha.y = window.innerHeight + Math.random() * 300;
       }
     }
-    requestAnimationFrame(animate);
+    requestAnimationFrame(desenhar);
   }
-  animate();
+  desenhar();
 })();
 
-let userDatabase = [];
-let emailToReset = ""; 
 
-//LIMPAR ERROS 
+//Simulador de usuário
 
-function clearAllErrors() {
-  const errorSpans = document.querySelectorAll('.error-message');
-  errorSpans.forEach(span => {
-    span.textContent = '';
-    span.style.display = 'none';
+let listaUsuarios = [];
+let emailParaRecuperar = ""; 
+
+//reseta mensagens
+function resetarErros() {
+  const spans = document.querySelectorAll('.msg-erro');
+  spans.forEach(s => {
+    s.textContent = '';
+    s.style.display = 'none';
   });
 
-  const inputs = document.querySelectorAll('.floating-input');
-  inputs.forEach(input => {
-    input.classList.remove('input-error');
+  const campos = document.querySelectorAll('.input-custom');
+  campos.forEach(c => {
+    c.classList.remove('erro-borda');
   });
 }
 
 
-//LOGIN
+//Login
 
-function handleLogin(e) {
+function fazerLogin(e) {
   e.preventDefault();
-  clearAllErrors(); 
+  resetarErros(); 
   
-  const email = document.getElementById('login-email').value;
-  const password = document.getElementById('login-password').value;
+  const emailDigitado = document.getElementById('login-email').value;
+  const senhaDigitada = document.getElementById('login-senha').value;
+  const usuario = listaUsuarios.find(u => u.email === emailDigitado); //verifica se tem e-mail
 
-  const user = userDatabase.find(user => user.email === email);
-
-  if (!user) {
-    document.getElementById('login-error').textContent = 'Não existe conta com esse e-mail.';
-    document.getElementById('login-error').style.display = 'block';
-    document.getElementById('login-email').classList.add('input-error');
+  if (!usuario) {
+    //avisa que nao achou
+    document.getElementById('erro-login-email').textContent = 'Não existe conta com esse e-mail.';
+    document.getElementById('erro-login-email').style.display = 'block';
+    document.getElementById('login-email').classList.add('erro-borda');
     return;
   }
 
-  if (user.password === password) {
-    alert('Login realizado com sucesso! Bem-vindo(a), ' + user.name + '!');
+  //onfere a senha
+  if (usuario.senha === senhaDigitada) {
+    alert('Login realizado com sucesso! Bem-vindo(a), ' + usuario.nome + '!');
     e.target.reset(); 
   } else {
-    document.getElementById('password-error').textContent = 'Senha incorreta.';
-    document.getElementById('password-error').style.display = 'block';
-    document.getElementById('login-password').classList.add('input-error');
+    document.getElementById('erro-login-senha').textContent = 'Senha incorreta.';
+    document.getElementById('erro-login-senha').style.display = 'block';
+    document.getElementById('login-senha').classList.add('erro-borda');
   }
 }
 
 
-//REGISTRO
+//Cadastro
 
-function handleRegister(e) {
+function cadastrarUsuario(e) {
   e.preventDefault();
-  clearAllErrors(); 
+  resetarErros(); 
   
-  const name = document.getElementById('register-name').value;
-  const email = document.getElementById('register-email').value;
-  const password = document.getElementById('register-password').value;
-  const confirmPassword = document.getElementById('register-confirm-password').value;
-  const dobString = document.getElementById('register-dob').value;
+  const nome = document.getElementById('cad-nome').value;
+  const email = document.getElementById('cad-email').value;
+  const senha = document.getElementById('cad-senha').value;
+  const confirma = document.getElementById('cad-confirma').value;
+  const data = document.getElementById('cad-nasc').value;
 
-  //Validação
-  let hasError = false; // Flag para rastrear erros
+  let erroEncontrado = false; 
 
-  //E-mail
-  const emailExists = userDatabase.find(user => user.email === email);
-  if (emailExists) {
-    document.getElementById('register-email-error').textContent = 'Este e-mail já está cadastrado.';
-    document.getElementById('register-email-error').style.display = 'block';
-    document.getElementById('register-email').classList.add('input-error');
-    hasError = true;
+  //verifica se email ja existe
+  const existe = listaUsuarios.find(u => u.email === email);
+  if (existe) {
+    document.getElementById('erro-cad-email').textContent = 'Este e-mail já está cadastrado.';
+    document.getElementById('erro-cad-email').style.display = 'block';
+    document.getElementById('cad-email').classList.add('erro-borda');
+    erroEncontrado = true;
   }
 
-  //Data de Nascimento
-  if (!dobString) {
-    document.getElementById('register-dob-error').textContent = 'Por favor, selecione sua data.';
-    document.getElementById('register-dob-error').style.display = 'block';
-    document.getElementById('register-dob').classList.add('input-error');
-    hasError = true;
+  //verifica idade
+  if (!data) {
+    document.getElementById('erro-cad-nasc').textContent = 'Por favor, selecione sua data.';
+    document.getElementById('erro-cad-nasc').style.display = 'block';
+    document.getElementById('cad-nasc').classList.add('erro-borda');
+    erroEncontrado = true;
   } else {
-    const parts = dobString.split('-'); 
-    const dob = new Date(parts[0], parts[1] - 1, parts[2]); 
-    const today = new Date();
-    let age = today.getFullYear() - dob.getFullYear();
-    const m = today.getMonth() - dob.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
-      age--;
+    const arrData = data.split('-'); 
+    const dataNasc = new Date(arrData[0], arrData[1] - 1, arrData[2]); 
+    const hoje = new Date();
+    let idade = hoje.getFullYear() - dataNasc.getFullYear();
+    const mes = hoje.getMonth() - dataNasc.getMonth();
+    
+    if (mes < 0 || (mes === 0 && hoje.getDate() < dataNasc.getDate())) {
+      idade--;
     }
-    if (age < 18) {
-      document.getElementById('register-dob-error').textContent = 'Você deve ter pelo menos 18 anos.';
-      document.getElementById('register-dob-error').style.display = 'block';
-      document.getElementById('register-dob').classList.add('input-error');
-      hasError = true;
+    if (idade < 18) {
+      document.getElementById('erro-cad-nasc').textContent = 'Você deve ter pelo menos 18 anos.';
+      document.getElementById('erro-cad-nasc').style.display = 'block';
+      document.getElementById('cad-nasc').classList.add('erro-borda');
+      erroEncontrado = true;
     }
   }
 
-  //Senha
-  const specialCharRegex = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
-  if (password.length < 6 || !specialCharRegex.test(password)) {
-    document.getElementById('register-password-error').textContent = 'Mín. 6 caracteres e 1 especial (!@#$).';
-    document.getElementById('register-password-error').style.display = 'block';
-    document.getElementById('register-password').classList.add('input-error');
-    hasError = true;
+  //Validar senha com min 6 chars + especial
+  const regexSenha = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+  if (senha.length < 6 || !regexSenha.test(senha)) {
+    document.getElementById('erro-cad-senha').textContent = 'Mín. 6 caracteres e 1 especial (!@#$).';
+    document.getElementById('erro-cad-senha').style.display = 'block';
+    document.getElementById('cad-senha').classList.add('erro-borda');
+    erroEncontrado = true;
   }
 
-  //Confirmação de Senha
-  if (password !== confirmPassword) {
-    document.getElementById('register-confirm-error').textContent = 'As senhas não coincidem.';
-    document.getElementById('register-confirm-error').style.display = 'block';
-    document.getElementById('register-confirm-password').classList.add('input-error');
-    hasError = true; 
+  // 4. confirma se as senhas batem
+  if (senha !== confirma) {
+    document.getElementById('erro-cad-confirma').textContent = 'As senhas não coincidem.';
+    document.getElementById('erro-cad-confirma').style.display = 'block';
+    document.getElementById('cad-confirma').classList.add('erro-borda');
+    erroEncontrado = true; 
   }
 
-  //erro
-  if (hasError) {
-    return;
+  if (erroEncontrado) {
+    return; // para tudo se deu ruim
   }
 
-  //Sucesso
-  const newUser = { name: name, email: email, password: password, dob: dobString };
-  userDatabase.push(newUser);
-  console.log('Usuário cadastrado:', newUser);
-  console.log('Banco de dados atual:', userDatabase);
-
-  const registerView = document.getElementById('register-view');
-  const welcomeView = document.getElementById('welcome-view');
+  // sucesso: salva no array
+  const novoUsuario = { 
+    nome: nome, 
+    email: email, 
+    senha: senha, 
+    nascimento: data 
+  };
   
-  registerView.style.display = 'none';
-  welcomeView.style.display = 'block';
-  welcomeView.classList.remove('fade-in-up');
-  void welcomeView.offsetWidth; 
-  welcomeView.classList.add('fade-in-up');
+  listaUsuarios.push(novoUsuario);
+  console.log('Novo usuário:', novoUsuario);
+
+  // troca pra tela de sucesso
+  const divCadastro = document.getElementById('tela-cadastro');
+  const divBemVindo = document.getElementById('tela-bemvindo');
+  
+  divCadastro.style.display = 'none';
+  divBemVindo.style.display = 'block';
+  
+  // reinicia a animacao css
+  divBemVindo.classList.remove('animacao-up');
+  void divBemVindo.offsetWidth; 
+  divBemVindo.classList.add('animacao-up');
 
   e.target.reset();
 }
 
-
-//Fazer Login
-
-function goToLogin() {
-  document.getElementById('welcome-view').style.display = 'none';
-  document.getElementById('register-view').style.display = 'block'; 
-  flipCard();
+//botao da tela de sucesso
+function irParaLogin() {
+  document.getElementById('tela-bemvindo').style.display = 'none';
+  document.getElementById('tela-cadastro').style.display = 'block'; 
+  
+  virarCard();
   
   setTimeout(() => {
-    showView('login-view');
+    trocarTela('tela-login');
   }, 500); 
 }
 
 
-//Esqueceu a senha
-
-function showView(viewId) {
-  clearAllErrors(); 
-  document.getElementById('innovativeCard').classList.remove('flipped');
+// funcao auxiliar pra mudar as divs da frente
+function trocarTela(idTela) {
+  resetarErros(); 
+  document.getElementById('cardLogin').classList.remove('virado');
   
-  document.getElementById('login-view').style.display = 'none';
-  document.getElementById('forgot-view').style.display = 'none';
-  document.getElementById('validate-view').style.display = 'none';
+  document.getElementById('tela-login').style.display = 'none';
+  document.getElementById('tela-esqueci').style.display = 'none';
+  document.getElementById('tela-validar').style.display = 'none';
 
-  const viewToShow = document.getElementById(viewId);
-  if (viewToShow) {
-    viewToShow.style.display = 'block';
-    viewToShow.classList.remove('fade-in-up');
-    void viewToShow.offsetWidth; 
-    viewToShow.classList.add('fade-in-up');
+  const alvo = document.getElementById(idTela);
+  if (alvo) {
+    alvo.style.display = 'block';
+    alvo.classList.remove('animacao-up');
+    void alvo.offsetWidth; 
+    alvo.classList.add('animacao-up');
   }
 }
 
-function handleForgotPassword(e) {
+function enviarCodigo(e) {
   e.preventDefault();
-  clearAllErrors(); 
-  const email = document.getElementById('forgot-email').value;
+  resetarErros(); 
+  const email = document.getElementById('esqueci-email').value;
   
-  const user = userDatabase.find(user => user.email === email);
+  const achou = listaUsuarios.find(u => u.email === email);
 
-  if (user) {
-    emailToReset = user.email; 
-    alert('Um código de verificação foi enviado para ' + email + '.\n(Use o código "123456" para testar.)');
-    showView('validate-view'); 
+  if (achou) {
+    emailParaRecuperar = achou.email; 
+    alert('Código enviado para ' + email + '.\n(Use "123456" para testar)');
+    trocarTela('tela-validar'); 
   } else {
-    document.getElementById('forgot-error').textContent = 'Não existe conta com esse e-mail.';
-    document.getElementById('forgot-error').style.display = 'block';
-    document.getElementById('forgot-email').classList.add('input-error');
+    document.getElementById('erro-esqueci').textContent = 'Não existe conta com esse e-mail.';
+    document.getElementById('erro-esqueci').style.display = 'block';
+    document.getElementById('esqueci-email').classList.add('erro-borda');
   }
 }
 
-function handleValidateCode(e) {
+function validarCodigo(e) {
   e.preventDefault();
-  clearAllErrors(); 
+  resetarErros(); 
   
-  const code = document.getElementById('validate-code').value;
-  const newPassword = document.getElementById('validate-password').value;
+  const codigo = document.getElementById('codigo-validacao').value;
+  const nova = document.getElementById('nova-senha').value;
 
-  if (!code || !newPassword) {
-    document.getElementById('validate-code-error').textContent = 'Preencha todos os campos.';
-    document.getElementById('validate-code-error').style.display = 'block';
+  if (!codigo || !nova) {
+    document.getElementById('erro-validacao-cod').textContent = 'Preencha tudo.';
+    document.getElementById('erro-validacao-cod').style.display = 'block';
     return;
   }
 
-  const specialCharRegex = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
-  if (newPassword.length < 6 || !specialCharRegex.test(newPassword)) {
-      document.getElementById('validate-code-error').textContent = 'A nova senha deve ter mín. 6 caracteres e 1 especial (!@#$).';
-      document.getElementById('validate-code-error').style.display = 'block';
-      document.getElementById('validate-password').classList.add('input-error');
+  //validar senha
+  const regex = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+  if (nova.length < 6 || !regex.test(nova)) {
+      document.getElementById('erro-validacao-cod').textContent = 'Senha fraca (min 6 chars + especial).';
+      document.getElementById('erro-validacao-cod').style.display = 'block';
       return;
   }
 
-  if (code === "123456") {
+  if (codigo === "123456") {
     
-    const userToUpdate = userDatabase.find(user => user.email === emailToReset);
+    const user = listaUsuarios.find(u => u.email === emailParaRecuperar);
 
-    if (userToUpdate) {
-      userToUpdate.password = newPassword;
-      alert('Senha redefinida com sucesso! Você já pode fazer o login.');
-      console.log('Banco de dados (senha resetada):', userDatabase);
+    if (user) {
+      user.senha = nova;
+      alert('Senha trocada com sucesso! Faça login.');
     } else {
-      alert('Erro ao encontrar usuário. Tente novamente.');
+      alert('Erro bizarro, usuario sumiu.');
     }
 
-    showView('login-view'); 
+    trocarTela('tela-login'); 
 
-    emailToReset = ""; 
-    document.getElementById('forgot-email').value = '';
-    document.getElementById('validate-code').value = '';
-    document.getElementById('validate-password').value = '';
+    emailParaRecuperar = ""; 
+    document.getElementById('esqueci-email').value = '';
+    document.getElementById('codigo-validacao').value = '';
+    document.getElementById('nova-senha').value = '';
 
   } else {
-    document.getElementById('validate-code-error').textContent = 'Código de verificação inválido.';
-    document.getElementById('validate-code-error').style.display = 'block';
-    document.getElementById('validate-code').classList.add('input-error');
+    document.getElementById('erro-validacao-cod').textContent = 'Código inválido.';
+    document.getElementById('erro-validacao-cod').style.display = 'block';
+    document.getElementById('codigo-validacao').classList.add('erro-borda');
   }
 }
