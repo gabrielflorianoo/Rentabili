@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Portal Investidor</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="futuristic-background">
+    <canvas id="animatedLines"></canvas>
+  </div>
+
+  <main class="main-container">
+    <div class="innovative-card" id="innovativeCard">
+      
+      <div class="card-face card-front">
+        <div class="card-section welcome-section">
+          <div class="welcome-content fade-in-up">
+            <div class="logo-container">
+              <img src="image/logo.jpeg" alt="Logo Portal Investidor" class="logo-img">
+            </div>
+            <h1 class="welcome-title">Rentabili Investidor</h1>
+            <p class="welcome-subtitle">Bem-vindo ao futuro dos investimentos</p>
+
+            <div class="innovation-features">
+              <div class="feature-item">
+                <svg class="feature-icon" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg><span>Tecnologia de ponta</span>
+              </div>
+              <div class="feature-item">
+                <svg class="feature-icon" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V5l-9-4z"/></svg><span>Segurança máxima</span>
+              </div>
+              <div class="feature-item">
+                <svg class="feature-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg><span>Interface intuitiva</span>
+              </div>
+            </div>
+          </div>
+          <button class="flip-button" onclick="flipCard()">Criar Conta →</button>
+        </div>
+
+        <div class="card-section form-section">
+          
+          <div class="form-content fade-in-up" id="login-view">
+            <div class="form-header">
+              <h2 class="form-title">Acesse sua conta</h2>
+              <p class="form-subtitle">Entre com suas credenciais</p>
+            </div>
+            <form onsubmit="handleLogin(event)">
+              <div class="floating-input-group">
+                <input type="email" id="login-email" class="floating-input" placeholder=" " required>
+                <label class="floating-label">E-mail</label>
+                <span class="error-message" id="login-error"></span>
+              </div>
+              <div class="floating-input-group">
+                <input type="password" id="login-password" class="floating-input" placeholder=" " required>
+                <label class="floating-label">Senha</label>
+                <span class="error-message" id="password-error"></span>
+              </div>
+              <button type="submit" class="holo-button">Entrar na Conta</button>
+            </form>
+            <a href="#" class="form-link" onclick="showView('forgot-view')">Esqueceu sua senha?</a>
+            <div class="progress-dots">
+              <div class="progress-dot active"></div>
+              <div class="progress-dot"></div>
+              <div class="progress-dot"></div>
+            </div>
+          </div>
+
+          <div class="form-content" id="forgot-view" style="display:none;">
+            <div class="form-header">
+              <h2 class="form-title">Recuperar Senha</h2>
+              <p class="form-subtitle">Insira seu e-mail para enviarmos um código</p>
+            </div>
+            <form onsubmit="handleForgotPassword(event)">
+              <div class="floating-input-group">
+                <input type="email" id="forgot-email" class="floating-input" placeholder=" " required>
+                <label class="floating-label">Seu E-mail</label>
+                <span class="error-message" id="forgot-error"></span>
+              </div>
+              <button type="submit" class="holo-button">Enviar Código</button>
+            </form>
+            <a href="#" class="form-link" onclick="showView('login-view')">← Voltar para o Login</a>
+          </div>
+
+          <div class="form-content" id="validate-view" style="display:none;">
+            <div class="form-header">
+              <h2 class="form-title">Validar Código</h2>
+              <p class="form-subtitle">Verifique seu e-mail e redefina sua senha</p>
+            </div>
+            <form onsubmit="handleValidateCode(event)">
+              <div class="floating-input-group">
+                <input type="text" id="validate-code" class="floating-input" placeholder=" " required>
+                <label class="floating-label">Código de Verificação</label>
+                <span class="error-message" id="validate-code-error"></span>
+              </div>
+              <div class="floating-input-group">
+                <input type="password" id="validate-password" class="floating-input" placeholder=" " required>
+                <label class="floating-label">Nova Senha</label>
+              </div>
+              <button type="submit" class="holo-button">Redefinir Senha</button>
+            </form>
+            <a href="#" class="form-link" onclick="showView('login-view')">Cancelar e Voltar</a>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="card-face card-back">
+        
+        <div class="card-section form-section">
+          
+          <div class="form-content fade-in-up" id="register-view">
+            <div class="form-header">
+              <h2 class="form-title">Crie sua conta</h2>
+              <p class="form-subtitle">Junte-se à inovação do investimento</p>
+            </div>
+
+            <form onsubmit="handleRegister(event)">
+              <div class="floating-input-group">
+                <input type="text" id="register-name" class="floating-input" placeholder=" " required>
+                <label class="floating-label">Nome Completo</label>
+              </div>
+              <div class="floating-input-group">
+                <input type="email" id="register-email" class="floating-input" placeholder=" " required>
+                <label class="floating-label">E-mail</label>
+                <span class="error-message" id="register-email-error"></span>
+              </div>
+              <div class="floating-input-group">
+                <input type="date" id="register-dob" class="floating-input" placeholder=" " required>
+                <label class="floating-label">Data de Nascimento</label>
+                <span class="error-message" id="register-dob-error"></span>
+              </div>
+              <div class="floating-input-group">
+                <input type="password" id="register-password" class="floating-input" placeholder=" " required>
+                <label class="floating-label">Senha</label>
+                <span class="error-message" id="register-password-error"></span>
+              </div>
+              <div class="floating-input-group">
+                <input type="password" id="register-confirm-password" class="floating-input" placeholder=" " required>
+                <label class="floating-label">Confirmar Senha</label>
+                <span class="error-message" id="register-confirm-error"></span>
+              </div>
+              <button type="submit" class="holo-button">Criar Conta</button>
+            </form>
+
+            <div class="progress-dots">
+              <div class="progress-dot"></div>
+              <div class="progress-dot active"></div>
+              <div class="progress-dot"></div>
+            </div>
+          </div>
+
+          <div class="form-content" id="welcome-view" style="display:none;">
+            <div class="form-header">
+              <h2 class="form-title">✅ Conta Criada!</h2>
+              <p class="form-subtitle">Seja bem-vindo ao Rentabili Investidor. Sua jornada para o futuro financeiro começa agora.</p>
+            </div>
+            
+            <button class="holo-button" onclick="goToLogin()">Fazer Login Agora</button>
+            
+            <div class="progress-dots">
+              <div class="progress-dot"></div>
+              <div class="progress-dot"></div>
+              <div class="progress-dot active"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-section welcome-section">
+          <div class="welcome-content fade-in-up">
+            
+            <div class="holographic-logo">
+                <img src="image/logo.jpeg" alt="Logo Portal Investidor" class="logo-img-back">
+            </div>
+            
+            <h1 class="welcome-title">Controle seu investimento com a gente</h1>
+            <p class="welcome-subtitle">Segurança, modernidade e performance</p>
+          </div>
+          <button class="flip-button" onclick="flipCard()">← Voltar</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/script.js"></script>
+</body>
+</html>
