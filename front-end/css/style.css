@@ -10,7 +10,7 @@ body {
   position: relative;
 }
 
-/* Fundo animado (canvas) */
+/* Fundo animado */
 .futuristic-background {
   position: fixed;
   inset: 0;
@@ -71,11 +71,11 @@ body {
 /* Tipografia e botões */
 .welcome-content { text-align:center; }
 
-/* --- LOGO CENTRALIZADA (MODIFICADO) --- */
+/* --- LOGO CENTRALIZADA --- */
 .holographic-logo {
   display: flex;
   justify-content: center;
-  margin-bottom: 15px; /* Movido da imagem para o container */
+  margin-bottom: 15px;
 }
 .logo-img-back {
   width: 60px; 
@@ -84,7 +84,6 @@ body {
   border-radius: 50%; 
   box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
-/* --- FIM DA MODIFICAÇÃO DA LOGO --- */
 
 .welcome-title { font-size:2.2rem; font-weight:600; color:#fff; }
 .welcome-subtitle { font-size:1.1rem; color: rgba(255,255,255,0.9); margin-bottom:25px; }
@@ -166,4 +165,5 @@ body {
   height: auto;
   border-radius: 8px; 
   box-shadow: 0 5px 15px rgba(0,0,0,0.2); 
+
 }
