@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
+import { useTheme } from "@/components/themeProvider";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import styles from "@/components/css/simulador.module.css";
 import DarkModeToggle from "@/components/ui/DarkModeToggle";
+import { Line } from "react-chartjs-2";
 
 import {
   Chart as ChartJS,
@@ -15,201 +17,138 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { Line } from "react-chartjs-2";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Tooltip,
-  Legend
-);
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend);
 
-export default function SimuladorInvestimento() {
+export default function SimuladorPage() {
+  const { dark } = useTheme();
+
+  const chartTextColor = dark ? "#fff" : "#222";
+  const chartBorderColor = dark ? "#4ade80" : "#166534";
+  const chartGridColor = dark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)";
+
   const [valorInicial, setValorInicial] = useState<number | null>(null);
   const [taxa, setTaxa] = useState<number | null>(null);
   const [tempo, setTempo] = useState<number | null>(null);
 
   const [resultado, setResultado] = useState<number | null>(null);
   const [jurosTotais, setJurosTotais] = useState<number | null>(null);
+  const [crescimento, setCrescimento] = useState<number | null>(null);
   const [evolucao, setEvolucao] = useState<number[]>([]);
 
-  const [loading, setLoading] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+  const calcularEvolucao = () => {
+    if (!valorInicial || !taxa || !tempo) return;
 
-  const [erros, setErros] = useState({
-    valorInicial: "",
-    taxa: "",
-    tempo: "",
-  });
+    const valores: number[] = [];
+    let atual = valorInicial;
 
-  // Aplica a classe dark
-  useEffect(() => {
-    if (darkMode) document.body.classList.add("dark");
-    else document.body.classList.remove("dark");
-  }, [darkMode]);
-
-  // =========================
-  // RECURSÃO
-  // =========================
-
-  const calcularEvolucaoRecursiva = (
-    valorAtual: number,
-    taxa: number,
-    mesesRestantes: number,
-    acumulado: number[] = []
-  ): number[] => {
-    if (mesesRestantes === 0) return [...acumulado, valorAtual];
-
-    const novoValor = valorAtual * (1 + taxa / 100);
-
-    return calcularEvolucaoRecursiva(
-      novoValor,
-      taxa,
-      mesesRestantes - 1,
-      [...acumulado, valorAtual]
-    );
-  };
-
-  // =========================
-  // VALIDAÇÃO UX
-  // =========================
-
-  const validar = () => {
-    const e = { valorInicial: "", taxa: "", tempo: "" };
-    let ok = true;
-
-    if (!valorInicial || valorInicial <= 0) {
-      e.valorInicial = "Informe um valor maior que zero.";
-      ok = false;
+    for (let i = 0; i <= tempo; i++) {
+      valores.push(atual);
+      atual *= 1 + taxa / 100;
     }
 
-    if (taxa === null || taxa <= 0) {
-      e.taxa = "A taxa deve ser maior que zero.";
-      ok = false;
-    }
+    const final = valores[valores.length - 1];
+    const juros = final - valorInicial;
+    const crescimentoPct = (juros / valorInicial) * 100;
 
-    if (!tempo || tempo <= 0) {
-      e.tempo = "O tempo deve ser maior que zero.";
-      ok = false;
-    }
-
-    setErros(e);
-    return ok;
+    setResultado(final);
+    setJurosTotais(juros);
+    setCrescimento(crescimentoPct);
+    setEvolucao(valores);
   };
-
-  // =========================
-  // SIMULAÇÃO
-  // =========================
-
-  const simular = () => {
-    if (!validar()) return;
-
-    setLoading(true);
-
-    setTimeout(() => {
-      const listaValores = calcularEvolucaoRecursiva(valorInicial!, taxa!, tempo!);
-      const valorFinal = listaValores[listaValores.length - 1];
-      const juros = valorFinal - valorInicial!;
-
-      setResultado(valorFinal);
-      setJurosTotais(juros);
-      setEvolucao(listaValores);
-
-      setLoading(false);
-    }, 600); // simula processamento
-  };
-const lineColor = darkMode ? "#ffffff" : "#000000";
-const pointColor = darkMode ? "#ffffff" : "#000000";
-
-
 
   return (
-    <div className={styles.simuladorContainer}>
-
-      {/* -------- DARK MODE -------- */}
+    <div className={`${styles.simuladorContainer} ${dark ? "dark" : ""}`}>
       <div className={styles.darkToggleWrapper}>
-        <DarkModeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
+        <DarkModeToggle />
       </div>
 
-      {/* -------- FORM -------- */}
-      <div className={styles.formWrapper}>
-        <h1 className={styles.simuladorTitulo}>Simulador de Investimentos</h1>
+      <div className={`${styles.card} ${dark ? styles.cardDark : ""}`}>
 
-        {/* Valor Inicial */}
-        <div className={styles.campoWrapper}>
+        <h1 className={styles.simuladorTitulo}>
+          Simulador de Investimentos
+        </h1>
+
+        <div className={styles.formWrapper}>
           <Input
+            placeholder="Ex: 1000 (valor inicial)"
             type="number"
-            placeholder="Valor Inicial (ex: 1000)"
-            className={erros.valorInicial ? styles.inputErro : ""}
             onChange={(e) => setValorInicial(Number(e.target.value))}
           />
-          {erros.valorInicial && (
-            <span className={styles.erroMsg}>{erros.valorInicial}</span>
-          )}
-        </div>
 
-        {/* Taxa */}
-        <div className={styles.campoWrapper}>
           <Input
+            placeholder="Ex: 0.8 (% ao mês)"
             type="number"
-            placeholder="Taxa (% ao mês, ex: 0.8)"
-            className={erros.taxa ? styles.inputErro : ""}
             onChange={(e) => setTaxa(Number(e.target.value))}
           />
-          {erros.taxa && (
-            <span className={styles.erroMsg}>{erros.taxa}</span>
-          )}
-        </div>
 
-        {/* Tempo */}
-        <div className={styles.campoWrapper}>
           <Input
+            placeholder="Ex: 12 (meses)"
             type="number"
-            placeholder="Tempo (meses, ex: 12)"
-            className={erros.tempo ? styles.inputErro : ""}
             onChange={(e) => setTempo(Number(e.target.value))}
           />
-          {erros.tempo && (
-            <span className={styles.erroMsg}>{erros.tempo}</span>
+
+          <Button onClick={calcularEvolucao} className="mt-4">
+            Simular
+          </Button>
+
+          {resultado !== null && (
+            <div className={`${styles.resultadoBox} ${dark ? styles.resultadoDark : ""}`}>
+              <p>📌 Valor Final: <b>R$ {resultado.toFixed(2)}</b></p>
+              <p>💰 Juros Totais: <b>R$ {jurosTotais?.toFixed(2)}</b></p>
+              <p>📈 Crescimento: <b>{crescimento?.toFixed(2)}%</b></p>
+            </div>
+          )}
+
+          {evolucao.length > 0 && (
+            <div className={styles.chartWrapper}>
+              <Line
+                data={{
+                  labels: evolucao.map((_, i) => `Mês ${i}`),
+                  datasets: [
+                    {
+                      label: "Evolução do Investimento",
+                      data: evolucao,
+                      borderWidth: 2,
+                      tension: 0.3,
+                      borderColor: chartBorderColor,
+                      backgroundColor: chartBorderColor,
+                      pointRadius: 4,     // ◀ RESTAURADO: pontos visíveis
+                      pointHoverRadius: 6,
+                    },
+                  ],
+                }}
+                options={{
+                  plugins: {
+                    legend: { labels: { color: chartTextColor } },
+                    tooltip: {
+                      callbacks: {
+                        label: function (ctx) 
+                        {
+                        const raw = ctx.raw;
+                        if (typeof raw === "number") {
+                        return `R$ ${raw.toFixed(2)}`;
+                        }
+                        return String(raw);
+                        },
+                      },
+                    },
+                  },
+                  scales: {
+                    x: {
+                      ticks: { color: chartTextColor },
+                      grid: { color: chartGridColor },
+                    },
+                    y: {
+                      ticks: { color: chartTextColor },
+                      grid: { color: chartGridColor },
+                    },
+                  },
+                }}
+              />
+            </div>
           )}
         </div>
-
-        {/* Botão */}
-        <Button onClick={simular} disabled={loading}>
-          {loading ? "Simulando..." : "Simular"}
-        </Button>
-
-        {/* Resultados */}
-        {resultado !== null && (
-          <div className={styles.resultadoCard}>
-            <p>📌 Valor Final: <strong>R$ {resultado.toFixed(2)}</strong></p>
-            <p>💸 Juros Totais: <strong>R$ {jurosTotais?.toFixed(2)}</strong></p>
-            <p>📈 Crescimento: <strong>{((resultado / valorInicial!) - 1).toFixed(2)}%</strong></p>
-          </div>
-        )}
-
-        {/* Gráfico */}
-        {evolucao.length > 0 && (
-          <div className={styles.graficoWrapper}>
-            <Line
-              data={{
-                labels: evolucao.map((_, i) => `Mês ${i}`),
-                datasets: [
-                  {
-                    label: "Evolução do Investimento",
-                    data: evolucao,
-                    borderWidth: 2,
-                    tension: 0.3, // 🔥 animação suave
-    borderColor: lineColor,        // <--- ADICIONADO
-    pointBackgroundColor: pointColor,
-                  },
-                ],
-              }}
-            />
-          </div>
-        )}
       </div>
     </div>
   );

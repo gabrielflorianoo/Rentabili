@@ -1,68 +1,70 @@
-/* Container principal */ 
-.simuladorContainer { /* background-color: transparent; */ /* agora o fundo vem do body */ 
-    color: inherit; /* herda a cor do body */ 
-    padding: 2rem; 
-    border-radius: 0.5rem; 
-    transition: background-color 0.3s, color 0.3s; 
-    min-height: 100vh; display: flex; 
-    flex-direction: column; 
-    align-items: center; } /* Dark mode aplicado no body */ 
-    body.dark .simuladorContainer { background-color: #1a1a1a; color: white; } 
-    .simuladorTitulo { font-size: 2rem; font-weight: bold; margin-bottom: 1rem; } 
-    .resultadoTexto { margin-top: 1rem; font-weight: bold; } /* Wrapper do toggle */ 
-    .darkToggleWrapper { 
-        display: flex; 
-        justify-content: flex-end; 
-        width: 100%; 
-        max-width: 400px; 
-        margin-bottom: 1rem; } /* Wrapper do formulário */ 
-        .formWrapper { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 1rem; 
-            width: 100%; 
-            max-width: 400px; } /* Inputs */ 
-            .formWrapper input { 
-                background-color: white; 
-                color: black; 
-                border: 1px solid #ccc; 
-                padding: 0.5rem; 
-                border-radius: 0.25rem; 
-                transition: background-color 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s; } 
-                .formWrapper input:hover { 
-                    border-color: #999; } 
-                    .formWrapper input:focus { 
-                        outline: none; 
-                        border-color: #2563eb; 
-                        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3); } 
-                        body.dark .formWrapper input { 
-                            background-color: #333; 
-                            color: white; 
-                            border-color: #555; } 
-                            body.dark .formWrapper input:hover { 
-                                border-color: #888; } 
-                                body.dark .formWrapper input:focus { 
-                                    border-color: #3b82f6; 
-                                    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3); } 
-                                    /* Botão */ 
-                                    .formWrapper button { background-color: #2563eb; /* azul padrão */ 
-                                        color: white; 
-                                        padding: 0.5rem; 
-                                        border: none; 
-                                        border-radius: 0.25rem; 
-                                        cursor: pointer; 
-                                        transition: background-color 0.3s, transform 0.1s, box-shadow 0.1s; } 
-                                        .formWrapper button:hover { 
-                                            background-color: #1e40af; } 
-                                            .formWrapper button:active { 
-                                                transform: scale(0.97); 
-                                                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); } 
-                                                body.dark .formWrapper button { 
-                                                    background-color: #3b82f6; /* azul mais claro no dark mode */ } 
-                                                    body.dark .formWrapper button:hover { background-color: #2563eb; } 
-                                                    body.dark .formWrapper button:active { transform: scale(0.97); 
-                                                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); 
-                                                    /* Padrão (modo claro): linha e pontos escuros */
+.simuladorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-height: 100vh;
+  padding: 40px 20px;
+  transition: background-color 0.3s, color 0.3s;
+}
 
+/* Toggle no topo */
+.darkToggleWrapper {
+  width: 100%;
+  max-width: 950px;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
 
-                                                    }
+/* Card principal */
+.card {
+  width: 100%;
+  max-width: 950px;
+  padding: 40px;
+  border-radius: 20px;
+  background: white;
+  box-shadow: 0 15px 40px rgba(0, 64, 0, 0.15);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* Card no dark */
+.cardDark {
+  background: #1e1e1e;
+  color: #f5f5f5;
+}
+
+/* Título */
+.simuladorTitulo {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Form */
+.formWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Caixa de resultado */
+.resultadoBox {
+  margin-top: 20px;
+  padding: 15px;
+  border-radius: 10px;
+  background: #f8fff8;
+  border: 1px solid #b6e3b6;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.resultadoDark {
+  background: #2a2a2a;
+  border-color: #444;
+}
+
+/* Gráfico */
+.chartWrapper {
+  margin-top: 20px;
+}
