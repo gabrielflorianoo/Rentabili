@@ -82,10 +82,17 @@ body {
 /* --- SEÇÕES INTERNAS --- */
 .card-section {
   flex: 1;
-  padding: 40px;
+  padding: 36px; /* reduzido levemente para melhor encaixe */
   display: flex;
   flex-direction: column;
   justify-content: center;
+}
+
+/* Limita a largura dos formulários para criar espaço entre os painéis */
+.form-section .form-content,
+.form-area .form-content {
+  max-width: 460px;
+  width: 100%;
 }
 
 .welcome-section {

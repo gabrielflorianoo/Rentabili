@@ -1,8 +1,10 @@
+import getPrisma from '../prismaClient.js';
+import bcrypt from 'bcryptjs';
+
 class UserController {
     constructor() {
         this.users = [
-            { id: 1, name: "Gabriela", email: "gabriela@example.com" },
-            { id: 2, name: "João", email: "joao@example.com" }
+            { id: 1, name: 'Usuário Local', email: 'local@example.com', phone: '123456789', password: 'localpassword', createdAt: new Date(), updatedAt: new Date() }
         ];
 
         this.getAll = this.getAll.bind(this);
@@ -12,42 +14,132 @@ class UserController {
         this.remove = this.remove.bind(this);
     }
 
-    getAll(req, res) {
-        res.json(this.users);
+    async getAll(req, res) {
+        if (process.env.USE_DB !== 'true') {
+            return res.json(this.users.map(u => ({ id: u.id, name: u.name, email: u.email, phone: u.phone, createdAt: u.createdAt })));
+        }
+        try {
+            const prisma = await getPrisma();
+            const users = await prisma.user.findMany({
+                select: { id: true, name: true, email: true, phone: true, createdAt: true }
+            });
+            res.json(users);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
     }
 
-    getById(req, res) {
-        const id = Number(req.params.id);
-        const user = this.users.find(u => u.id === id);
-        if (!user) return res.status(404).json({ error: "Usuário não encontrado" });
-        res.json(user);
+    async getById(req, res) {
+        if (process.env.USE_DB !== 'true') {
+            const id = Number(req.params.id);
+            const user = this.users.find(u => u.id === id);
+            if (user) {
+                return res.json({ id: user.id, name: user.name, email: user.email, phone: user.phone, createdAt: user.createdAt });
+            } else {
+                return res.status(404).json({ error: "Usuário não encontrado" });
+            }
+        }
+        try {
+            const prisma = await getPrisma();
+            const id = Number(req.params.id);
+            const user = await prisma.user.findUnique({
+                where: { id },
+                select: { id: true, name: true, email: true, phone: true, createdAt: true }
+            });
+            if (!user) return res.status(404).json({ error: "Usuário não encontrado" });
+            res.json(user);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
     }
 
-    create(req, res) {
-        const { name, email } = req.body || {};
-        if (!name || !email) return res.status(400).json({ error: "name e email são obrigatórios" });
-        const id = this.users.length ? Math.max(...this.users.map(u => u.id)) + 1 : 1;
-        const newUser = { id, name, email };
-        this.users.push(newUser);
-        res.status(201).json(newUser);
+    async create(req, res) {
+        if (process.env.USE_DB !== 'true') {
+            const { name, email, password, phone } = req.body;
+            if (!name || !email || !password) {
+                return res.status(400).json({ error: "name, email e password são obrigatórios" });
+            }
+            // Simulate creation
+            const newUser = { id: Date.now(), name, email, phone, createdAt: new Date() };
+            return res.status(201).json(newUser);
+        }
+        try {
+            const prisma = await getPrisma();
+            const { name, email, password, phone } = req.body;
+            if (!name || !email || !password) {
+                return res.status(400).json({ error: "name, email e password são obrigatórios" });
+            }
+
+            const hashedPassword = await bcrypt.hash(password, 10);
+
+            const newUser = await prisma.user.create({
+                data: {
+                    name,
+                    email,
+                    password: hashedPassword,
+                    phone
+                }
+            });
+
+            const { password: _, ...userWithoutPassword } = newUser;
+            res.status(201).json(userWithoutPassword);
+        } catch (error) {
+            if (error.code === 'P2002') {
+                return res.status(400).json({ error: "Email já cadastrado" });
+            }
+            res.status(500).json({ error: error.message });
+        }
     }
 
-    update(req, res) {
-        const id = Number(req.params.id);
-        const idx = this.users.findIndex(u => u.id === id);
-        if (idx === -1) return res.status(404).json({ error: "Usuário não encontrado" });
-        const { name, email } = req.body || {};
-        if (name !== undefined) this.users[idx].name = name;
-        if (email !== undefined) this.users[idx].email = email;
-        res.json(this.users[idx]);
+    async update(req, res) {
+        if (process.env.USE_DB !== 'true') {
+            const id = Number(req.params.id);
+            const { name, email, phone } = req.body;
+            if (id === 1) {
+                return res.json({ id: 1, name: name || 'Usuário Local', email: email || 'local@example.com', phone: phone || '123456789', createdAt: new Date() });
+            } else {
+                return res.status(404).json({ error: "Usuário não encontrado" });
+            }
+        }
+        try {
+            const prisma = await getPrisma();
+            const id = Number(req.params.id);
+            const { name, email, phone } = req.body;
+
+            const updatedUser = await prisma.user.update({
+                where: { id },
+                data: { name, email, phone },
+                select: { id: true, name: true, email: true, phone: true, createdAt: true }
+            });
+            res.json(updatedUser);
+        } catch (error) {
+            if (error.code === 'P2025') {
+                return res.status(404).json({ error: "Usuário não encontrado" });
+            }
+            res.status(500).json({ error: error.message });
+        }
     }
 
-    remove(req, res) {
-        const id = Number(req.params.id);
-        const idx = this.users.findIndex(u => u.id === id);
-        if (idx === -1) return res.status(404).json({ error: "Usuário não encontrado" });
-        this.users.splice(idx, 1);
-        res.status(204).send();
+    async remove(req, res) {
+        if (process.env.USE_DB !== 'true') {
+            const id = Number(req.params.id);
+            if (id === 1) {
+                return res.status(204).send();
+            } else {
+                return res.status(404).json({ error: "Usuário não encontrado" });
+            }
+        }
+        try {
+            const prisma = await getPrisma();
+            const id = Number(req.params.id);
+            await prisma.user.delete({ where: { id } });
+            res.status(204).send();
+        } catch (error) {
+            if (error.code === 'P2025') {
+                return res.status(404).json({ error: "Usuário não encontrado" });
+            }
+            res.status(500).json({ error: error.message });
+        }
     }
 }
 

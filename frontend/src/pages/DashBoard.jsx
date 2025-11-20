@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { servicoAutenticacao } from '../services/servicoAutenticacao';
+import { getDashboard } from '../utils/api';
 import './DashBoard.css';
 
 function Sidebar({ aoSair }) {
@@ -35,25 +36,20 @@ export default function Dashboard() {
         setUserData(user);
 
         // BUSCA DADOS REAIS NO BACK-END
-        fetch('http://localhost:3000/dashboard/summary', {
-            headers: { 
-                'Authorization': `Bearer ${token}` // Envia o token para provar quem é
-            }
-        })
-        .then(res => {
-            if (res.status === 401) {
-                // Se o token venceu, desloga
-                servicoAutenticacao.sair();
-                navigate('/');
-            }
-            return res.json();
-        })
+        getDashboard()
         .then(data => {
             if(data.totalBalance !== undefined) {
                 setSummary(data);
             }
         })
-        .catch(err => console.error("Erro ao conectar no dashboard:", err));
+        .catch(err => {
+            console.error("Erro ao conectar no dashboard:", err);
+            if (err.response?.status === 401) {
+                // Se o token venceu, desloga
+                servicoAutenticacao.sair();
+                navigate('/');
+            }
+        });
 
     }, [navigate]);
 

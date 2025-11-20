@@ -1,54 +1,35 @@
+import { login, createUser } from '../utils/api.js';
+
 const API_URL = 'http://localhost:3000';
 
 export const servicoAutenticacao = {
   // LOGIN: Envia e-mail e senha para o Back-end
   entrar: async (email, password) => {
     try {
-        const response = await fetch(`${API_URL}/auth/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            // Salva o token (chave de acesso) e o usuário no navegador
-            localStorage.setItem('rentabil_token', data.token);
-            localStorage.setItem('rentabil_user', JSON.stringify(data.user));
-            return { sucesso: true, usuario: data.user };
-        } else {
-            return { sucesso: false, erro: data.error || 'Falha ao entrar', campo: 'email' };
-        }
+        const data = await login({ email, password });
+        // Salva o token (chave de acesso) e o usuário no navegador
+        localStorage.setItem('rentabil_token', data.token);
+        localStorage.setItem('rentabil_user', JSON.stringify(data.user));
+        return { sucesso: true, usuario: data.user };
     } catch (error) {
         console.error(error);
-        return { sucesso: false, erro: 'Sem conexão com o servidor.', campo: 'email' };
+        return { sucesso: false, erro: error.response?.data?.error || 'Falha ao entrar', campo: 'email' };
     }
   },
 
   // CADASTRO: Envia os dados para criar usuário no Banco
   cadastrar: async (dados) => {
     try {
-        const response = await fetch(`${API_URL}/users`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                name: dados.nome,
-                email: dados.email,
-                password: dados.senha, // Envia a senha para ser criptografada no back
-                phone: dados.nascimento // Usamos phone provisoriamente para guardar data ou telefone
-            })
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            return { sucesso: true };
-        } else {
-            return { sucesso: false, erro: data.error || 'Erro ao cadastrar', campo: 'email' };
-        }
+        const userData = {
+            name: dados.nome,
+            email: dados.email,
+            password: dados.senha,
+            phone: dados.nascimento // Usamos phone provisoriamente para guardar data ou telefone
+        };
+        await createUser(userData);
+        return { sucesso: true };
     } catch (error) {
-        return { sucesso: false, erro: 'Erro de conexão.', campo: 'email' };
+        return { sucesso: false, erro: error.response?.data?.error || 'Erro ao cadastrar', campo: 'email' };
     }
   },
 

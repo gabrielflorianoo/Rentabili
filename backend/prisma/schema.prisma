@@ -1,0 +1,104 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+    provider = "prisma-client"
+}
+
+datasource db {
+    provider = "mysql"
+}
+
+model User {
+    id       Int      @id @default(autoincrement())
+    name     String
+    email    String   @unique
+    password String
+    phone    String?
+    actives  Active[]
+    wallets  Wallet[]
+    transactions Transaction[]
+    investments  Investment[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Active {
+    id       Int                 @id @default(autoincrement())
+    name     String
+    type     String
+    userId   Int
+    user     User                @relation(fields: [userId], references: [id])
+    balances HistoricalBalance[]
+    investments Investment[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([userId])
+}
+
+model HistoricalBalance {
+    id       Int      @id @default(autoincrement())
+    date     DateTime
+    value    Decimal  @db.Decimal(10, 2)
+    activeId Int
+    active   Active   @relation(fields: [activeId], references: [id])
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([activeId, date])
+}
+
+model Wallet {
+    id       Int          @id @default(autoincrement())
+    name     String
+    balance  Decimal      @db.Decimal(10, 2) @default(0)
+    userId   Int
+    user     User         @relation(fields: [userId], references: [id])
+    transactions Transaction[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([userId])
+}
+
+model Transaction {
+    id          Int      @id @default(autoincrement())
+    amount      Decimal  @db.Decimal(10, 2)
+    type        String   // e.g., 'income', 'expense'
+    description String?
+    date        DateTime
+    userId      Int
+    user        User     @relation(fields: [userId], references: [id])
+    walletId    Int?
+    wallet      Wallet?  @relation(fields: [walletId], references: [id])
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([userId])
+    @@index([walletId])
+}
+
+model Investment {
+    id       Int      @id @default(autoincrement())
+    amount   Decimal  @db.Decimal(10, 2)
+    activeId Int
+    active   Active   @relation(fields: [activeId], references: [id])
+    userId   Int
+    user     User     @relation(fields: [userId], references: [id])
+    date     DateTime
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([userId])
+    @@index([activeId])
+}

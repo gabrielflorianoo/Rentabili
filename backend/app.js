@@ -2,7 +2,7 @@ import createError from "http-errors";
 import express, { json, urlencoded } from "express";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
-import cors from "cors"; 
+import cors from "cors";
 
 // Importar rotas
 import usersRouter from './routes/users.js';
@@ -10,11 +10,15 @@ import investmentsRouter from './routes/investments.js';
 import transactionsRouter from './routes/transactions.js';
 import walletsRouter from './routes/wallets.js';
 import authRouter from './routes/auth.js';
+import dashboardRouter from './routes/dashboard.js';
 
 const app = express();
 
 // Middlewares
-app.use(cors()); // <--- LIBERA O ACESSO DO FRONT-END
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true
+}));
 app.use(logger("dev"));
 app.use(json());
 app.use(urlencoded({ extended: false }));
@@ -26,6 +30,7 @@ app.use('/investments', investmentsRouter);
 app.use('/transactions', transactionsRouter);
 app.use('/wallets', walletsRouter);
 app.use('/auth', authRouter);
+app.use('/dashboard', dashboardRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
