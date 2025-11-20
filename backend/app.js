@@ -2,6 +2,7 @@ import createError from "http-errors";
 import express, { json, urlencoded } from "express";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
+import cors from "cors"; 
 
 // Importar rotas
 import usersRouter from './routes/users.js';
@@ -13,14 +14,13 @@ import authRouter from './routes/auth.js';
 const app = express();
 
 // Middlewares
+app.use(cors()); // <--- LIBERA O ACESSO DO FRONT-END
 app.use(logger("dev"));
 app.use(json());
 app.use(urlencoded({ extended: false }));
 app.use(cookieParser());
 
 // Rotas
-
-// Register routes (ensure routes are registered before 404 handler)
 app.use('/users', usersRouter);
 app.use('/investments', investmentsRouter);
 app.use('/transactions', transactionsRouter);
@@ -32,7 +32,7 @@ app.use(function (req, res, next) {
     next(createError(404));
 });
 
-// error handler (return JSON to avoid requiring a view engine)
+// error handler
 app.use(function (err, req, res, next) {
     const status = err.status || 500;
     const payload = {
@@ -42,8 +42,13 @@ app.use(function (err, req, res, next) {
     res.status(status).json(payload);
 });
 
+// Inicia o servidor se este arquivo for executado diretamente
 const PORT = process.env.PORT || 3000;
-+
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+// Apenas inicia o listen se não estiver sendo importado por testes
+if (process.env.NODE_ENV !== 'test') {
+    app.listen(PORT, () => {
+        console.log(`🚀 Servidor rodando na porta ${PORT}`);
+    });
+}
+
+export default app;
