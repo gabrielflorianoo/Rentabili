@@ -203,6 +203,5 @@ Verifique se o token está sendo enviado corretamente. O token é armazenado em 
 
 Este projeto está sob a licença MIT.
 
-## 👨‍💻 Desenvolvedor
-
-Gabriel Floriano
+## 👨‍💻 Desenvolvedores
+*Ver página de contribuidores*
