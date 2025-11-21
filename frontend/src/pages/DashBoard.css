@@ -1,19 +1,21 @@
 .dashboard-wrap {
     display: flex;
     height: 100vh;
-    width: 100vw; /* Adicionei width 100vw para garantir tela cheia */
+    width: 100vw;
     font-family: Inter, sans-serif;
-    background-color: #fff; /* Garante fundo branco */
-    color: #333; /* Garante cor de texto padrão */
+    background-color: #fff;
+    color: #333;
     position: relative;
-    z-index: 20; /* Garante que fique acima do seu canvas animado */
+    z-index: 20;
 }
 
 .sidebar {
     width: 220px;
     background: #fff;
     border-right: 1px solid #e6e6e6;
-    padding: 20px
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
 }
 
 .sidebar .logo {
@@ -21,7 +23,13 @@
     align-items: center;
     gap: 8px;
     font-weight: 700;
-    margin-bottom: 20px
+    margin-bottom: 20px;
+}
+
+.sidebar nav {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
 
 .sidebar nav a {
@@ -31,50 +39,68 @@
     color: #333;
     margin-bottom: 8px;
     text-decoration: none;
-    cursor: pointer; /* Adicionado para UX */
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.sidebar nav a:hover {
+    background: #f0f0f0;
 }
 
 .sidebar nav a.active {
     background: #2f8a2f;
-    color: #fff
+    color: #fff;
 }
 
 .content {
     flex: 1;
     padding: 28px;
-    overflow-y: auto; /* Caso o conteúdo cresça */
+    overflow-y: auto;
 }
 
 .content-head {
     display: flex;
     justify-content: space-between;
-    align-items: center
+    align-items: center;
+}
+
+.user-badge {
+    background: #f0f0f0;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
 }
 
 .summary {
     display: flex;
     gap: 24px;
-    margin-top: 20px
+    margin-top: 20px;
 }
 
 .summary .left {
-    flex: 1
+    flex: 1;
 }
 
 .summary .right {
-    width: 220px
+    width: 220px;
 }
 
 .big {
     font-size: 28px;
     font-weight: 700;
-    margin-top: 8px
+    margin-top: 8px;
+}
+
+.acc {
+    margin-top: 10px;
+    color: #666;
+    font-size: 0.9rem;
 }
 
 .widgets {
     display: flex;
     gap: 24px;
-    margin-top: 26px
+    margin-top: 26px;
 }
 
 .widget {
@@ -83,7 +109,7 @@
     padding: 18px;
     width: 48%;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-    border: 1px solid #eee; /* Adicionei borda leve para visualização */
+    border: 1px solid #eee;
 }
 
 .chart-placeholder {
@@ -92,5 +118,6 @@
     border-radius: 6px;
     display: flex;
     align-items: center;
-    justify-content: center
+    justify-content: center;
+    color: #999;
 }
