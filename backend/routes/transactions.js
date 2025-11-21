@@ -12,4 +12,3 @@ router.put('/:id', authenticateToken, transactionController.update);
 router.delete('/:id', authenticateToken, transactionController.remove);
 
 export default router;
-

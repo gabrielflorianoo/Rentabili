@@ -60,7 +60,8 @@
     color: #333;
 }
 
-.btn-edit, .btn-delete {
+.btn-edit,
+.btn-delete {
     background: none;
     border: none;
     cursor: pointer;
@@ -69,7 +70,8 @@
     transition: transform 0.2s;
 }
 
-.btn-edit:hover, .btn-delete:hover {
+.btn-edit:hover,
+.btn-delete:hover {
     transform: scale(1.2);
 }
 

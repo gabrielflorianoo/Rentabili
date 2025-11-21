@@ -13,15 +13,18 @@ export const api = axios.create({
 });
 
 // Interceptor para adicionar token de autenticação
-api.interceptors.request.use((config) => {
-    const token = localStorage.getItem('rentabil_token');
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-}, (error) => {
-    return Promise.reject(error);
-});
+api.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('rentabil_token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    },
+);
 
 // --- Função Auxiliar para Tratamento de Respostas/Erros ---
 /**
@@ -32,10 +35,14 @@ api.interceptors.request.use((config) => {
 export const handleHTTP = async (request) => {
     try {
         const response = await request;
-        return response.data; // Retorna os dados da resposta com sucesso
+        console.log("Dados retornados: ", response.data);
+        return response.data;
     } catch (error) {
         // Lógica de tratamento de erro mais robusta pode ser adicionada aqui
-        console.error('Erro na requisição HTTP:', error.response || error.message || error);
+        console.error(
+            'Erro na requisição HTTP:',
+            error.response || error.message || error,
+        );
 
         // Rejeita a promessa com o objeto de erro, para que o componente/serviço chamador possa tratar
         // Pode-se optar por retornar 'error.response.data' se o backend fornecer mensagens de erro úteis.
@@ -46,7 +53,8 @@ export const handleHTTP = async (request) => {
 // --- Funções de API Separadas ---
 
 // 🚀 Auth Routes
-export const login = (credentials) => handleHTTP(api.post('/auth/login', credentials));
+export const login = (credentials) =>
+    handleHTTP(api.post('/auth/login', credentials));
 export const register = (userData) => handleHTTP(api.post('/users', userData));
 export const logout = () => handleHTTP(api.post('/auth/logout'));
 
@@ -55,25 +63,35 @@ export const getDashboard = () => handleHTTP(api.get('/dashboard/summary'));
 
 // 💰 Investments Routes
 export const getInvestments = () => handleHTTP(api.get('/investments'));
-export const createInvestment = (investmentData) => handleHTTP(api.post('/investments', investmentData));
-export const updateInvestment = (id, investmentData) => handleHTTP(api.put(`/investments/${id}`, investmentData));
-export const deleteInvestment = (id) => handleHTTP(api.delete(`/investments/${id}`));
+export const createInvestment = (investmentData) =>
+    handleHTTP(api.post('/investments', investmentData));
+export const updateInvestment = (id, investmentData) =>
+    handleHTTP(api.put(`/investments/${id}`, investmentData));
+export const deleteInvestment = (id) =>
+    handleHTTP(api.delete(`/investments/${id}`));
 
 // 💸 Transactions Routes
 export const getTransactions = () => handleHTTP(api.get('/transactions'));
-export const createTransaction = (transactionData) => handleHTTP(api.post('/transactions', transactionData));
-export const updateTransaction = (id, transactionData) => handleHTTP(api.put(`/transactions/${id}`, transactionData));
-export const deleteTransaction = (id) => handleHTTP(api.delete(`/transactions/${id}`));
+export const createTransaction = (transactionData) =>
+    handleHTTP(api.post('/transactions', transactionData));
+export const updateTransaction = (id, transactionData) =>
+    handleHTTP(api.put(`/transactions/${id}`, transactionData));
+export const deleteTransaction = (id) =>
+    handleHTTP(api.delete(`/transactions/${id}`));
 
 // 👥 Users Routes
 export const getUsers = () => handleHTTP(api.get('/users'));
-export const createUser = (userData) => handleHTTP(api.post('/users', userData));
+export const createUser = (userData) =>
+    handleHTTP(api.post('/users', userData));
 export const getUser = (id) => handleHTTP(api.get(`/users/${id}`));
-export const updateUser = (id, userData) => handleHTTP(api.put(`/users/${id}`, userData));
+export const updateUser = (id, userData) =>
+    handleHTTP(api.put(`/users/${id}`, userData));
 export const deleteUser = (id) => handleHTTP(api.delete(`/users/${id}`));
 
 // 👛 Wallets Routes
 export const getWallets = () => handleHTTP(api.get('/wallets'));
-export const createWallet = (walletData) => handleHTTP(api.post('/wallets', walletData));
-export const updateWallet = (id, walletData) => handleHTTP(api.put(`/wallets/${id}`, walletData));
+export const createWallet = (walletData) =>
+    handleHTTP(api.post('/wallets', walletData));
+export const updateWallet = (id, walletData) =>
+    handleHTTP(api.put(`/wallets/${id}`, walletData));
 export const deleteWallet = (id) => handleHTTP(api.delete(`/wallets/${id}`));

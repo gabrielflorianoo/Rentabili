@@ -1,8 +1,9 @@
-import createError from "http-errors";
-import express, { json, urlencoded } from "express";
-import cookieParser from "cookie-parser";
-import logger from "morgan";
-import cors from "cors";
+import 'dotenv/config';
+import createError from 'http-errors';
+import express, { json, urlencoded } from 'express';
+import cookieParser from 'cookie-parser';
+import logger from 'morgan';
+import cors from 'cors';
 
 // Importar rotas
 import usersRouter from './routes/users.js';
@@ -12,14 +13,22 @@ import walletsRouter from './routes/wallets.js';
 import authRouter from './routes/auth.js';
 import dashboardRouter from './routes/dashboard.js';
 
+// Log para verificar se o .env está sendo lido
+console.log('🔧 Configuração do ambiente:');
+console.log('   USE_DB:', process.env.USE_DB);
+console.log('   DATABASE_URL:', process.env.DATABASE_URL ? '✅ Configurado' : '❌ Não configurado');
+console.log('   PORT:', process.env.PORT || 3000);
+
 const app = express();
 
 // Middlewares
-app.use(cors({
-    origin: 'http://localhost:5173',
-    credentials: true
-}));
-app.use(logger("dev"));
+app.use(
+    cors({
+        origin: 'http://localhost:5173',
+        credentials: true,
+    }),
+);
+app.use(logger('dev'));
 app.use(json());
 app.use(urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -42,7 +51,7 @@ app.use(function (err, req, res, next) {
     const status = err.status || 500;
     const payload = {
         message: err.message,
-        error: req.app.get("env") === "development" ? err : {}
+        error: req.app.get('env') === 'development' ? err : {},
     };
     res.status(status).json(payload);
 });

@@ -20,18 +20,21 @@ O Rentabili é um sistema completo de gerenciamento de rentabilidade de investim
 ## 🔧 Instalação
 
 ### 1. Clone o repositório
+
 ```bash
 git clone <url-do-repositorio>
 cd Rentabili
 ```
 
 ### 2. Instalar dependências do Backend
+
 ```bash
 cd backend
 npm install
 ```
 
 ### 3. Instalar dependências do Frontend
+
 ```bash
 cd ../frontend
 npm install
@@ -66,6 +69,7 @@ npx prisma generate
 ## ▶️ Executar o Projeto
 
 ### Backend
+
 ```bash
 cd backend
 npm start
@@ -73,6 +77,7 @@ npm start
 ```
 
 ### Frontend
+
 ```bash
 cd frontend
 npm run dev
@@ -82,15 +87,18 @@ npm run dev
 ## 🎯 Uso
 
 ### Login de Teste (Modo Mock)
+
 - **Email:** local@example.com
 - **Password:** localpassword
 
 ### Criar Nova Conta
+
 1. Clique em "Criar Conta →" no cartão de login
 2. Preencha os dados
 3. Após criar, faça login
 
 ### Navegação
+
 - **Dashboard:** Visão geral do patrimônio
 - **Investimentos:** Gerenciar investimentos (adicionar, editar, excluir)
 - **Relatórios:** Visualizar estatísticas e histórico de transações
@@ -119,25 +127,30 @@ Rentabili/
 ## 🔐 API Endpoints
 
 ### Autenticação
+
 - `POST /auth/login` - Login
 - `POST /users` - Criar usuário
 
 ### Dashboard
+
 - `GET /dashboard/summary` - Resumo financeiro (requer autenticação)
 
 ### Investimentos
+
 - `GET /investments` - Listar investimentos
 - `POST /investments` - Criar investimento
 - `PUT /investments/:id` - Atualizar investimento
 - `DELETE /investments/:id` - Deletar investimento
 
 ### Transações
+
 - `GET /transactions` - Listar transações
 - `POST /transactions` - Criar transação
 - `PUT /transactions/:id` - Atualizar transação
 - `DELETE /transactions/:id` - Deletar transação
 
 ### Carteiras
+
 - `GET /wallets` - Listar carteiras
 - `POST /wallets` - Criar carteira
 - `PUT /wallets/:id` - Atualizar carteira
@@ -146,12 +159,14 @@ Rentabili/
 ## 🎨 Tecnologias Utilizadas
 
 ### Frontend
+
 - React 18
 - React Router DOM
 - Axios
 - CSS3 com animações
 
 ### Backend
+
 - Node.js
 - Express
 - Prisma ORM
@@ -162,18 +177,24 @@ Rentabili/
 ## 🐛 Solução de Problemas
 
 ### Erro de CORS
+
 Certifique-se de que o backend está configurado para aceitar requisições do frontend:
+
 ```javascript
-app.use(cors({
-    origin: 'http://localhost:5173',
-    credentials: true
-}));
+app.use(
+    cors({
+        origin: 'http://localhost:5173',
+        credentials: true,
+    }),
+);
 ```
 
 ### Erro 401 (Unauthorized)
+
 Verifique se o token está sendo enviado corretamente. O token é armazenado em `localStorage` como `rentabil_token`.
 
 ### Banco de dados não conecta
+
 1. Verifique se o MySQL está rodando
 2. Confirme as credenciais no `.env`
 3. Execute `npx prisma migrate dev`

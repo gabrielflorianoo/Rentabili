@@ -8,40 +8,40 @@ import ProtectedRoute from './components/ProtectRout';
 import './styles/estilo.css';
 
 export default function App() {
-  return (
-    <Router>
-      <Routes>
-        {/* Rota padrão é o Login */}
-        <Route path="/" element={<PaginaAutenticacao />} />
+    return (
+        <Router>
+            <Routes>
+                {/* Rota padrão é o Login */}
+                <Route path="/" element={<PaginaAutenticacao />} />
 
-        {/* Rotas protegidas */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
+                {/* Rotas protegidas */}
+                <Route
+                    path="/dashboard"
+                    element={
+                        <ProtectedRoute>
+                            <Dashboard />
+                        </ProtectedRoute>
+                    }
+                />
 
-        <Route
-          path="/investimentos"
-          element={
-            <ProtectedRoute>
-              <Investimentos />
-            </ProtectedRoute>
-          }
-        />
+                <Route
+                    path="/investimentos"
+                    element={
+                        <ProtectedRoute>
+                            <Investimentos />
+                        </ProtectedRoute>
+                    }
+                />
 
-        <Route
-          path="/relatorios"
-          element={
-            <ProtectedRoute>
-              <Relatorios />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
-    </Router>
-  );
+                <Route
+                    path="/relatorios"
+                    element={
+                        <ProtectedRoute>
+                            <Relatorios />
+                        </ProtectedRoute>
+                    }
+                />
+            </Routes>
+        </Router>
+    );
 }

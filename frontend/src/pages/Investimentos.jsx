@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { servicoAutenticacao } from '../services/servicoAutenticacao';
-import { getInvestments, createInvestment, updateInvestment, deleteInvestment } from '../utils/api';
+import {
+    getInvestments,
+    createInvestment,
+    updateInvestment,
+    deleteInvestment,
+} from '../utils/api';
 import './Investimentos.css';
 
 function Sidebar({ aoSair, paginaAtiva }) {
@@ -9,17 +14,41 @@ function Sidebar({ aoSair, paginaAtiva }) {
 
     return (
         <aside className="sidebar">
-            <div className="logo">📈<strong>RENTABIL</strong></div>
+            <div className="logo">
+                📈<strong>RENTABIL</strong>
+            </div>
             <nav>
-                <a onClick={() => navigate('/dashboard')} className={paginaAtiva === 'dashboard' ? 'active' : ''}>Dashboard</a>
-                <a onClick={() => navigate('/investimentos')} className={paginaAtiva === 'investimentos' ? 'active' : ''}>Investimentos</a>
-                <a onClick={() => navigate('/relatorios')} className={paginaAtiva === 'relatorios' ? 'active' : ''}>Relatórios</a>
-                <a onClick={aoSair} style={{ marginTop: 'auto', color: '#d90429', cursor: 'pointer' }}>
+                <a
+                    onClick={() => navigate('/dashboard')}
+                    className={paginaAtiva === 'dashboard' ? 'active' : ''}
+                >
+                    Dashboard
+                </a>
+                <a
+                    onClick={() => navigate('/investimentos')}
+                    className={paginaAtiva === 'investimentos' ? 'active' : ''}
+                >
+                    Investimentos
+                </a>
+                <a
+                    onClick={() => navigate('/relatorios')}
+                    className={paginaAtiva === 'relatorios' ? 'active' : ''}
+                >
+                    Relatórios
+                </a>
+                <a
+                    onClick={aoSair}
+                    style={{
+                        marginTop: 'auto',
+                        color: '#d90429',
+                        cursor: 'pointer',
+                    }}
+                >
                     Sair da Conta
                 </a>
             </nav>
         </aside>
-    )
+    );
 }
 
 export default function Investimentos() {
@@ -32,7 +61,7 @@ export default function Investimentos() {
     const [formData, setFormData] = useState({
         activeId: '',
         amount: '',
-        date: new Date().toISOString().split('T')[0]
+        date: new Date().toISOString().split('T')[0],
     });
 
     useEffect(() => {
@@ -54,7 +83,7 @@ export default function Investimentos() {
             const data = await getInvestments();
             setInvestimentos(data || []);
         } catch (err) {
-            console.error("Erro ao carregar investimentos:", err);
+            console.error('Erro ao carregar investimentos:', err);
             if (err.response?.status === 401) {
                 servicoAutenticacao.sair();
                 navigate('/');
@@ -75,14 +104,14 @@ export default function Investimentos() {
             setFormData({
                 activeId: investimento.activeId,
                 amount: investimento.amount,
-                date: new Date(investimento.date).toISOString().split('T')[0]
+                date: new Date(investimento.date).toISOString().split('T')[0],
             });
         } else {
             setInvestimentoEditando(null);
             setFormData({
                 activeId: '',
                 amount: '',
-                date: new Date().toISOString().split('T')[0]
+                date: new Date().toISOString().split('T')[0],
             });
         }
         setMostrarModal(true);
@@ -94,7 +123,7 @@ export default function Investimentos() {
         setFormData({
             activeId: '',
             amount: '',
-            date: new Date().toISOString().split('T')[0]
+            date: new Date().toISOString().split('T')[0],
         });
     };
 
@@ -104,7 +133,7 @@ export default function Investimentos() {
             const dados = {
                 ...formData,
                 amount: parseFloat(formData.amount),
-                activeId: parseInt(formData.activeId)
+                activeId: parseInt(formData.activeId),
             };
 
             if (investimentoEditando) {
@@ -116,20 +145,29 @@ export default function Investimentos() {
             fecharModal();
             carregarInvestimentos();
         } catch (err) {
-            console.error("Erro ao salvar investimento:", err);
-            alert("Erro ao salvar investimento: " + (err.response?.data?.error || err.message));
+            console.error('Erro ao salvar investimento:', err);
+            alert(
+                'Erro ao salvar investimento: ' +
+                    (err.response?.data?.error || err.message),
+            );
         }
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Tem certeza que deseja excluir este investimento?')) return;
+        if (
+            !window.confirm('Tem certeza que deseja excluir este investimento?')
+        )
+            return;
 
         try {
             await deleteInvestment(id);
             carregarInvestimentos();
         } catch (err) {
-            console.error("Erro ao excluir investimento:", err);
-            alert("Erro ao excluir investimento: " + (err.response?.data?.error || err.message));
+            console.error('Erro ao excluir investimento:', err);
+            alert(
+                'Erro ao excluir investimento: ' +
+                    (err.response?.data?.error || err.message),
+            );
         }
     };
 
@@ -143,7 +181,10 @@ export default function Investimentos() {
                 </header>
 
                 <div className="actions-bar">
-                    <button className="btn-primary" onClick={() => abrirModal()}>
+                    <button
+                        className="btn-primary"
+                        onClick={() => abrirModal()}
+                    >
                         + Novo Investimento
                     </button>
                 </div>
@@ -165,20 +206,55 @@ export default function Investimentos() {
                             <tbody>
                                 {investimentos.length === 0 ? (
                                     <tr>
-                                        <td colSpan="5" style={{ textAlign: 'center', padding: '40px' }}>
+                                        <td
+                                            colSpan="5"
+                                            style={{
+                                                textAlign: 'center',
+                                                padding: '40px',
+                                            }}
+                                        >
                                             Nenhum investimento cadastrado
                                         </td>
                                     </tr>
                                 ) : (
-                                    investimentos.map(inv => (
+                                    investimentos.map((inv) => (
                                         <tr key={inv.id}>
                                             <td>{inv.id}</td>
-                                            <td>{inv.active?.name || `Ativo #${inv.activeId}`}</td>
-                                            <td>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(inv.amount)}</td>
-                                            <td>{new Date(inv.date).toLocaleDateString('pt-BR')}</td>
                                             <td>
-                                                <button className="btn-edit" onClick={() => abrirModal(inv)}>✏️</button>
-                                                <button className="btn-delete" onClick={() => handleDelete(inv.id)}>🗑️</button>
+                                                {inv.active?.name ||
+                                                    `Ativo #${inv.activeId}`}
+                                            </td>
+                                            <td>
+                                                {new Intl.NumberFormat(
+                                                    'pt-BR',
+                                                    {
+                                                        style: 'currency',
+                                                        currency: 'BRL',
+                                                    },
+                                                ).format(inv.amount)}
+                                            </td>
+                                            <td>
+                                                {new Date(
+                                                    inv.date,
+                                                ).toLocaleDateString('pt-BR')}
+                                            </td>
+                                            <td>
+                                                <button
+                                                    className="btn-edit"
+                                                    onClick={() =>
+                                                        abrirModal(inv)
+                                                    }
+                                                >
+                                                    ✏️
+                                                </button>
+                                                <button
+                                                    className="btn-delete"
+                                                    onClick={() =>
+                                                        handleDelete(inv.id)
+                                                    }
+                                                >
+                                                    🗑️
+                                                </button>
                                             </td>
                                         </tr>
                                     ))
@@ -191,15 +267,27 @@ export default function Investimentos() {
                 {/* Modal */}
                 {mostrarModal && (
                     <div className="modal-overlay" onClick={fecharModal}>
-                        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                            <h3>{investimentoEditando ? 'Editar Investimento' : 'Novo Investimento'}</h3>
+                        <div
+                            className="modal-content"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <h3>
+                                {investimentoEditando
+                                    ? 'Editar Investimento'
+                                    : 'Novo Investimento'}
+                            </h3>
                             <form onSubmit={handleSubmit}>
                                 <div className="form-group">
                                     <label>ID do Ativo</label>
                                     <input
                                         type="number"
                                         value={formData.activeId}
-                                        onChange={(e) => setFormData({ ...formData, activeId: e.target.value })}
+                                        onChange={(e) =>
+                                            setFormData({
+                                                ...formData,
+                                                activeId: e.target.value,
+                                            })
+                                        }
                                         required
                                     />
                                 </div>
@@ -209,7 +297,12 @@ export default function Investimentos() {
                                         type="number"
                                         step="0.01"
                                         value={formData.amount}
-                                        onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                                        onChange={(e) =>
+                                            setFormData({
+                                                ...formData,
+                                                amount: e.target.value,
+                                            })
+                                        }
                                         required
                                     />
                                 </div>
@@ -218,13 +311,26 @@ export default function Investimentos() {
                                     <input
                                         type="date"
                                         value={formData.date}
-                                        onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                                        onChange={(e) =>
+                                            setFormData({
+                                                ...formData,
+                                                date: e.target.value,
+                                            })
+                                        }
                                         required
                                     />
                                 </div>
                                 <div className="modal-actions">
-                                    <button type="button" className="btn-cancel" onClick={fecharModal}>Cancelar</button>
-                                    <button type="submit" className="btn-save">Salvar</button>
+                                    <button
+                                        type="button"
+                                        className="btn-cancel"
+                                        onClick={fecharModal}
+                                    >
+                                        Cancelar
+                                    </button>
+                                    <button type="submit" className="btn-save">
+                                        Salvar
+                                    </button>
                                 </div>
                             </form>
                         </div>
@@ -232,5 +338,5 @@ export default function Investimentos() {
                 )}
             </div>
         </div>
-    )
+    );
 }

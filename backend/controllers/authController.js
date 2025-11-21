@@ -1,46 +1,64 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import getPrisma from '../prismaClient.js';
+import getPrismaClient from '../prismaClient.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret_change_me';
 const JWT_EXPIRES_IN = '1h';
 
 class AuthController {
-	constructor() {
-		this.login = this.login.bind(this);
-	}
+    constructor() {
+        this.login = this.login.bind(this);
+    }
 
-	async login(req, res) {
-		try {
-			const { email, password } = req.body || {};
-			if (!email || !password) return res.status(400).json({ error: 'email e password são obrigatórios' });
+    async login(req, res) {
+        try {
+            const { email, password } = req.body || {};
+            if (!email || !password)
+                return res
+                    .status(400)
+                    .json({ error: 'email e password são obrigatórios' });
 
-			if (process.env.USE_DB !== 'true') {
-				// Mock login
-				if (email === 'local@example.com' && password === 'localpassword') {
-					const payload = { id: 1, email: 'local@example.com', name: 'Usuário Local' };
-					const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
-					return res.json({ token, user: payload });
-				} else {
-					return res.status(401).json({ error: 'Credenciais inválidas' });
-				}
-			}
+            if (process.env.USE_DB !== 'true') {
+                // Mock login
+                if (
+                    email === 'local@example.com' &&
+                    password === 'localpassword'
+                ) {
+                    const payload = {
+                        id: 1,
+                        email: 'local@example.com',
+                        name: 'Usuário Local',
+                    };
+                    const token = jwt.sign(payload, JWT_SECRET, {
+                        expiresIn: JWT_EXPIRES_IN,
+                    });
+                    return res.json({ token, user: payload });
+                } else {
+                    return res
+                        .status(401)
+                        .json({ error: 'Credenciais inválidas' });
+                }
+            }
 
-			const prisma = await getPrisma();
-			const user = await prisma.user.findUnique({ where: { email } });
-			if (!user) return res.status(401).json({ error: 'Credenciais inválidas' });
+            const prisma = await getPrismaClient();
+            const user = await prisma.user.findUnique({ where: { email } });
+            if (!user)
+                return res.status(401).json({ error: 'Credenciais inválidas' });
 
-			const match = await bcrypt.compare(password, user.password);
-			if (!match) return res.status(401).json({ error: 'Credenciais inválidas' });
+            const match = await bcrypt.compare(password, user.password);
+            if (!match)
+                return res.status(401).json({ error: 'Credenciais inválidas' });
 
-			const payload = { id: user.id, email: user.email, name: user.name };
-			const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+            const payload = { id: user.id, email: user.email, name: user.name };
+            const token = jwt.sign(payload, JWT_SECRET, {
+                expiresIn: JWT_EXPIRES_IN,
+            });
 
-			res.json({ token, user: payload });
-		} catch (error) {
-			res.status(500).json({ error: error.message });
-		}
-	}
+            res.json({ token, user: payload });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
 }
 
 export default AuthController;

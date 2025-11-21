@@ -9,17 +9,41 @@ function Sidebar({ aoSair, paginaAtiva }) {
 
     return (
         <aside className="sidebar">
-            <div className="logo">📈<strong>RENTABIL</strong></div>
+            <div className="logo">
+                📈<strong>RENTABIL</strong>
+            </div>
             <nav>
-                <a onClick={() => navigate('/dashboard')} className={paginaAtiva === 'dashboard' ? 'active' : ''}>Dashboard</a>
-                <a onClick={() => navigate('/investimentos')} className={paginaAtiva === 'investimentos' ? 'active' : ''}>Investimentos</a>
-                <a onClick={() => navigate('/relatorios')} className={paginaAtiva === 'relatorios' ? 'active' : ''}>Relatórios</a>
-                <a onClick={aoSair} style={{ marginTop: 'auto', color: '#d90429', cursor: 'pointer' }}>
+                <a
+                    onClick={() => navigate('/dashboard')}
+                    className={paginaAtiva === 'dashboard' ? 'active' : ''}
+                >
+                    Dashboard
+                </a>
+                <a
+                    onClick={() => navigate('/investimentos')}
+                    className={paginaAtiva === 'investimentos' ? 'active' : ''}
+                >
+                    Investimentos
+                </a>
+                <a
+                    onClick={() => navigate('/relatorios')}
+                    className={paginaAtiva === 'relatorios' ? 'active' : ''}
+                >
+                    Relatórios
+                </a>
+                <a
+                    onClick={aoSair}
+                    style={{
+                        marginTop: 'auto',
+                        color: '#d90429',
+                        cursor: 'pointer',
+                    }}
+                >
                     Sair da Conta
                 </a>
             </nav>
         </aside>
-    )
+    );
 }
 
 export default function Relatorios() {
@@ -51,14 +75,17 @@ export default function Relatorios() {
             const [transData, invData, dashData] = await Promise.all([
                 getTransactions().catch(() => []),
                 getInvestments().catch(() => []),
-                getDashboard().catch(() => ({ totalBalance: 0, activesCount: 0 }))
+                getDashboard().catch(() => ({
+                    totalBalance: 0,
+                    activesCount: 0,
+                })),
             ]);
 
             setTransacoes(transData || []);
             setInvestimentos(invData || []);
             setResumo(dashData);
         } catch (err) {
-            console.error("Erro ao carregar dados:", err);
+            console.error('Erro ao carregar dados:', err);
             if (err.response?.status === 401) {
                 servicoAutenticacao.sair();
                 navigate('/');
@@ -76,15 +103,17 @@ export default function Relatorios() {
     // Cálculos de estatísticas
     const calcularEstatisticas = () => {
         const totalReceitas = transacoes
-            .filter(t => t.type === 'income')
+            .filter((t) => t.type === 'income')
             .reduce((acc, t) => acc + parseFloat(t.amount), 0);
 
         const totalDespesas = transacoes
-            .filter(t => t.type === 'expense')
+            .filter((t) => t.type === 'expense')
             .reduce((acc, t) => acc + parseFloat(t.amount), 0);
 
-        const totalInvestido = investimentos
-            .reduce((acc, inv) => acc + parseFloat(inv.amount), 0);
+        const totalInvestido = investimentos.reduce(
+            (acc, inv) => acc + parseFloat(inv.amount),
+            0,
+        );
 
         const saldoLiquido = totalReceitas - totalDespesas;
 
@@ -92,13 +121,13 @@ export default function Relatorios() {
             totalReceitas,
             totalDespesas,
             totalInvestido,
-            saldoLiquido
+            saldoLiquido,
         };
     };
 
     const stats = calcularEstatisticas();
 
-    const transacoesFiltradas = transacoes.filter(t => {
+    const transacoesFiltradas = transacoes.filter((t) => {
         if (filtro === 'receitas') return t.type === 'income';
         if (filtro === 'despesas') return t.type === 'expense';
         return true;
@@ -122,9 +151,14 @@ export default function Relatorios() {
                             <div className="stat-card green">
                                 <div className="stat-icon">💰</div>
                                 <div className="stat-info">
-                                    <div className="stat-label">Total em Receitas</div>
+                                    <div className="stat-label">
+                                        Total em Receitas
+                                    </div>
                                     <div className="stat-value">
-                                        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.totalReceitas)}
+                                        {new Intl.NumberFormat('pt-BR', {
+                                            style: 'currency',
+                                            currency: 'BRL',
+                                        }).format(stats.totalReceitas)}
                                     </div>
                                 </div>
                             </div>
@@ -132,9 +166,14 @@ export default function Relatorios() {
                             <div className="stat-card red">
                                 <div className="stat-icon">💸</div>
                                 <div className="stat-info">
-                                    <div className="stat-label">Total em Despesas</div>
+                                    <div className="stat-label">
+                                        Total em Despesas
+                                    </div>
                                     <div className="stat-value">
-                                        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.totalDespesas)}
+                                        {new Intl.NumberFormat('pt-BR', {
+                                            style: 'currency',
+                                            currency: 'BRL',
+                                        }).format(stats.totalDespesas)}
                                     </div>
                                 </div>
                             </div>
@@ -142,9 +181,14 @@ export default function Relatorios() {
                             <div className="stat-card blue">
                                 <div className="stat-icon">📊</div>
                                 <div className="stat-info">
-                                    <div className="stat-label">Total Investido</div>
+                                    <div className="stat-label">
+                                        Total Investido
+                                    </div>
                                     <div className="stat-value">
-                                        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.totalInvestido)}
+                                        {new Intl.NumberFormat('pt-BR', {
+                                            style: 'currency',
+                                            currency: 'BRL',
+                                        }).format(stats.totalInvestido)}
                                     </div>
                                 </div>
                             </div>
@@ -152,9 +196,14 @@ export default function Relatorios() {
                             <div className="stat-card purple">
                                 <div className="stat-icon">💵</div>
                                 <div className="stat-info">
-                                    <div className="stat-label">Saldo Líquido</div>
+                                    <div className="stat-label">
+                                        Saldo Líquido
+                                    </div>
                                     <div className="stat-value">
-                                        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.saldoLiquido)}
+                                        {new Intl.NumberFormat('pt-BR', {
+                                            style: 'currency',
+                                            currency: 'BRL',
+                                        }).format(stats.saldoLiquido)}
                                     </div>
                                 </div>
                             </div>
@@ -164,7 +213,10 @@ export default function Relatorios() {
                         <section className="filters-section">
                             <div className="filter-group">
                                 <label>Tipo de Transação:</label>
-                                <select value={filtro} onChange={(e) => setFiltro(e.target.value)}>
+                                <select
+                                    value={filtro}
+                                    onChange={(e) => setFiltro(e.target.value)}
+                                >
                                     <option value="todos">Todas</option>
                                     <option value="receitas">Receitas</option>
                                     <option value="despesas">Despesas</option>
@@ -172,9 +224,14 @@ export default function Relatorios() {
                             </div>
                             <div className="filter-group">
                                 <label>Período:</label>
-                                <select value={periodo} onChange={(e) => setPeriodo(e.target.value)}>
+                                <select
+                                    value={periodo}
+                                    onChange={(e) => setPeriodo(e.target.value)}
+                                >
                                     <option value="mes">Último Mês</option>
-                                    <option value="trimestre">Último Trimestre</option>
+                                    <option value="trimestre">
+                                        Último Trimestre
+                                    </option>
                                     <option value="ano">Último Ano</option>
                                 </select>
                             </div>
@@ -196,23 +253,62 @@ export default function Relatorios() {
                                     <tbody>
                                         {transacoesFiltradas.length === 0 ? (
                                             <tr>
-                                                <td colSpan="4" style={{ textAlign: 'center', padding: '40px' }}>
+                                                <td
+                                                    colSpan="4"
+                                                    style={{
+                                                        textAlign: 'center',
+                                                        padding: '40px',
+                                                    }}
+                                                >
                                                     Nenhuma transação encontrada
                                                 </td>
                                             </tr>
                                         ) : (
-                                            transacoesFiltradas.map(trans => (
+                                            transacoesFiltradas.map((trans) => (
                                                 <tr key={trans.id}>
-                                                    <td>{new Date(trans.date).toLocaleDateString('pt-BR')}</td>
-                                                    <td>{trans.description || 'Sem descrição'}</td>
                                                     <td>
-                                                        <span className={`badge ${trans.type === 'income' ? 'badge-green' : 'badge-red'}`}>
-                                                            {trans.type === 'income' ? 'Receita' : 'Despesa'}
+                                                        {new Date(
+                                                            trans.date,
+                                                        ).toLocaleDateString(
+                                                            'pt-BR',
+                                                        )}
+                                                    </td>
+                                                    <td>
+                                                        {trans.description ||
+                                                            'Sem descrição'}
+                                                    </td>
+                                                    <td>
+                                                        <span
+                                                            className={`badge ${trans.type === 'income' ? 'badge-green' : 'badge-red'}`}
+                                                        >
+                                                            {trans.type ===
+                                                            'income'
+                                                                ? 'Receita'
+                                                                : 'Despesa'}
                                                         </span>
                                                     </td>
-                                                    <td className={trans.type === 'income' ? 'text-green' : 'text-red'}>
-                                                        {trans.type === 'income' ? '+' : '-'}
-                                                        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Math.abs(trans.amount))}
+                                                    <td
+                                                        className={
+                                                            trans.type ===
+                                                            'income'
+                                                                ? 'text-green'
+                                                                : 'text-red'
+                                                        }
+                                                    >
+                                                        {trans.type === 'income'
+                                                            ? '+'
+                                                            : '-'}
+                                                        {new Intl.NumberFormat(
+                                                            'pt-BR',
+                                                            {
+                                                                style: 'currency',
+                                                                currency: 'BRL',
+                                                            },
+                                                        ).format(
+                                                            Math.abs(
+                                                                trans.amount,
+                                                            ),
+                                                        )}
                                                     </td>
                                                 </tr>
                                             ))
@@ -227,18 +323,31 @@ export default function Relatorios() {
                             <h3>Resumo de Investimentos</h3>
                             <div className="investments-summary">
                                 <div className="summary-item">
-                                    <span className="summary-label">Total de Investimentos:</span>
-                                    <span className="summary-value">{investimentos.length}</span>
-                                </div>
-                                <div className="summary-item">
-                                    <span className="summary-label">Valor Total Investido:</span>
+                                    <span className="summary-label">
+                                        Total de Investimentos:
+                                    </span>
                                     <span className="summary-value">
-                                        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.totalInvestido)}
+                                        {investimentos.length}
                                     </span>
                                 </div>
                                 <div className="summary-item">
-                                    <span className="summary-label">Ativos Diferentes:</span>
-                                    <span className="summary-value">{resumo.activesCount}</span>
+                                    <span className="summary-label">
+                                        Valor Total Investido:
+                                    </span>
+                                    <span className="summary-value">
+                                        {new Intl.NumberFormat('pt-BR', {
+                                            style: 'currency',
+                                            currency: 'BRL',
+                                        }).format(stats.totalInvestido)}
+                                    </span>
+                                </div>
+                                <div className="summary-item">
+                                    <span className="summary-label">
+                                        Ativos Diferentes:
+                                    </span>
+                                    <span className="summary-value">
+                                        {resumo.activesCount}
+                                    </span>
                                 </div>
                             </div>
                         </section>
@@ -246,5 +355,5 @@ export default function Relatorios() {
                 )}
             </div>
         </div>
-    )
+    );
 }

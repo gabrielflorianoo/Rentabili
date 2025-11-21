@@ -1,9 +1,17 @@
-import getPrisma from '../prismaClient.js';
+import getPrismaClient from '../prismaClient.js';
+const prisma = getPrismaClient();
 
 class WalletController {
     constructor() {
         this.wallets = [
-            { id: 1, name: 'Carteira Principal', balance: 2500, userId: 1, createdAt: new Date(), updatedAt: new Date() }
+            {
+                id: 1,
+                name: 'Carteira Principal',
+                balance: 2500,
+                userId: 1,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
         ];
 
         this.getAll = this.getAll.bind(this);
@@ -18,7 +26,6 @@ class WalletController {
             return res.json(this.wallets);
         }
         try {
-            const prisma = await getPrisma();
             const wallets = await prisma.wallet.findMany();
             res.json(wallets);
         } catch (error) {
@@ -29,15 +36,20 @@ class WalletController {
     async getById(req, res) {
         if (process.env.USE_DB !== 'true') {
             const id = Number(req.params.id);
-            const item = this.wallets.find(w => w.id === id);
-            if (!item) return res.status(404).json({ error: 'Carteira não encontrada' });
+            const item = this.wallets.find((w) => w.id === id);
+            if (!item)
+                return res
+                    .status(404)
+                    .json({ error: 'Carteira não encontrada' });
             return res.json(item);
         }
         try {
-            const prisma = await getPrisma();
             const id = Number(req.params.id);
             const wallet = await prisma.wallet.findUnique({ where: { id } });
-            if (!wallet) return res.status(404).json({ error: 'Carteira não encontrada' });
+            if (!wallet)
+                return res
+                    .status(404)
+                    .json({ error: 'Carteira não encontrada' });
             res.json(wallet);
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -47,17 +59,28 @@ class WalletController {
     async create(req, res) {
         if (process.env.USE_DB !== 'true') {
             const { name, balance, userId } = req.body || {};
-            if (!name || !userId) return res.status(400).json({ error: 'name e userId são obrigatórios' });
-            const id = this.wallets.length ? Math.max(...this.wallets.map(w => w.id)) + 1 : 1;
-            const newItem = { id, name, balance: balance ?? 0, userId, createdAt: new Date(), updatedAt: new Date() };
+            if (!name || !userId)
+                return res
+                    .status(400)
+                    .json({ error: 'name e userId são obrigatórios' });
+            const id = this.wallets.length
+                ? Math.max(...this.wallets.map((w) => w.id)) + 1
+                : 1;
+            const newItem = {
+                id,
+                name,
+                balance: balance ?? 0,
+                userId,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            };
             this.wallets.push(newItem);
             return res.status(201).json(newItem);
         }
         try {
-            const prisma = await getPrisma();
             const { name, balance, userId } = req.body;
             const newWallet = await prisma.wallet.create({
-                data: { name, balance, userId }
+                data: { name, balance, userId },
             });
             res.status(201).json(newWallet);
         } catch (error) {
@@ -68,8 +91,11 @@ class WalletController {
     async update(req, res) {
         if (process.env.USE_DB !== 'true') {
             const id = Number(req.params.id);
-            const idx = this.wallets.findIndex(w => w.id === id);
-            if (idx === -1) return res.status(404).json({ error: 'Carteira não encontrada' });
+            const idx = this.wallets.findIndex((w) => w.id === id);
+            if (idx === -1)
+                return res
+                    .status(404)
+                    .json({ error: 'Carteira não encontrada' });
             const { name, balance, userId } = req.body || {};
             if (name !== undefined) this.wallets[idx].name = name;
             if (balance !== undefined) this.wallets[idx].balance = balance;
@@ -78,12 +104,11 @@ class WalletController {
             return res.json(this.wallets[idx]);
         }
         try {
-            const prisma = await getPrisma();
             const id = Number(req.params.id);
             const { name, balance, userId } = req.body;
             const updatedWallet = await prisma.wallet.update({
                 where: { id },
-                data: { name, balance, userId }
+                data: { name, balance, userId },
             });
             res.json(updatedWallet);
         } catch (error) {
@@ -94,13 +119,15 @@ class WalletController {
     async remove(req, res) {
         if (process.env.USE_DB !== 'true') {
             const id = Number(req.params.id);
-            const idx = this.wallets.findIndex(w => w.id === id);
-            if (idx === -1) return res.status(404).json({ error: 'Carteira não encontrada' });
+            const idx = this.wallets.findIndex((w) => w.id === id);
+            if (idx === -1)
+                return res
+                    .status(404)
+                    .json({ error: 'Carteira não encontrada' });
             this.wallets.splice(idx, 1);
             return res.status(204).send();
         }
         try {
-            const prisma = await getPrisma();
             const id = Number(req.params.id);
             await prisma.wallet.delete({ where: { id } });
             res.status(204).send();
