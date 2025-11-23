@@ -31,7 +31,7 @@ export const servicoAutenticacao = {
                 phone: dados.nascimento,
             };
             const response = await authApi.register(payload);
-            if (response.status === 201 || response.status === 200) {
+            if (response.user) {
                 return { sucesso: true };
             }
             return { sucesso: false, erro: response.data?.error || 'Erro ao cadastrar', campo: 'email' };

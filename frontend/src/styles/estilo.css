@@ -196,6 +196,7 @@ body {
 /* Botões do Login */
 .holo-button, .flip-button { margin-top: 25px; padding: 12px 30px; border-radius: 50px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; font-size: 0.95rem; }
 .holo-button { background: linear-gradient(90deg, #00a651, #00cc44); color: #fff; border: none; }
+.holo-button.carregando { background: linear-gradient(90deg, #808080 #a3a3a3); color: #fff; border: none; }
 .holo-button:hover { transform: scale(1.03); }
 .holo-button:disabled { opacity: 0.7; cursor: not-allowed; }
 .flip-button { background: transparent; border: 2px solid rgba(255, 255, 255, 0.9); color: #fff; }

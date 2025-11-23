@@ -8,6 +8,52 @@ const JWT_EXPIRES_IN = '1h';
 class AuthController {
     constructor() {
         this.login = this.login.bind(this);
+        this.register = this.register.bind(this);
+    }
+
+    async register(req, res) {
+        try {
+            const { name, email, password } = req.body || {};
+            if (!name || !email || !password) {
+                return res
+                    .status(400)
+                    .json({ error: 'Nome, email e senha são obrigatórios' });
+            }
+
+            if (process.env.USE_DB !== 'true') {
+                // Mock register
+                return res.status(201).json({
+                    message: 'Usuário registrado com sucesso (mock)',
+                    user: { name, email },
+                });
+            }
+
+            const prisma = getPrismaClient();
+
+            const existingUser = await prisma.user.findUnique({
+                where: { email },
+            });
+            if (existingUser) {
+                return res.status(409).json({ error: 'Email já registrado' });
+            }
+
+            const hashedPassword = await bcrypt.hash(password, 10);
+
+            const newUser = await prisma.user.create({
+                data: {
+                    name,
+                    email,
+                    password: hashedPassword,
+                },
+            });
+
+            res.status(201).json({
+                message: 'Usuário registrado com sucesso',
+                user: { id: newUser.id, name: newUser.name, email: newUser.email },
+            });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
     }
 
     async login(req, res) {

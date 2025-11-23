@@ -5,6 +5,7 @@ import imgLogo from '../../assets/logo.jpeg';
 
 const VersoCartao = ({ aoVirar }) => {
     const [sucesso, setSucesso] = useState(false);
+    const [carregando, setCarregando] = useState(false);
     const [dadosForm, setDadosForm] = useState({
         nome: '',
         email: '',
@@ -39,18 +40,22 @@ const VersoCartao = ({ aoVirar }) => {
     const lidarComCadastro = async (ev) => {
         ev.preventDefault();
         if (!validar()) return;
+
+        setCarregando(true);
         try {
             // Se `servicoAutenticacao` tiver função de cadastro, pode ser usada aqui.
-            if (
-                servicoAutenticacao &&
-                typeof servicoAutenticacao.cadastrar === 'function'
-            ) {
-                await servicoAutenticacao.cadastrar(dadosForm);
-            }
-            setSucesso(true);
+            const resposta = await servicoAutenticacao.cadastrar(dadosForm);
+            console.log(resposta);
+
+            if (resposta.sucesso)
+                setSucesso(true);
+            else
+                setErros({ geral: resposta.erro });
         } catch (err) {
             setErros({ geral: 'Erro ao criar conta' });
-            // opcional: console.error(err);
+            opcional: console.error(err);
+        } finally {
+            setCarregando(false);
         }
     };
 
@@ -61,8 +66,8 @@ const VersoCartao = ({ aoVirar }) => {
 
     const preencherAutomaticamente = () => {
         setDadosForm({
-            nome: 'Banco do Bradesco',
-            email: 'email@example.com',
+            nome: 'Banco do Bradesco2',
+            email: 'email2@example.com',
             nascimento: '0001-01-01', // Formato YYYY-MM-DD para input type="date"
             senha: '123123@',
             confirmarSenha: '123123@',
@@ -138,8 +143,8 @@ const VersoCartao = ({ aoVirar }) => {
                                 <div className="erro-geral">{erros.geral}</div>
                             )}
 
-                            <button type="submit" className="holo-button">
-                                Criar Conta
+                            <button type="submit" className={`holo-button ${carregando ?? ' carregando'}`}>
+                                {carregando ? 'Enviando...' : 'Criar Conta'}
                             </button>
                             <button
                                 type="button"

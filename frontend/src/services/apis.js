@@ -53,7 +53,7 @@ const remove = (url, config) => handleResponse(apiClient.delete(url, config));
 // Auth API
 export const authApi = {
     login: (email, password) => post('/auth/login', { email, password }),
-    register: (payload) => post('/users', payload),
+    register: (payload) => post('/auth/register', payload),
 };
 
 // Users API
