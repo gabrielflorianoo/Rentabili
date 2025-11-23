@@ -38,21 +38,72 @@ export default function Dashboard() {
 
                 // Busca investimentos para calcular total investido e rentabilidade
                 const invs = await getInvestments().catch(() => []);
-                setInvestments(invs || []);
-                // Somar apenas investimentos do tipo 'Investimento'
-                const invested = (invs || [])
-                    .filter((it) => it.kind === 'Investimento')
-                    .reduce((acc, it) => acc + parseFloat(it.amount || 0), 0);
 
-                console.log((invs || [])
-                    .filter((it) => it.kind === 'Investimento'));
+                // Normaliza kind e amount para evitar problemas de tipagem/formatos
+                const parseAmount = (val) => {
+                    if (val === null || val === undefined) return 0;
+                    if (typeof val === 'number') return val;
+                    const s = String(val).trim();
+                    if (s === '') return 0;
+                    try {
+                        // Caso o número venha com separador de milhares e vírgula decimal (ex: "10.000,00")
+                        if (s.indexOf(',') > -1 && s.indexOf('.') > -1) {
+                            // assume '.' milhares e ',' decimal
+                            return parseFloat(s.replace(/\./g, '').replace(',', '.')) || 0;
+                        }
+                        // caso venha com vírgula decimal (ex: "1000,50")
+                        if (s.indexOf(',') > -1 && s.indexOf('.') === -1) {
+                            return parseFloat(s.replace(',', '.')) || 0;
+                        }
+                        // caso padrão inglês (ex: "13284.81")
+                        return parseFloat(s) || 0;
+                    } catch (e) {
+                        return 0;
+                    }
+                };
+
+                const normalized = (invs || []).map(i => {
+                    const rawKind = (i.kind ?? 'Investimento') + '';
+                    const kindNorm = rawKind.toLowerCase() === 'renda' ? 'Renda' : 'Investimento';
+                    return { ...i, kind: kindNorm, amountNum: parseAmount(i.amount) };
+                });
+
+                // mantemos a lista normalizada no estado para debug/uso futuro
+                setInvestments(normalized || []);
+
+                const invested = (normalized || [])
+                    .filter(it => it.kind === 'Investimento')
+                    .reduce((acc, it) => acc + (it.amountNum || 0), 0);
+
+                // Somar ganhos/perdas como DELTA entre cada 'Renda' e o investimento anterior do mesmo ativo
+                const investmentsByActive = (normalized || [])
+                    .filter(it => it.kind === 'Investimento')
+                    .reduce((map, it) => {
+                        if (!map[it.activeId]) map[it.activeId] = [];
+                        map[it.activeId].push(it);
+                        return map;
+                    }, {});
+
+                // sort investments per active by date asc
+                Object.keys(investmentsByActive).forEach(k => investmentsByActive[k].sort((a,b) => new Date(a.date) - new Date(b.date)));
+
+                const gain = (normalized || [])
+                    .filter(it => it.kind === 'Renda')
+                    .reduce((acc, renda) => {
+                        const list = investmentsByActive[renda.activeId] || [];
+                        // find latest investment with date <= renda.date
+                        const base = list.slice().reverse().find(inv => new Date(inv.date) <= new Date(renda.date));
+                        if (base) {
+                            const delta = (renda.amountNum || 0) - (base.amountNum || 0);
+                            return acc + delta;
+                        }
+                        // fallback: if no base found, assume renda.amountNum is already the delta
+                        return acc + (renda.amountNum || 0);
+                    }, 0);
+
+                console.log('Investimentos normalizados:', normalized);
 
                 setTotalInvested(invested);
-
-                // Somar ganhos/perdas apenas do tipo 'Renda'
-                const gain = (invs || [])
-                    .filter((it) => it.kind != 'Investimento')
-                    .reduce((acc, it) => acc + parseFloat(it.amount || 0), 0);
                 // totalBalance pode ser string/number
                 setTotalGain(gain);
             } catch (err) {
@@ -102,7 +153,7 @@ export default function Dashboard() {
                                 <div className="small-value">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalInvested)}</div>
                             </div>
                             <div className="small-card" style={{ marginTop: 8 }}>
-                                <div className="small-label">Ganho/Loss Investimentos</div>
+                                <div className="small-label">Ganho/Perda Investimentos</div>
                                 <div className="small-value" style={{ color: totalGain >= 0 ? '#2f8a2f' : '#d90429', fontWeight: 700 }}>
                                     {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalGain)}
                                 </div>

@@ -316,12 +316,27 @@ export default function Investimentos() {
                                         <div className="renda-section">
                                             <h3>Rendas</h3>
                                             <ul className="renda-list">
-                                                {rendas.map(r => (
-                                                    <li key={r.id} className="renda-item">
-                                                        {'\u00A0'}{(r.active?.name) || (activeById.get(r.activeId)?.name) || `Ativo #${r.activeId}`} — {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(r.amount)} — {new Date(r.date).toLocaleDateString('pt-BR')}
-                                                        <button className="btn-delete" style={{ marginLeft: 8 }} onClick={() => handleDelete(r.id)}>🗑️</button>
-                                                    </li>
-                                                ))}
+                                                            {rendas.map(r => {
+                                                                // tenta achar o investimento base (último investimento deste ativo antes da renda)
+                                                                const base = investimentosSomente
+                                                                    .filter(i => i.activeId === r.activeId && new Date(i.date) <= new Date(r.date))
+                                                                    .sort((a,b) => new Date(b.date) - new Date(a.date))[0];
+                                                                let displayAmount = r.amount;
+                                                                // se encontrarmos base e ambos tiverem amount numérico, mostramos apenas o delta
+                                                                const amtR = parseFloat(r.amount) || (typeof r.amountNum === 'number' ? r.amountNum : NaN);
+                                                                const amtBase = base ? (parseFloat(base.amount) || (typeof base.amountNum === 'number' ? base.amountNum : NaN)) : NaN;
+                                                                if (!isNaN(amtR) && !isNaN(amtBase)) {
+                                                                    const delta = +(amtR - amtBase).toFixed(2);
+                                                                    displayAmount = delta;
+                                                                }
+
+                                                                return (
+                                                                    <li key={r.id} className="renda-item">
+                                                                        {'\u00A0'}{(r.active?.name) || (activeById.get(r.activeId)?.name) || `Ativo #${r.activeId}`} — {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(displayAmount)} — {new Date(r.date).toLocaleDateString('pt-BR')}
+                                                                        <button className="btn-delete" style={{ marginLeft: 8 }} onClick={() => handleDelete(r.id)}>🗑️</button>
+                                                                    </li>
+                                                                );
+                                                            })}
                                             </ul>
                                         </div>
                                     )}
