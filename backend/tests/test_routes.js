@@ -12,7 +12,11 @@ async function req(method, path, body) {
         const res = await fetch(url, opts);
         const text = await res.text();
         let data = text;
-        try { data = JSON.parse(text); } catch (e) { /* not json */ }
+        try {
+            data = JSON.parse(text);
+        } catch (e) {
+            /* not json */
+        }
         return { ok: res.ok, status: res.status, data };
     } catch (err) {
         return { error: err.message };
@@ -33,7 +37,10 @@ async function testUsers() {
     show(await req('GET', '/users'));
 
     print('Users: POST /users');
-    const created = await req('POST', '/users', { name: 'Tester', email: 'tester@example.com' });
+    const created = await req('POST', '/users', {
+        name: 'Tester',
+        email: 'tester@example.com',
+    });
     show(created);
     const userId = created.data?.id;
 
@@ -58,7 +65,10 @@ async function testWalletsInvestmentsTransactions() {
     show(await req('GET', '/wallets'));
 
     print('Wallets: POST /wallets');
-    const createdWallet = await req('POST', '/wallets', { name: 'Carteira Teste', balance: 1000 });
+    const createdWallet = await req('POST', '/wallets', {
+        name: 'Carteira Teste',
+        balance: 1000,
+    });
     show(createdWallet);
     const walletId = createdWallet.data?.id;
 
@@ -67,7 +77,11 @@ async function testWalletsInvestmentsTransactions() {
     show(await req('GET', '/investments'));
 
     print('Investments: POST /investments');
-    const createdInvestment = await req('POST', '/investments', { name: 'Ação Teste', value: 500, walletId });
+    const createdInvestment = await req('POST', '/investments', {
+        name: 'Ação Teste',
+        value: 500,
+        walletId,
+    });
     show(createdInvestment);
     const investmentId = createdInvestment.data?.id;
 
@@ -76,11 +90,22 @@ async function testWalletsInvestmentsTransactions() {
     show(await req('GET', '/transactions'));
 
     print('Transactions: POST (deposit) /transactions');
-    const deposit = await req('POST', '/transactions', { type: 'deposit', amount: 250, walletId, description: 'Depósito teste' });
+    const deposit = await req('POST', '/transactions', {
+        type: 'deposit',
+        amount: 250,
+        walletId,
+        description: 'Depósito teste',
+    });
     show(deposit);
 
     print('Transactions: POST (buy) /transactions');
-    const buy = await req('POST', '/transactions', { type: 'buy', amount: 500, walletId, investmentId, description: 'Compra teste' });
+    const buy = await req('POST', '/transactions', {
+        type: 'buy',
+        amount: 500,
+        walletId,
+        investmentId,
+        description: 'Compra teste',
+    });
     show(buy);
 
     // Cleanup: delete created investment and wallet
@@ -95,11 +120,15 @@ async function testWalletsInvestmentsTransactions() {
 }
 
 (async function main() {
-    console.log('Iniciando testes de rotas. Certifique-se de que o servidor está rodando em http://localhost:3000');
+    console.log(
+        'Iniciando testes de rotas. Certifique-se de que o servidor está rodando em http://localhost:3000',
+    );
 
     // feature-detect fetch (Node versions recentes têm fetch global)
     if (typeof fetch === 'undefined') {
-        console.error('fetch não disponível no runtime Node. Execute com Node >= 18 ou instale um polyfill (node-fetch).');
+        console.error(
+            'fetch não disponível no runtime Node. Execute com Node >= 18 ou instale um polyfill (node-fetch).',
+        );
         process.exit(1);
     }
 
@@ -113,6 +142,9 @@ async function testWalletsInvestmentsTransactions() {
 async function testAuth() {
     print('Auth: POST /auth/login');
     // demo user from userController has email gabriela@example.com and default password 'password'
-    const res = await req('POST', '/auth/login', { email: 'gabriela@example.com', password: 'password' });
+    const res = await req('POST', '/auth/login', {
+        email: 'gabriela@example.com',
+        password: 'password',
+    });
     show(res);
 }
