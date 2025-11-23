@@ -275,7 +275,7 @@ export default function Dashboard() {
                                 fontWeight: 'bold',
                             }}
                         >
-                            +{rentabilidade}%
+                            {rentabilidade}%
                         </div>
                         <div>Rentabilidade Mensal</div>
                     </div>
