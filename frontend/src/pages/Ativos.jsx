@@ -2,24 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { servicoAutenticacao } from '../services/servicoAutenticacao';
 import { activesApi } from '../services/apis';
+import { generateActive } from '../utils/fakeData';
 import './Ativos.css';
-
-function Sidebar({ aoSair, paginaAtiva }) {
-    const navigate = useNavigate();
-
-    return (
-        <aside className="sidebar">
-            <div className="logo">📈<strong>RENTABIL</strong></div>
-            <nav>
-                <a onClick={() => navigate('/dashboard')} className={paginaAtiva === 'dashboard' ? 'active' : ''}>Dashboard</a>
-                <a onClick={() => navigate('/investimentos')} className={paginaAtiva === 'investimentos' ? 'active' : ''}>Investimentos</a>
-                <a onClick={() => navigate('/actives')} className={paginaAtiva === 'actives' ? 'active' : ''}>Ativos</a>
-                <a onClick={() => navigate('/relatorios')} className={paginaAtiva === 'relatorios' ? 'active' : ''}>Relatórios</a>
-                <a onClick={aoSair} style={{ marginTop: 'auto', color: '#d90429', cursor: 'pointer' }}>Sair da Conta</a>
-            </nav>
-        </aside>
-    );
-}
+import Sidebar from '../components/Sidebar';
 
 export default function Ativos() {
     const navigate = useNavigate();
@@ -172,6 +157,14 @@ export default function Ativos() {
                                     <input value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} required />
                                 </div>
                                 <div className="modal-actions">
+                                    <button
+                                        type="button"
+                                        className="btn-secondary"
+                                        onClick={() => setForm(generateActive())}
+                                        style={{ marginRight: 8 }}
+                                    >
+                                        Auto-preencher
+                                    </button>
                                     <button type="button" className="btn-cancel" onClick={closeModal}>Cancelar</button>
                                     <button type="submit" className="btn-save">Salvar</button>
                                 </div>

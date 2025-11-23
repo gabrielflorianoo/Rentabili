@@ -2,57 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { servicoAutenticacao } from '../services/servicoAutenticacao';
 import './DashBoard.css';
+import Sidebar from '../components/Sidebar';
 
 import { dashboardApi } from '../services/apis';
-
-function Sidebar({ aoSair }) {
-    const navigate = useNavigate();
-
-    return (
-        <aside className="sidebar">
-            <div className="logo">
-                📈<strong>RENTABIL</strong>
-            </div>
-            <nav>
-                <a
-                    onClick={() => navigate('/dashboard')}
-                    className="active"
-                    style={{ cursor: 'pointer' }}
-                >
-                    Dashboard
-                </a>
-                <a
-                    onClick={() => navigate('/investimentos')}
-                    style={{ cursor: 'pointer' }}
-                >
-                    Investimentos
-                </a>
-                <a
-                    onClick={() => navigate('/actives')}
-                    style={{ cursor: 'pointer' }}
-                >
-                    Ativos
-                </a>
-                <a
-                    onClick={() => navigate('/relatorios')}
-                    style={{ cursor: 'pointer' }}
-                >
-                    Relatórios
-                </a>
-                <a
-                    onClick={aoSair}
-                    style={{
-                        marginTop: 'auto',
-                        color: '#d90429',
-                        cursor: 'pointer',
-                    }}
-                >
-                    Sair da Conta
-                </a>
-            </nav>
-        </aside>
-    );
-}
 
 export default function Dashboard() {
     const navigate = useNavigate();
@@ -99,7 +51,7 @@ export default function Dashboard() {
 
     return (
         <div className="dashboard-wrap">
-            <Sidebar aoSair={handleLogout} />
+            <Sidebar aoSair={handleLogout} paginaAtiva="dashboard" />
             <div className="content">
                 <header className="content-head">
                     <h2>Dashboard</h2>

@@ -13,6 +13,7 @@ import Sobre from './pages/Sobre';
 import Investimentos from './pages/Investimentos';
 import Relatorios from './pages/Relatorios';
 import Ativos from './pages/Ativos';
+import Transacoes from './pages/Transacoes';
 // -------------------------------------
 
 // Importação dos Componentes e Estilos
@@ -48,6 +49,14 @@ export default function App() {
                     element={
                         <RotaProtegida>
                             <Investimentos />
+                        </RotaProtegida>
+                    }
+                />
+                <Route
+                    path="/transacoes"
+                    element={
+                        <RotaProtegida>
+                            <Transacoes />
                         </RotaProtegida>
                     }
                 />

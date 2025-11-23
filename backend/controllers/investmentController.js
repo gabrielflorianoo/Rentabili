@@ -96,7 +96,11 @@ class InvestmentController {
         }
         try {
             const prisma = getPrismaClient();
-            const { amount, activeId, userId, date } = req.body;
+            const { amount, activeId, date } = req.body;
+            // userId deve vir do token autenticado (req.user)
+            const userId = req.user?.id ?? req.body?.userId;
+            if (!userId) return res.status(400).json({ error: 'Usuário não autenticado' });
+
             const newInvestment = await prisma.investment.create({
                 data: { amount, activeId, userId, date },
             });
@@ -126,7 +130,8 @@ class InvestmentController {
         try {
             const prisma = getPrismaClient();
             const id = Number(req.params.id);
-            const { amount, activeId, userId, date } = req.body;
+            const { amount, activeId, date } = req.body;
+            const userId = req.user?.id ?? req.body?.userId;
             const updatedInvestment = await prisma.investment.update({
                 where: { id },
                 data: { amount, activeId, userId, date },

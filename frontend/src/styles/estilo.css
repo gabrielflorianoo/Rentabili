@@ -93,6 +93,16 @@ body {
 }
 .btn-acesso:hover { background: #0a5c2b; }
 
+/* Botões padrão usados nas páginas internas */
+.btn-primary { background:#2f8a2f; color:#fff; padding:8px 12px; border-radius:6px; border:none; cursor:pointer; font-weight:600; }
+.btn-primary:hover { filter:brightness(0.95); }
+.btn-secondary { background:#fff; color:#1a3d1a; padding:8px 12px; border-radius:6px; border:1px solid #cddfcf; cursor:pointer; font-weight:600; }
+.btn-secondary:hover { background:#f5fff7; }
+.btn-save { background:#0f7c3a; color:#fff; padding:8px 12px; border-radius:6px; border:none; cursor:pointer; }
+.btn-cancel { background:transparent; color:#333; padding:8px 12px; border-radius:6px; border:1px solid #ddd; cursor:pointer; }
+.btn-edit { background:#ffd966; border:none; padding:6px 8px; border-radius:6px; cursor:pointer; }
+.btn-delete { background:#ffd6d6; border:none; padding:6px 8px; border-radius:6px; cursor:pointer; }
+
 /* Rodapé */
 .footer {
   text-align: center;

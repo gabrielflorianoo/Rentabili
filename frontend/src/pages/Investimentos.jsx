@@ -6,56 +6,11 @@ import {
     createInvestment,
     updateInvestment,
     deleteInvestment,
+    getActives,
 } from '../utils/api';
+import { generateInvestment } from '../utils/fakeData';
 import './Investimentos.css';
-
-function Sidebar({ aoSair, paginaAtiva }) {
-    const navigate = useNavigate();
-
-    return (
-        <aside className="sidebar">
-            <div className="logo">
-                📈<strong>RENTABIL</strong>
-            </div>
-            <nav>
-                <a
-                    onClick={() => navigate('/dashboard')}
-                    className={paginaAtiva === 'dashboard' ? 'active' : ''}
-                >
-                    Dashboard
-                </a>
-                <a
-                    onClick={() => navigate('/investimentos')}
-                    className={paginaAtiva === 'investimentos' ? 'active' : ''}
-                >
-                    Investimentos
-                </a>
-                <a
-                    onClick={() => navigate('/actives')}
-                    className={paginaAtiva === 'actives' ? 'active' : ''}
-                >
-                    Ativos
-                </a>
-                <a
-                    onClick={() => navigate('/relatorios')}
-                    className={paginaAtiva === 'relatorios' ? 'active' : ''}
-                >
-                    Relatórios
-                </a>
-                <a
-                    onClick={aoSair}
-                    style={{
-                        marginTop: 'auto',
-                        color: '#d90429',
-                        cursor: 'pointer',
-                    }}
-                >
-                    Sair da Conta
-                </a>
-            </nav>
-        </aside>
-    );
-}
+import Sidebar from '../components/Sidebar';
 
 export default function Investimentos() {
     const navigate = useNavigate();
@@ -136,10 +91,12 @@ export default function Investimentos() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            const formDateISO = new Date(formData.date).toISOString();
             const dados = {
                 ...formData,
                 amount: parseFloat(formData.amount),
                 activeId: parseInt(formData.activeId),
+                date: formDateISO,
             };
 
             if (investimentoEditando) {
@@ -154,7 +111,7 @@ export default function Investimentos() {
             console.error('Erro ao salvar investimento:', err);
             alert(
                 'Erro ao salvar investimento: ' +
-                    (err.response?.data?.error || err.message),
+                (err.response?.data?.error || err.message),
             );
         }
     };
@@ -172,7 +129,7 @@ export default function Investimentos() {
             console.error('Erro ao excluir investimento:', err);
             alert(
                 'Erro ao excluir investimento: ' +
-                    (err.response?.data?.error || err.message),
+                (err.response?.data?.error || err.message),
             );
         }
     };
@@ -327,6 +284,28 @@ export default function Investimentos() {
                                     />
                                 </div>
                                 <div className="modal-actions">
+                                    <button
+                                        type="button"
+                                        className="btn-secondary"
+                                        onClick={async () => {
+                                            // Tenta buscar ativos válidos do backend
+                                            try {
+                                                const actives = await getActives().catch(() => []);
+                                                const fake = generateInvestment();
+                                                if (Array.isArray(actives) && actives.length > 0) {
+                                                    const pick = actives[Math.floor(Math.random() * actives.length)];
+                                                    fake.activeId = String(pick.id);
+                                                }
+                                                setFormData(fake);
+                                            } catch (err) {
+                                                console.error('Erro ao auto-preencher investimentos:', err);
+                                                setFormData(generateInvestment());
+                                            }
+                                        }}
+                                        style={{ marginRight: 8 }}
+                                    >
+                                        Auto-preencher
+                                    </button>
                                     <button
                                         type="button"
                                         className="btn-cancel"

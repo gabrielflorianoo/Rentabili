@@ -35,7 +35,6 @@ api.interceptors.request.use(
 export const handleHTTP = async (request) => {
     try {
         const response = await request;
-        console.log("Dados retornados: ", response.data);
         return response.data;
     } catch (error) {
         // Lógica de tratamento de erro mais robusta pode ser adicionada aqui
@@ -94,4 +93,7 @@ export const createWallet = (walletData) =>
     handleHTTP(api.post('/wallets', walletData));
 export const updateWallet = (id, walletData) =>
     handleHTTP(api.put(`/wallets/${id}`, walletData));
+
+// 🟦 Actives Routes
+export const getActives = () => handleHTTP(api.get('/actives'));
 export const deleteWallet = (id) => handleHTTP(api.delete(`/wallets/${id}`));
