@@ -40,7 +40,7 @@ class AuthController {
                 }
             }
 
-            const prisma = await getPrismaClient();
+            const prisma = getPrismaClient();
             const user = await prisma.user.findUnique({ where: { email } });
             if (!user)
                 return res.status(401).json({ error: 'Credenciais inválidas' });

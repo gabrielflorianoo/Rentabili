@@ -1,45 +1,44 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import PaginaAutenticacao from './pages/PaginaAutenticacao';
+
+// Importação das Páginas
+import HomeHero from './pages/HomeHero';           
+import PaginaAutenticacao from './pages/PaginaAutenticacao'; 
 import Dashboard from './pages/DashBoard';
-import Investimentos from './pages/Investimentos';
-import Relatorios from './pages/Relatorios';
-import ProtectedRoute from './components/ProtectRout';
-import './styles/estilo.css';
+
+// --- NOVAS IMPORTAÇÕES NECESSÁRIAS ---
+import Resumo from './pages/Resumo';
+import Planos from './pages/Planos';
+import Sobre from './pages/Sobre';
+// -------------------------------------
+
+// Importação dos Componentes e Estilos
+import RotaProtegida from './components/ProtectRout'; // Mantive como você mandou
+import './styles/estilo.css'; 
 
 export default function App() {
     return (
         <Router>
             <Routes>
-                {/* Rota padrão é o Login */}
-                <Route path="/" element={<PaginaAutenticacao />} />
+                {/* Rota Principal (Home) */}
+                <Route path="/" element={<HomeHero />} />
+                
+                {/* Rota de Login */}
+                <Route path="/login" element={<PaginaAutenticacao />} />
 
-                {/* Rotas protegidas */}
-                <Route
-                    path="/dashboard"
+                {/* --- ROTAS DOS MENUS (PÚBLICAS) --- */}
+                <Route path="/resumo" element={<Resumo />} />
+                <Route path="/planos" element={<Planos />} />
+                <Route path="/sobre" element={<Sobre />} />
+
+                {/* --- ROTA PROTEGIDA (DASHBOARD) --- */}
+                <Route 
+                    path="/dashboard" 
                     element={
-                        <ProtectedRoute>
+                        <RotaProtegida>
                             <Dashboard />
-                        </ProtectedRoute>
-                    }
-                />
-
-                <Route
-                    path="/investimentos"
-                    element={
-                        <ProtectedRoute>
-                            <Investimentos />
-                        </ProtectedRoute>
-                    }
-                />
-
-                <Route
-                    path="/relatorios"
-                    element={
-                        <ProtectedRoute>
-                            <Relatorios />
-                        </ProtectedRoute>
-                    }
+                        </RotaProtegida>
+                    } 
                 />
             </Routes>
         </Router>

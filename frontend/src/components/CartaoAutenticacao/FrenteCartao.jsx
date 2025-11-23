@@ -23,6 +23,18 @@ const FrenteCartao = ({ aoVirar }) => {
         setErros({ ...erros, [e.target.id]: '' });
     };
 
+    const preencherAutomaticamente = () => {
+        // Usuário padrão do sistema
+        setDadosForm({
+            ...dadosForm,
+            email: 'email@example.com',
+            senha: '123123@',
+            codigo: '',
+            novaSenha: '',
+        });
+        setErros({});
+    };
+
     // --- LOGIN REAL (Conectado ao Banco) ---
     const lidarComLogin = async (e) => {
         e.preventDefault();
@@ -131,6 +143,15 @@ const FrenteCartao = ({ aoVirar }) => {
                                 disabled={carregando}
                             >
                                 {carregando ? 'Entrando...' : 'Entrar na Conta'}
+                            </button>
+
+                            <button
+                                type="button"
+                                className="holo-button secondary-button"
+                                onClick={preencherAutomaticamente}
+                                style={{ marginTop: '10px' }}
+                            >
+                                Preencher Automaticamente
                             </button>
                         </form>
                         <a

@@ -36,7 +36,7 @@ class InvestmentController {
             return res.json(this.investments);
         }
         try {
-            const prisma = await getPrismaClient();
+            const prisma = getPrismaClient();
             const investments = await prisma.investment.findMany();
             res.json(investments);
         } catch (error) {
@@ -55,7 +55,7 @@ class InvestmentController {
             return res.json(item);
         }
         try {
-            const prisma = await getPrismaClient();
+            const prisma = getPrismaClient();
             const id = Number(req.params.id);
             const investment = await prisma.investment.findUnique({
                 where: { id },
@@ -95,7 +95,7 @@ class InvestmentController {
             return res.status(201).json(newItem);
         }
         try {
-            const prisma = await getPrismaClient();
+            const prisma = getPrismaClient();
             const { amount, activeId, userId, date } = req.body;
             const newInvestment = await prisma.investment.create({
                 data: { amount, activeId, userId, date },
@@ -124,7 +124,7 @@ class InvestmentController {
             return res.json(this.investments[idx]);
         }
         try {
-            const prisma = await getPrismaClient();
+            const prisma = getPrismaClient();
             const id = Number(req.params.id);
             const { amount, activeId, userId, date } = req.body;
             const updatedInvestment = await prisma.investment.update({
@@ -149,7 +149,7 @@ class InvestmentController {
             return res.status(204).send();
         }
         try {
-            const prisma = await getPrismaClient();
+            const prisma = getPrismaClient();
             const id = Number(req.params.id);
             await prisma.investment.delete({ where: { id } });
             res.status(204).send();

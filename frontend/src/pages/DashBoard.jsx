@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { servicoAutenticacao } from '../services/servicoAutenticacao';
-import { getDashboard } from '../utils/api';
 import './DashBoard.css';
+
+import { dashboardApi } from '../services/apis';
 
 function Sidebar({ aoSair }) {
     const navigate = useNavigate();
@@ -25,6 +26,12 @@ function Sidebar({ aoSair }) {
                     style={{ cursor: 'pointer' }}
                 >
                     Investimentos
+                </a>
+                <a
+                    onClick={() => navigate('/actives')}
+                    style={{ cursor: 'pointer' }}
+                >
+                    Ativos
                 </a>
                 <a
                     onClick={() => navigate('/relatorios')}
@@ -66,20 +73,23 @@ export default function Dashboard() {
         setUserData(user);
 
         // BUSCA DADOS REAIS NO BACK-END
-        getDashboard()
-            .then((data) => {
-                if (data.totalBalance !== undefined) {
-                    setSummary(data);
-                }
-            })
-            .catch((err) => {
-                console.error('Erro ao conectar no dashboard:', err);
-                if (err.response?.status === 401) {
-                    // Se o token venceu, desloga
-                    servicoAutenticacao.sair();
-                    navigate('/');
-                }
-            });
+        const getDashboardData = async () => {
+            dashboardApi.getSummary()
+                .then((data) => {
+                    if (data.totalBalance !== undefined) {
+                        setSummary(data);
+                    }
+                })
+                .catch((err) => {
+                    console.error('Erro ao conectar no dashboard:', err);
+                    if (err.response?.status === 401) {
+                        // Se o token venceu, desloga
+                        servicoAutenticacao.sair();
+                        navigate('/');
+                    }
+                });
+        }
+        getDashboardData();
     }, [navigate]);
 
     const handleLogout = () => {
