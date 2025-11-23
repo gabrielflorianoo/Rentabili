@@ -2,12 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { servicoAutenticacao } from '../services/servicoAutenticacao';
 import {
-    getInvestments,
-    createInvestment,
-    updateInvestment,
-    deleteInvestment,
-    getActives,
-} from '../utils/api';
+    investmentsApi,
+    activesApi,
+} from '../services/apis';
 import { generateInvestment } from '../utils/fakeData';
 import './Investimentos.css';
 import Sidebar from '../components/Sidebar';
@@ -44,7 +41,7 @@ export default function Investimentos() {
 
     const carregarActives = async () => {
         try {
-            const data = await getActives().catch(() => []);
+            const data = await activesApi.list().catch(() => []);
             setActives(data || []);
         } catch (err) {
             console.error('Erro ao carregar ativos:', err);
@@ -55,7 +52,7 @@ export default function Investimentos() {
     const carregarInvestimentos = async () => {
         try {
             setCarregando(true);
-            const data = await getInvestments();
+            const data = await investmentsApi.list();
             setInvestimentos(data || []);
         } catch (err) {
             console.error('Erro ao carregar investimentos:', err);
@@ -117,9 +114,9 @@ export default function Investimentos() {
             };
 
             if (investimentoEditando) {
-                await updateInvestment(investimentoEditando.id, dados);
+                await investmentsApi.update(investimentoEditando.id, dados);
             } else {
-                await createInvestment(dados);
+                await investmentsApi.create(dados);
             }
 
             fecharModal();
@@ -140,7 +137,7 @@ export default function Investimentos() {
             return;
 
         try {
-            await deleteInvestment(id);
+            await investmentsApi.remove(id);
             carregarInvestimentos();
         } catch (err) {
             console.error('Erro ao excluir investimento:', err);
@@ -316,27 +313,27 @@ export default function Investimentos() {
                                         <div className="renda-section">
                                             <h3>Rendas</h3>
                                             <ul className="renda-list">
-                                                            {rendas.map(r => {
-                                                                // tenta achar o investimento base (último investimento deste ativo antes da renda)
-                                                                const base = investimentosSomente
-                                                                    .filter(i => i.activeId === r.activeId && new Date(i.date) <= new Date(r.date))
-                                                                    .sort((a,b) => new Date(b.date) - new Date(a.date))[0];
-                                                                let displayAmount = r.amount;
-                                                                // se encontrarmos base e ambos tiverem amount numérico, mostramos apenas o delta
-                                                                const amtR = parseFloat(r.amount) || (typeof r.amountNum === 'number' ? r.amountNum : NaN);
-                                                                const amtBase = base ? (parseFloat(base.amount) || (typeof base.amountNum === 'number' ? base.amountNum : NaN)) : NaN;
-                                                                if (!isNaN(amtR) && !isNaN(amtBase)) {
-                                                                    const delta = +(amtR - amtBase).toFixed(2);
-                                                                    displayAmount = delta;
-                                                                }
+                                                {rendas.map(r => {
+                                                    // tenta achar o investimento base (último investimento deste ativo antes da renda)
+                                                    const base = investimentosSomente
+                                                        .filter(i => i.activeId === r.activeId && new Date(i.date) <= new Date(r.date))
+                                                        .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+                                                    let displayAmount = r.amount;
+                                                    // se encontrarmos base e ambos tiverem amount numérico, mostramos apenas o delta
+                                                    const amtR = parseFloat(r.amount) || (typeof r.amountNum === 'number' ? r.amountNum : NaN);
+                                                    const amtBase = base ? (parseFloat(base.amount) || (typeof base.amountNum === 'number' ? base.amountNum : NaN)) : NaN;
+                                                    if (!isNaN(amtR) && !isNaN(amtBase)) {
+                                                        const delta = +(amtR - amtBase).toFixed(2);
+                                                        displayAmount = delta;
+                                                    }
 
-                                                                return (
-                                                                    <li key={r.id} className="renda-item">
-                                                                        {'\u00A0'}{(r.active?.name) || (activeById.get(r.activeId)?.name) || `Ativo #${r.activeId}`} — {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(displayAmount)} — {new Date(r.date).toLocaleDateString('pt-BR')}
-                                                                        <button className="btn-delete" style={{ marginLeft: 8 }} onClick={() => handleDelete(r.id)}>🗑️</button>
-                                                                    </li>
-                                                                );
-                                                            })}
+                                                    return (
+                                                        <li key={r.id} className="renda-item">
+                                                            {'\u00A0'}{(r.active?.name) || (activeById.get(r.activeId)?.name) || `Ativo #${r.activeId}`} — {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(displayAmount)} — {new Date(r.date).toLocaleDateString('pt-BR')}
+                                                            <button className="btn-delete" style={{ marginLeft: 8 }} onClick={() => handleDelete(r.id)}>🗑️</button>
+                                                        </li>
+                                                    );
+                                                })}
                                             </ul>
                                         </div>
                                     )}

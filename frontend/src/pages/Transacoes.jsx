@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { servicoAutenticacao } from '../services/servicoAutenticacao';
-import { getTransactions, createTransaction } from '../utils/api';
+import { transactionsApi } from '../services/apis';
 import './Transacoes.css';
 import { generateTransaction } from '../utils/fakeData';
 import Sidebar from '../components/Sidebar';
@@ -32,7 +32,7 @@ export default function Transacoes() {
         }
         setUserData(user);
 
-        carregarTransacoes();
+        transactionsApi.list();
     }, [navigate]);
 
     const carregarTransacoes = async () => {
@@ -70,7 +70,7 @@ export default function Transacoes() {
 
             console.log("Payload enviado:", payload);
 
-            await createTransaction(payload);
+            await transactionsApi.create(payload);
             setForm({ description: '', amount: '', date: new Date().toISOString().split('T')[0], type: 'income' });
             carregarTransacoes();
         } catch (err) {

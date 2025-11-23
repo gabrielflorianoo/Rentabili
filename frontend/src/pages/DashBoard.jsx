@@ -5,7 +5,7 @@ import './DashBoard.css';
 import Sidebar from '../components/Sidebar';
 
 import { dashboardApi } from '../services/apis';
-import { getInvestments } from '../utils/api';
+import { investmentsApi } from '../services/apis';
 
 export default function Dashboard() {
     const navigate = useNavigate();
@@ -37,7 +37,7 @@ export default function Dashboard() {
                 }
 
                 // Busca investimentos para calcular total investido e rentabilidade
-                const invs = await getInvestments().catch(() => []);
+                const invs = await investmentsApi.list().catch(() => []);
 
                 // Normaliza kind e amount para evitar problemas de tipagem/formatos
                 const parseAmount = (val) => {

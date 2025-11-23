@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { servicoAutenticacao } from '../services/servicoAutenticacao';
-import { getTransactions, getDashboard, getInvestments } from '../utils/api';
+import { transactionsApi, dashboardApi, investmentsApi } from '../services/apis';
 import Sidebar from '../components/Sidebar';
 import './Relatorios.css';
 
@@ -32,9 +32,9 @@ export default function Relatorios() {
         try {
             setCarregando(true);
             const [transData, invData, dashData] = await Promise.all([
-                getTransactions().catch(() => []),
-                getInvestments().catch(() => []),
-                getDashboard().catch(() => ({
+                transactionsApi.list().catch(() => []),
+                investmentsApi.list().catch(() => []),
+                dashboardApi.getSummary().catch(() => ({
                     totalBalance: 0,
                     activesCount: 0,
                 })),
