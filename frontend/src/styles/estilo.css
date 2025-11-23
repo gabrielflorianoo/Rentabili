@@ -3,9 +3,8 @@
 
 body {
   font-family: "Poppins", sans-serif;
-  background: #ffffff;
   min-height: 100vh;
-  color: #1a3d1a;
+  color: #177917;
   position: relative;
   overflow-x: hidden; 
   overflow-y: auto;   
@@ -15,7 +14,6 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: #f8f9fa;
 }
 
 .page-content {
@@ -36,7 +34,7 @@ body {
 
 .section-title {
   font-size: 1.8rem;
-  color: #1a3d1a;
+  color:#177517;
   margin-top: 30px;
   margin-bottom: 15px;
 }
@@ -45,7 +43,7 @@ body {
   font-size: 1.1rem;
   line-height: 1.6;
   margin-bottom: 15px;
-  color: #555;
+  color: #b3abab;
 }
 
 .page-list {
@@ -71,7 +69,13 @@ body {
   left: 0;
   width: 100%;
   z-index: 1000;
-  height: 90px;
+  height: 50px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
 .brand { display: flex; align-items: center; gap: 10px; }
@@ -81,11 +85,12 @@ body {
   display: flex; justify-content: center; align-items: center; color: white;
 }
 
-.logo-text { font-weight: bold; font-size: 20px; color: #1a3d1a; }
+.logo-text { font-weight: bold; font-size: 20px; color:#177517; }
 
 .menu { display: flex; gap: 30px; }
 .menu a { text-decoration: none; color: #555; font-weight: 500; transition: 0.2s; cursor: pointer; }
 .menu a:hover { color: #0f7c3a; }
+
 
 .btn-acesso {
   background: #0f7c3a; color: #fff; padding: 10px 24px; border-radius: 6px;
@@ -235,4 +240,147 @@ body {
   .innovative-card { height: auto; padding: 20px 0; }
   .card-face { position: relative; flex-direction: column; height: auto; }
   .card-section { padding: 25px; }
+}
+
+/* =========================================
+   VERDE QUE FUNCIONA EM LIGHT E DARK MODE
+========================================= */
+
+/* Modo claro */
+.texto-verde {
+  color: #0f7c3a;
+}
+
+/* Modo escuro */
+.dark .texto-verde {
+  color: #4ade80; /* verde claro visível */
+}
+
+/* =========================================
+   TABELA SOBRE
+========================================= */
+
+.tabela-sobre {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background: white;
+}
+
+.tabela-head {
+  background: #0f7c3a;
+  color: white;
+  padding: 12px;
+  text-align: left;
+}
+
+.tabela-cell {
+  border: 1px solid #494646ff;
+  padding: 12px;
+}
+
+/* Modo escuro */
+.dark .tabela-sobre {
+  background: #161616 !important;
+  color: white !important;
+}
+
+.dark .tabela-cell {
+  border-color: #3a3a3a !important;
+}
+
+.dark .tabela-head {
+  background: #15803d !important; /* verde mais claro */
+}
+/* =========================================
+   PLANOS — LAYOUT
+========================================= */
+
+.titulo-centralizado {
+  text-align: center;
+}
+
+.planos-container {
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+  margin-top: 40px;
+}
+
+/* =========================================
+   CARD DOS PLANOS
+========================================= */
+
+.card-plano {
+  background: rgb(194, 192, 192);
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+  flex: 1;
+  min-width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Dark mode */
+.dark .card-plano {
+  background: #111;
+  box-shadow: 0 5px 20px rgba(255,255,255,0.05);
+}
+
+/* Card destacado (plano avançado) */
+.destaque {
+  border: 2px solid #0f7c3a;
+}
+
+.dark .destaque {
+  border-color: #4ade80;
+}
+
+/* =========================================
+   TÍTULOS E PREÇOS
+========================================= */
+
+.plano-titulo {
+  color: #0f7c3a;
+  font-size: 1.6rem;
+}
+
+.dark .plano-titulo {
+  color: #4ade80;
+}
+
+.preco {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin: 10px 0;
+  color: #1f2937;
+}
+
+.dark .preco {
+  color: white;
+}
+
+/* =========================================
+   LISTA DO PLANO
+========================================= */
+
+.plano-lista {
+  text-align: left;
+  width: 100%;
+}
+
+/* Dark mode */
+.dark .plano-lista li {
+  color: #e5e5e5;
+}
+
+/* =========================================
+   BOTÃO
+========================================= */
+
+.btn-plano {
+  margin-top: auto;
+  width: 100%;
 }

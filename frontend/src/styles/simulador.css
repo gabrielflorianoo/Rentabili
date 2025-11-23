@@ -1,0 +1,63 @@
+.simuladorContainer {
+display: flex;
+flex-direction: column;
+align-items: center;
+width: 100%;
+min-height: 100vh;
+padding: 40px 20px;
+transition: background-color 0.3s, color 0.3s;
+}
+
+.darkToggleWrapper {
+width: 100%;
+max-width: 950px;
+display: flex;
+justify-content: flex-end;
+margin-bottom: 20px;
+}
+
+.card {
+width: 100%;
+max-width: 950px;
+padding: 40px;
+border-radius: 20px;
+background: white;
+box-shadow: 0 15px 40px rgba(0, 64, 0, 0.15);
+transition: background-color 0.3s, color 0.3s;
+}
+
+.cardDark {
+background: #1e1e1e;
+color: #f5f5f5;
+}
+
+.simuladorTitulo {
+font-size: 2rem;
+font-weight: 600;
+margin-bottom: 20px;
+text-align: center;
+}
+
+.formWrapper {
+display: flex;
+flex-direction: column;
+gap: 15px;
+}
+
+.resultadoBox {
+margin-top: 20px;
+padding: 15px;
+border-radius: 10px;
+background: #f8fff8;
+border: 1px solid #b6e3b6;
+transition: background-color 0.3s, border-color 0.3s;
+}
+
+.resultadoDark {
+background: #2a2a2a;
+border-color: #444;
+}
+
+.chartWrapper {
+margin-top: 20px;
+}

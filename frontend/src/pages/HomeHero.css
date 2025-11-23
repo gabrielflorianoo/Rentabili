@@ -51,7 +51,7 @@
 
 .menu a {
   text-decoration: none;
-  color: #555;
+  color: #b1abab;
   transition: 0.2s;
   font-weight: 500;
   cursor: pointer;
@@ -96,7 +96,7 @@
   font-weight: 300;
   line-height: 1.2;
   margin-bottom: 20px;
-  color: #1a3d1a;
+  color: #177517;
   
   /* --- ANIMAÇÃO DO TÍTULO --- */
   opacity: 0; /* Começa invisível */
@@ -105,7 +105,7 @@
 }
 
 .hero-sub {
-  color: #555;
+  color: #9b9999;
   margin-bottom: 40px;
   font-size: 1.1rem;
   line-height: 1.6;

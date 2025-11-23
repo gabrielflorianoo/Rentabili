@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import './HomeHero.css';
+import rentabil from '../assets/rentabil.png';
 
 export default function HomeHero() {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ export default function HomeHero() {
         </section>
 
         <aside className="hero-right">
-          <img src="https://img.freepik.com/fotos-gratis/homem-de-negocios-feliz-apontando-para-o-lado_1149-1233.jpg?w=740" alt="Homem apontando" />
+          <img src={rentabil} alt="Ilustração do Rentabil" /> 
         </aside>
       </main>
       <Footer />

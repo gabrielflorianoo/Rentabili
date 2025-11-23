@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import DarkModeToggle from "../components/DarkModeToggle";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -22,8 +23,12 @@ export default function Header() {
         <Link to="/planos">Planos</Link>
         <Link to="/sobre">Sobre</Link>
       </nav>
-
-      <button onClick={() => navigate('/login')} className="btn-acesso">ACESSE AQUI</button>
+        <div className="header-right"> 
+          <DarkModeToggle /> 
+          <button onClick={() => navigate('/login')} className="btn-acesso"> 
+            ACESSE AQUI 
+          </button> 
+        </div>
     </header>
   );
 }
