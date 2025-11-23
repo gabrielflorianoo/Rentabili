@@ -514,3 +514,51 @@ body {
         padding: 25px;
     }
 }
+.loading {
+    margin-top: 20px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #0f7c3a;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: fadeIn 0.6s ease forwards;
+}
+
+/* Bolinha animada */
+.loading::before {
+    content: "";
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: linear-gradient(90deg, #00a651, #00cc44);
+    animation: pulse 0.9s infinite ease-in-out;
+}
+
+/* Animação de entrada */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Pulsa igual carregamentos do Nubank/PicPay */
+@keyframes pulse {
+    0% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+}

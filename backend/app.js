@@ -31,6 +31,7 @@ app.use(
     cors({
         origin: [
             'http://localhost:5173',
+            'http://localhost:3000',
             'https://reimagined-fishstick-v69vx7j79rxx3wj9x-3000.app.github.dev/',
             'https://reimagined-fishstick-v69vx7j79rxx3wj9x-5173.app.github.dev',
             'https://crispy-bassoon-5gjqwp7pj5r9hj76-5173.app.github.dev',

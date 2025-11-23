@@ -180,119 +180,105 @@ export default function Dashboard() {
     };
 
     return (
-        <div className="dashboard-wrap">
-            <Sidebar aoSair={handleLogout} paginaAtiva="dashboard" />
-            <div className="content">
-                <header className="content-head">
-                    <h2>Dashboard</h2>
-                    <div className="user-badge">👤 {userData.name}</div>
-                </header>
+     <div className="dashboard-wrap">
+    <Sidebar aoSair={handleLogout} paginaAtiva="dashboard" />
+    <div className="content">
+        <header className="content-head">
+            <h2>Dashboard</h2>
+            <div className="user-badge">👤 {userData.name}</div>
+        </header>
 
-                <section className="summary">
-                    <div className="left">
-                        <h3>Patrimônio Total</h3>
-                        {/* Formata dinheiro para R$ */}
-                        <div className="big">
+        <section className="summary">
+            <div className="left">
+                <h3>Patrimônio Total</h3>
+                {/* Formata dinheiro para R$ */}
+                <div className="big">
+                    {new Intl.NumberFormat('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL',
+                    }).format(summary.totalBalance)}
+                </div>
+                <div className="acc">
+                    Baseado em <strong>{summary.activesCount}</strong>{' '}
+                    ativos encontrados no banco.
+                </div>
+                <div style={{ marginTop: 12 }}>
+                    <div className="small-card">
+                        <div className="small-label">
+                            Total Investido
+                        </div>
+                        <div className="small-value">
                             {new Intl.NumberFormat('pt-BR', {
+                            style: 'currency',
+                            currency: 'BRL',
+                            }).format(totalInvested)}
+                        </div>
+                    </div>
+                    {loadingInvestments ? (
+                    <p className={'loading'}>Carregando...</p>
+                    ) : (
+                    <>
+                        <div className="small-card" style={{ marginTop: 8 }}>
+                            <div className="small-label">
+                                Ganho/Perda Investimentos
+                            </div>
+                            <div className="small-value" style={{ color: totalGain>= 0
+                                ? '#2f8a2f'
+                                : '#d90429',
+                                fontWeight: 700,
+                                }}
+                                >
+                                {new Intl.NumberFormat('pt-BR', {
                                 style: 'currency',
                                 currency: 'BRL',
-                            }).format(summary.totalBalance)}
+                                }).format(totalGain)}
+                            </div>
                         </div>
-                        <div className="acc">
-                            Baseado em <strong>{summary.activesCount}</strong>{' '}
-                            ativos encontrados no banco.
-                        </div>
-                        <div style={{ marginTop: 12 }}>
-                            <div className="small-card">
-                                <div className="small-label">
-                                    Total Investido
+                        <section className="widgets">
+                            <div className="widget">
+                                <div className="pie" style={{ fontSize: '2rem' , color: rentabilidade> 0
+                                    ? '#2f8a2f'
+                                    : rentabilidade === 0
+                                    ? '#808080'
+                                    : '#ff0000',
+                                    fontWeight: 'bold',
+                                    }}
+                                    >
+                                    {rentabilidade}%
                                 </div>
-                                <div className="small-value">
-                                    {new Intl.NumberFormat('pt-BR', {
-                                        style: 'currency',
-                                        currency: 'BRL',
-                                    }).format(totalInvested)}
+                                <div>Rentabilidade Mensal</div>
+                            </div>
+                            <div className="widget">
+                                {error && <p style={{ color: 'red' }}>{error}</p>}
+                                {!loading && !error && donutData.length > 0 && (
+                                <GraficoDonut data={donutData} />
+                                )}
+                                {!loading && !error && donutData.length === 0 && (
+                                <p>Nenhum dado de distribuição disponível.</p>
+                                )}
+                                <div style={{ marginTop: -10 }}>
+                                    Carteira Diversificada
                                 </div>
                             </div>
-                            {loadingInvestments ? (
-                                <p>Carregando...</p>
-                            ) : (
-                                <div
-                                    className="small-card"
-                                    style={{ marginTop: 8 }}
-                                >
-                                    <div className="small-label">
-                                        Ganho/Perda Investimentos
-                                    </div>
-                                    <div
-                                        className="small-value"
-                                        style={{
-                                            color:
-                                                totalGain >= 0
-                                                    ? '#2f8a2f'
-                                                    : '#d90429',
-                                            fontWeight: 700,
-                                        }}
-                                    >
-                                        {new Intl.NumberFormat('pt-BR', {
-                                            style: 'currency',
-                                            currency: 'BRL',
-                                        }).format(totalGain)}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                    <div className="right">
-                        <div
-                            className="evol"
-                            style={{ marginBottom: '10px', fontWeight: '600' }}
-                        >
-                            Evolução
-                        </div>
-                        {error && <p style={{ color: 'red' }}>{error}</p>}
-                        {!loading && !error && graphData.length > 0 && (
-                            <GraficoLinha data={graphData} />
-                        )}
-                        {!loading && !error && graphData.length === 0 && (
-                            <p>Nenhum dado de evolução disponível.</p>
-                        )}
-                    </div>
-                </section>
-
-                <section className="widgets">
-                    <div className="widget">
-                        <div
-                            className="pie"
-                            style={{
-                                fontSize: '2rem',
-                                color:
-                                    rentabilidade > 0
-                                        ? '#2f8a2f'
-                                        : rentabilidade === 0
-                                          ? '#808080'
-                                          : '#ff0000',
-                                fontWeight: 'bold',
-                            }}
-                        >
-                            {rentabilidade}%
-                        </div>
-                        <div>Rentabilidade Mensal</div>
-                    </div>
-                    <div className="widget">
-                        {error && <p style={{ color: 'red' }}>{error}</p>}
-                        {!loading && !error && donutData.length > 0 && (
-                            <GraficoDonut data={donutData} />
-                        )}
-                        {!loading && !error && donutData.length === 0 && (
-                            <p>Nenhum dado de distribuição disponível.</p>
-                        )}
-                        <div style={{ marginTop: -10 }}>
-                            Carteira Diversificada
-                        </div>
-                    </div>
-                </section>
+                        </section>
+                    </>
+                    )}
+                </div>
             </div>
-        </div>
+            <div className="right">
+                <div className="evol" style={{ marginBottom: '10px' , fontWeight: '600' }}>
+                    Evolução
+                </div>
+                {error && <p style={{ color: 'red' }}>{error}</p>}
+                {!loading && !error && graphData.length > 0 && (
+                <GraficoLinha data={graphData} />
+                )}
+                {!loading && !error && graphData.length === 0 && (
+                <p>Nenhum dado de evolução disponível.</p>
+                )}
+            </div>
+        </section>
+    </div>
+</div>
     );
 }

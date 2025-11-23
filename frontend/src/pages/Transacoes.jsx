@@ -161,7 +161,7 @@ export default function Transacoes() {
                                         <span
                                             className={`toggle-label ${form.type === 'income' ? 'active' : ''}`}
                                         >
-                                            Receita
+                                            Despesa
                                         </span>
                                         <label className="switch">
                                             <input
@@ -180,11 +180,7 @@ export default function Transacoes() {
                                             />
                                             <span className="slider" />
                                         </label>
-                                        <span
-                                            className={`toggle-label ${form.type === 'expense' ? 'active' : ''}`}
-                                        >
-                                            Despesa
-                                        </span>
+                                      
                                     </div>
 
                                     <div style={{ marginLeft: 'auto' }}>

@@ -259,7 +259,7 @@ export default function Investimentos() {
                 </div>
 
                 {carregando ? (
-                    <div className="loading">Carregando investimentos...</div>
+                    <div className={'loading'}>Carregando investimentos...</div>
                 ) : (
                     <div className="table-container">
                         {/** Prepare filtered lists **/}

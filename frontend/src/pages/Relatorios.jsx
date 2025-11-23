@@ -106,7 +106,7 @@ export default function Relatorios() {
                 </header>
 
                 {carregando ? (
-                    <div className="loading">Carregando relatórios...</div>
+                    <div className={'loading'}>Carregando relatórios...</div>
                 ) : (
                     <>
                         {/* Cards de Estatísticas */}
