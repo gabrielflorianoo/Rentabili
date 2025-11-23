@@ -7,7 +7,8 @@
         "@prisma/client": "^6.17.1",
         "bcryptjs": "^3.0.2",
         "dotenv": "^17.2.3",
-        "recharts": "^3.5.0"
+        "recharts": "^3.5.0",
+        "vercel": "^48.10.10"
     },
     "name": "rentabili",
     "version": "1.0.0",
