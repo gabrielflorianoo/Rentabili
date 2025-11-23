@@ -1,14 +1,14 @@
 {
     "devDependencies": {
         "concurrently": "^9.2.1",
-        "prisma": "^6.17.1"
+        "prisma": "^6.17.1",
+        "vercel": "^48.10.10"
     },
     "dependencies": {
         "@prisma/client": "^6.17.1",
         "bcryptjs": "^3.0.2",
         "dotenv": "^17.2.3",
-        "recharts": "^3.5.0",
-        "vercel": "^48.10.10"
+        "recharts": "^3.5.0"
     },
     "name": "rentabili",
     "version": "1.0.0",

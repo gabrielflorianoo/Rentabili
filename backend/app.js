@@ -36,6 +36,9 @@ app.use(
             'https://reimagined-fishstick-v69vx7j79rxx3wj9x-5173.app.github.dev',
             'https://crispy-bassoon-5gjqwp7pj5r9hj76-5173.app.github.dev',
             'https://crispy-bassoon-5gjqwp7pj5r9hj76-3000.app.github.dev',
+            // Paths do deploy
+            'https://rentabili.vercel.app/',
+            'https://backend-rentabili.vercel.app/',
         ],
         credentials: true,
     }),
