@@ -14,7 +14,7 @@ import Investimentos from './pages/Investimentos';
 import Relatorios from './pages/Relatorios';
 import Ativos from './pages/Ativos';
 import Transacoes from './pages/Transacoes';
-import Simulador from './pages/Simulador';
+// import Simulador from './pages/Simulador';
 // -------------------------------------
 
 // Importação dos Componentes e Estilos
@@ -77,14 +77,14 @@ export default function App() {
                         </RotaProtegida>
                     }
                 />
-                <Route
+                {/* <Route
                     path="/simulador"
                     element={
                         <RotaProtegida>
                             <Simulador />
                         </RotaProtegida>
                     }
-                />
+                /> */}
             </Routes>
         </Router>
     );
