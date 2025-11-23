@@ -18,7 +18,10 @@ import historicalBalancesRouter from './routes/historicalBalances.js';
 // Log para verificar se o .env está sendo lido
 console.log('🔧 Configuração do ambiente:');
 console.log('   USE_DB:', process.env.USE_DB);
-console.log('   DATABASE_URL:', process.env.DATABASE_URL ? '✅ Configurado' : '❌ Não configurado');
+console.log(
+    '   DATABASE_URL:',
+    process.env.DATABASE_URL ? '✅ Configurado' : '❌ Não configurado',
+);
 console.log('   PORT:', process.env.PORT || 3000);
 
 const app = express();
@@ -28,8 +31,11 @@ app.use(
     cors({
         origin: [
             'http://localhost:5173',
+            'http://localhost:3000',
             'https://reimagined-fishstick-v69vx7j79rxx3wj9x-3000.app.github.dev/',
-            'https://reimagined-fishstick-v69vx7j79rxx3wj9x-5173.app.github.dev'
+            'https://reimagined-fishstick-v69vx7j79rxx3wj9x-5173.app.github.dev',
+            'https://crispy-bassoon-5gjqwp7pj5r9hj76-5173.app.github.dev',
+            'https://crispy-bassoon-5gjqwp7pj5r9hj76-3000.app.github.dev',
         ],
         credentials: true,
     }),

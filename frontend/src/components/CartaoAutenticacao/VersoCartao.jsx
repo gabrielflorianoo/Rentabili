@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import InputFlutuante from '../InputFlutuante';
 import { servicoAutenticacao } from '../../services/servicoAutenticacao';
 import imgLogo from '../../assets/logo.jpeg';
-
+import styles from './VersoCartao.module.css';
 const VersoCartao = ({ aoVirar }) => {
     const [sucesso, setSucesso] = useState(false);
+    const [carregando, setCarregando] = useState(false);
     const [dadosForm, setDadosForm] = useState({
         nome: '',
         email: '',
@@ -39,18 +40,20 @@ const VersoCartao = ({ aoVirar }) => {
     const lidarComCadastro = async (ev) => {
         ev.preventDefault();
         if (!validar()) return;
+
+        setCarregando(true);
         try {
             // Se `servicoAutenticacao` tiver função de cadastro, pode ser usada aqui.
-            if (
-                servicoAutenticacao &&
-                typeof servicoAutenticacao.cadastrar === 'function'
-            ) {
-                await servicoAutenticacao.cadastrar(dadosForm);
-            }
-            setSucesso(true);
+            const resposta = await servicoAutenticacao.cadastrar(dadosForm);
+            console.log(resposta);
+
+            if (resposta.sucesso) setSucesso(true);
+            else setErros({ geral: resposta.erro });
         } catch (err) {
             setErros({ geral: 'Erro ao criar conta' });
-            // opcional: console.error(err);
+            console.error(err);
+        } finally {
+            setCarregando(false);
         }
     };
 
@@ -61,8 +64,8 @@ const VersoCartao = ({ aoVirar }) => {
 
     const preencherAutomaticamente = () => {
         setDadosForm({
-            nome: 'Banco do Bradesco',
-            email: 'email@example.com',
+            nome: 'Banco do Bradesco2',
+            email: 'email2@example.com',
             nascimento: '0001-01-01', // Formato YYYY-MM-DD para input type="date"
             senha: '123123@',
             confirmarSenha: '123123@',
@@ -71,121 +74,125 @@ const VersoCartao = ({ aoVirar }) => {
     };
 
     return (
-        <div className="card-face card-back">
-            <div className="form-area">
-                {!sucesso ? (
-                    <div className="form-content fade-in-up">
-                        <div className="form-header">
-                            <h2 className="form-title">Crie sua conta</h2>
-                            <p className="form-subtitle">Junte-se à inovação</p>
-                        </div>
-                        <form onSubmit={lidarComCadastro}>
-                            <InputFlutuante
-                                id="nome"
-                                type="text"
-                                rotulo="Nome Completo"
-                                valor={dadosForm.nome}
-                                aoMudar={lidarComMudanca}
-                                erro={erros.nome}
-                                required
-                            />
-
-                            <InputFlutuante
-                                id="email"
-                                type="email"
-                                rotulo="E-mail"
-                                valor={dadosForm.email}
-                                aoMudar={lidarComMudanca}
-                                erro={erros.email}
-                                required
-                            />
-
-                            <InputFlutuante
-                                id="nascimento"
-                                type="date"
-                                rotulo="Data de Nascimento"
-                                valor={dadosForm.nascimento}
-                                aoMudar={lidarComMudanca}
-                                erro={erros.nascimento}
-                                required
-                            />
-
-                            <InputFlutuante
-                                id="senha"
-                                type="password"
-                                rotulo="Senha"
-                                valor={dadosForm.senha}
-                                aoMudar={lidarComMudanca}
-                                erro={erros.senha}
-                                required
-                            />
-                            <span className="dica-campo">
-                                Mínimo de 6 caracteres e 1 caractere especial
-                                (@, #, $, etc).
-                            </span>
-
-                            <InputFlutuante
-                                id="confirmarSenha"
-                                type="password"
-                                rotulo="Confirmar Senha"
-                                valor={dadosForm.confirmarSenha}
-                                aoMudar={lidarComMudanca}
-                                erro={erros.confirmarSenha}
-                                required
-                            />
-
-                            {erros.geral && (
-                                <div className="erro-geral">{erros.geral}</div>
-                            )}
-
-                            <button type="submit" className="holo-button">
-                                Criar Conta
-                            </button>
-                            <button
-                                type="button"
-                                className="holo-button secondary-button"
-                                onClick={preencherAutomaticamente}
-                                style={{ marginTop: '10px' }}
-                            >
-                                Preencher Automaticamente
-                            </button>
-                        </form>
+    <div className={`${styles.cardFace} ${styles.cardBack}`}>
+        <div className={styles.formArea}>
+            {!sucesso ? (
+                <div className={`${styles.formContent} ${styles.fadeInUp}`}>
+                    <div className={styles.formHeader}>
+                        <h2 className={styles.formTitle}>Crie sua conta</h2>
+                        <p className={styles.formSubtitle}>Junte-se à inovação</p>
                     </div>
-                ) : (
-                    <div
-                        className="form-content fade-in-up"
-                        style={{ textAlign: 'center' }}
-                    >
-                        <div className="form-header">
-                            <h2 className="form-title">Conta Criada!</h2>
-                            <p className="form-subtitle">
-                                Seja bem-vindo ao Rentabili Investidor.
-                            </p>
-                        </div>
-                        <button className="holo-button" onClick={irParaLogin}>
-                            Fazer Login Agora
-                        </button>
-                    </div>
-                )}
-            </div>
 
-            <div className="card-section welcome-section">
-                <div className="welcome-content fade-in-up">
-                    <div className="holographic-logo">
-                        <img
-                            src={imgLogo}
-                            alt="Logo"
-                            className="logo-img-back"
+                    <form onSubmit={lidarComCadastro}>
+                        <InputFlutuante
+                            id="nome"
+                            type="text"
+                            rotulo="Nome Completo"
+                            valor={dadosForm.nome}
+                            aoMudar={lidarComMudanca}
+                            erro={erros.nome}
+                            required
                         />
-                    </div>
-                    <h1 className="welcome-title">Controle seu investimento</h1>
+
+                        <InputFlutuante
+                            id="email"
+                            type="email"
+                            rotulo="E-mail"
+                            valor={dadosForm.email}
+                            aoMudar={lidarComMudanca}
+                            erro={erros.email}
+                            required
+                        />
+
+                        <InputFlutuante
+                            id="nascimento"
+                            type="date"
+                            rotulo="Data de Nascimento"
+                            valor={dadosForm.nascimento}
+                            aoMudar={lidarComMudanca}
+                            erro={erros.nascimento}
+                            required
+                        />
+
+                        <InputFlutuante
+                            id="senha"
+                            type="password"
+                            rotulo="Senha"
+                            valor={dadosForm.senha}
+                            aoMudar={lidarComMudanca}
+                            erro={erros.senha}
+                            required
+                        />
+
+                        <span className={styles.dicaCampo}>
+                            Mínimo de 6 caracteres e 1 caractere especial
+                            (@, #, $, etc).
+                        </span>
+
+                        <InputFlutuante
+                            id="confirmarSenha"
+                            type="password"
+                            rotulo="Confirmar Senha"
+                            valor={dadosForm.confirmarSenha}
+                            aoMudar={lidarComMudanca}
+                            erro={erros.confirmarSenha}
+                            required
+                        />
+
+                        {erros.geral && (
+                            <div className={styles.errorMessage}>
+                                {erros.geral}
+                            </div>
+                        )}
+
+                        <button
+                            type="submit"
+                            className={styles.holoButton}
+                        >
+                            {carregando ? 'Enviando...' : 'Criar Conta'}
+                        </button>
+
+                        <button
+                            type="button"
+                            className={`${styles.holoButton} ${styles.secondaryButton}`}
+                            onClick={preencherAutomaticamente}
+                        >
+                            Preencher Automaticamente
+                        </button>
+                    </form>
                 </div>
-                <button className="flip-button" onClick={aoVirar}>
-                    ← Voltar
-                </button>
-            </div>
+            ) : (
+                <div
+                    className={`${styles.formContent} ${styles.fadeInUp}`}
+                    style={{ textAlign: 'center' }}
+                >
+                    <div className={styles.formHeader}>
+                        <h2 className={styles.formTitle}>Conta Criada!</h2>
+                        <p className={styles.formSubtitle}>
+                            Seja bem-vindo ao Rentabili Investidor.
+                        </p>
+                    </div>
+
+                    <button className={styles.holoButton} onClick={irParaLogin}>
+                        Fazer Login Agora
+                    </button>
+                </div>
+            )}
         </div>
-    );
+
+        <div className={`${styles.cardSection} ${styles.welcomeSection}`}>
+            <div className={`${styles.welcomeContent} ${styles.fadeInUp}`}>
+                <img src={imgLogo} alt="Logo" className={styles.logoImgBack} />
+                <h1 className={styles.welcomeTitle}>Controle seu investimento</h1>
+            </div>
+
+            <button className={styles.flipButton} onClick={aoVirar}>
+                ← Voltar
+            </button>
+        </div>
+    </div>
+);
+
 };
 
 export default VersoCartao;

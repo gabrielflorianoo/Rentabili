@@ -31,7 +31,7 @@ export default function Ativos() {
         try {
             setLoading(true);
             const res = await activesApi.list();
-            setActives(res.data || []);
+            setActives(res || []);
         } catch (err) {
             console.error('Erro ao carregar ativos:', err);
             if (err?.response?.status === 401) {
@@ -77,7 +77,10 @@ export default function Ativos() {
             loadActives();
         } catch (err) {
             console.error('Erro ao salvar ativo:', err);
-            alert('Erro ao salvar ativo: ' + (err.response?.data?.error || err.message));
+            alert(
+                'Erro ao salvar ativo: ' +
+                    (err.response?.data?.error || err.message),
+            );
         }
     };
 
@@ -88,7 +91,10 @@ export default function Ativos() {
             loadActives();
         } catch (err) {
             console.error('Erro ao excluir ativo:', err);
-            alert('Erro ao excluir ativo: ' + (err.response?.data?.error || err.message));
+            alert(
+                'Erro ao excluir ativo: ' +
+                    (err.response?.data?.error || err.message),
+            );
         }
     };
 
@@ -102,7 +108,9 @@ export default function Ativos() {
                 </header>
 
                 <div className="actions-bar">
-                    <button className="btn-primary" onClick={() => openModal()}>+ Novo Ativo</button>
+                    <button className="btn-primary" onClick={() => openModal()}>
+                        + Novo Ativo
+                    </button>
                 </div>
 
                 {loading ? (
@@ -121,7 +129,13 @@ export default function Ativos() {
                             <tbody>
                                 {actives.length === 0 ? (
                                     <tr>
-                                        <td colSpan="4" style={{ textAlign: 'center', padding: '40px' }}>
+                                        <td
+                                            colSpan="4"
+                                            style={{
+                                                textAlign: 'center',
+                                                padding: '40px',
+                                            }}
+                                        >
                                             Nenhum ativo cadastrado
                                         </td>
                                     </tr>
@@ -132,8 +146,20 @@ export default function Ativos() {
                                             <td>{a.name}</td>
                                             <td>{a.type}</td>
                                             <td>
-                                                <button className="btn-edit" onClick={() => openModal(a)}>✏️</button>
-                                                <button className="btn-delete" onClick={() => handleDelete(a.id)}>🗑️</button>
+                                                <button
+                                                    className="btn-edit"
+                                                    onClick={() => openModal(a)}
+                                                >
+                                                    ✏️
+                                                </button>
+                                                <button
+                                                    className="btn-delete"
+                                                    onClick={() =>
+                                                        handleDelete(a.id)
+                                                    }
+                                                >
+                                                    🗑️
+                                                </button>
                                             </td>
                                         </tr>
                                     ))
@@ -145,28 +171,59 @@ export default function Ativos() {
 
                 {showModal && (
                     <div className="modal-overlay" onClick={closeModal}>
-                        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                        <div
+                            className="modal-content"
+                            onClick={(e) => e.stopPropagation()}
+                        >
                             <h3>{editing ? 'Editar Ativo' : 'Novo Ativo'}</h3>
                             <form onSubmit={handleSubmit}>
                                 <div className="form-group">
                                     <label>Nome</label>
-                                    <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+                                    <input
+                                        value={form.name}
+                                        onChange={(e) =>
+                                            setForm({
+                                                ...form,
+                                                name: e.target.value,
+                                            })
+                                        }
+                                        required
+                                    />
                                 </div>
                                 <div className="form-group">
                                     <label>Tipo</label>
-                                    <input value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} required />
+                                    <input
+                                        value={form.type}
+                                        onChange={(e) =>
+                                            setForm({
+                                                ...form,
+                                                type: e.target.value,
+                                            })
+                                        }
+                                        required
+                                    />
                                 </div>
                                 <div className="modal-actions">
                                     <button
                                         type="button"
                                         className="btn-secondary"
-                                        onClick={() => setForm(generateActive())}
+                                        onClick={() =>
+                                            setForm(generateActive())
+                                        }
                                         style={{ marginRight: 8 }}
                                     >
                                         Auto-preencher
                                     </button>
-                                    <button type="button" className="btn-cancel" onClick={closeModal}>Cancelar</button>
-                                    <button type="submit" className="btn-save">Salvar</button>
+                                    <button
+                                        type="button"
+                                        className="btn-cancel"
+                                        onClick={closeModal}
+                                    >
+                                        Cancelar
+                                    </button>
+                                    <button type="submit" className="btn-save">
+                                        Salvar
+                                    </button>
                                 </div>
                             </form>
                         </div>

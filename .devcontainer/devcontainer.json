@@ -1,0 +1,22 @@
+{
+    "name": "Default Linux Universal",
+    "image": "mcr.microsoft.com/devcontainers/universal:2-linux",
+    "forwardPorts": [3000, 5173],
+    "portsAttributes": {
+        "3000": {
+            "label": "Backend (Express/Node)",
+            "onAutoForward": "notify",
+            "visibility": "public"
+        },
+        "5173": {
+            "label": "Frontend (Vite)",
+            "onAutoForward": "notify",
+            "visibility": "public"
+        }
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": ["kilocode.kilo-code"]
+        }
+    }
+}

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const BASE_URL = 'http://localhost:3000' || import.meta.env.VITE_API_URL
 
 // Cria uma instância do axios com baseURL e headers padrão
 const apiClient = axios.create({
@@ -9,6 +9,23 @@ const apiClient = axios.create({
         'Content-Type': 'application/json',
     },
 });
+
+/**
+ * Função para tratar a resposta de uma requisição Axios.
+ * @param {Promise} responsePromise - A promessa retornada por uma chamada do axios.
+ * @returns {Promise<any>} O dado da resposta ou null em caso de erro.
+ */
+const handleResponse = async (responsePromise) => {
+    try {
+        const response = await responsePromise;
+        return response.data;
+    } catch (error) {
+        // Você pode adicionar tratamento de erro específico aqui (ex: redirecionar no 401)
+        console.error('Erro na Requisição API:', error);
+        // Lança o erro novamente para que o código de chamada possa tratá-lo (opcional, mas recomendado)
+        throw error;
+    }
+};
 
 // Interceptor para adicionar token quando presente
 apiClient.interceptors.request.use((config) => {
@@ -24,69 +41,81 @@ apiClient.interceptors.request.use((config) => {
     return config;
 });
 
+// --- Funções Auxiliares Genéricas ---
+// Cria uma função auxiliar para aplicar o handleResponse a todas as chamadas.
+
+const get = (url, config) => handleResponse(apiClient.get(url, config));
+const post = (url, data, config) =>
+    handleResponse(apiClient.post(url, data, config));
+const put = (url, data, config) =>
+    handleResponse(apiClient.put(url, data, config));
+const remove = (url, config) => handleResponse(apiClient.delete(url, config));
+
 // Auth API
 export const authApi = {
-    login: (email, password) => apiClient.post('/auth/login', { email, password }),
-    register: (payload) => apiClient.post('/users', payload),
+    login: (email, password) => post('/auth/login', { email, password }),
+    register: (payload) => post('/auth/register', payload),
 };
 
 // Users API
 export const userApi = {
-    list: () => apiClient.get('/users'),
-    getById: (id) => apiClient.get(`/users/${id}`),
-    create: (payload) => apiClient.post('/users', payload),
-    update: (id, payload) => apiClient.put(`/users/${id}`, payload),
-    remove: (id) => apiClient.delete(`/users/${id}`),
+    list: () => get('/users'),
+    getById: (id) => get(`/users/${id}`),
+    create: (payload) => post('/users', payload),
+    update: (id, payload) => put(`/users/${id}`, payload),
+    remove: (id) => remove(`/users/${id}`),
 };
 
 // Transactions API
 export const transactionsApi = {
-    list: () => apiClient.get('/transactions'),
-    getById: (id) => apiClient.get(`/transactions/${id}`),
-    create: (payload) => apiClient.post('/transactions', payload),
-    update: (id, payload) => apiClient.put(`/transactions/${id}`, payload),
-    remove: (id) => apiClient.delete(`/transactions/${id}`),
+    list: () => get('/transactions'),
+    getById: (id) => get(`/transactions/${id}`),
+    create: (payload) => post('/transactions', payload),
+    update: (id, payload) => put(`/transactions/${id}`, payload),
+    remove: (id) => remove(`/transactions/${id}`),
 };
 
 // Investments API
 export const investmentsApi = {
-    list: () => apiClient.get('/investments'),
-    getById: (id) => apiClient.get(`/investments/${id}`),
-    create: (payload) => apiClient.post('/investments', payload),
-    update: (id, payload) => apiClient.put(`/investments/${id}`, payload),
-    remove: (id) => apiClient.delete(`/investments/${id}`),
+    list: () => get('/investments'),
+    getById: (id) => get(`/investments/${id}`),
+    create: (payload) => post('/investments', payload),
+    update: (id, payload) => put(`/investments/${id}`, payload),
+    remove: (id) => remove(`/investments/${id}`),
+    getTotalInvested: () => get('/investments/total-invested'),
+    getGainLoss: () => get('/investments/gain-loss'),
 };
 
 // Wallets API
 export const walletsApi = {
-    list: () => apiClient.get('/wallets'),
-    getById: (id) => apiClient.get(`/wallets/${id}`),
-    create: (payload) => apiClient.post('/wallets', payload),
-    update: (id, payload) => apiClient.put(`/wallets/${id}`, payload),
-    remove: (id) => apiClient.delete(`/wallets/${id}`),
+    list: () => get('/wallets'),
+    getById: (id) => get(`/wallets/${id}`),
+    create: (payload) => post('/wallets', payload),
+    update: (id, payload) => put(`/wallets/${id}`, payload),
+    remove: (id) => remove(`/wallets/${id}`),
 };
 
 // Dashboard API
 export const dashboardApi = {
-    getSummary: () => apiClient.get('/dashboard/summary'),
+    getSummary: () => get('/dashboard/summary'),
 };
 
 // Actives API
 export const activesApi = {
-    list: () => apiClient.get('/actives'),
-    getById: (id) => apiClient.get(`/actives/${id}`),
-    create: (payload) => apiClient.post('/actives', payload),
-    update: (id, payload) => apiClient.put(`/actives/${id}`, payload),
-    remove: (id) => apiClient.delete(`/actives/${id}`),
+    list: () => get('/actives'),
+    getById: (id) => get(`/actives/${id}`),
+    create: (payload) => post('/actives', payload),
+    update: (id, payload) => put(`/actives/${id}`, payload),
+    remove: (id) => remove(`/actives/${id}`),
 };
 
 // Historical Balances API
 export const historicalBalancesApi = {
-    listByActive: (activeId) => apiClient.get(`/historical-balances/active/${activeId}`),
-    getById: (id) => apiClient.get(`/historical-balances/${id}`),
-    create: (payload) => apiClient.post('/historical-balances', payload),
-    update: (id, payload) => apiClient.put(`/historical-balances/${id}`, payload),
-    remove: (id) => apiClient.delete(`/historical-balances/${id}`),
+    listByActive: (activeId) => get(`/historical-balances/active/${activeId}`),
+    getById: (id) => get(`/historical-balances/${id}`),
+    create: (payload) => post('/historical-balances', payload),
+    update: (id, payload) => put(`/historical-balances/${id}`, payload),
+    remove: (id) => remove(`/historical-balances/${id}`),
 };
 
 export default apiClient;
