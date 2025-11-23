@@ -103,7 +103,95 @@
     animation: fadeInUp 0.8s ease forwards; /* Executa animação */
     animation-delay: 0.1s; /* Começa quase imediatamente */
 }
+/* ÁREA QUE SEGURA OS 3 CÍRCULOS */
+.circle-wrapper-3 {
+    position: relative;
+    width: 520px;
+    height: 520px;
+    margin: 0 auto;
+}
 
+/* ESTILO BASE DE QUALQUER CÍRCULO */
+.hero-circle {
+    width: 230px;
+    height: 230px;
+    border-radius: 50%;
+    overflow: hidden;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: #e8f5e9;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+/* AJUSTE DAS IMAGENS (CENTRO PERFEITO) */
+.hero-circle img {
+    width: 125%;
+    height: 125%;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* CÍRCULO PRINCIPAL – Superior esquerdo */
+.circle-main {
+    top: 0;
+    left: 0;
+    z-index: 3;
+    animation: floatUp 2.4s ease-in-out infinite alternate;
+}
+
+/* CÍRCULO SECUNDÁRIO – Inferior direito */
+.circle-secondary {
+    bottom: 0;
+    right: 0;
+    z-index: 2;
+    animation: floatDown 2.4s ease-in-out infinite alternate;
+}
+
+/* CÍRCULO TERCEIRO – Superior direito */
+.circle-third {
+    top: 40px;
+    right: -40px;
+    z-index: 1;
+    animation: floatUpSmall 2.8s ease-in-out infinite alternate;
+    
+}
+
+/* ANIMAÇÕES */
+@keyframes floatUp {
+    from { transform: translateY(0); }
+    to   { transform: translateY(-12px); }
+}
+
+@keyframes floatDown {
+    from { transform: translateY(0); }
+    to   { transform: translateY(12px); }
+}
+
+@keyframes floatUpSmall {
+    from { transform: translateY(0); }
+    to   { transform: translateY(-8px); }
+}
+
+/* RESPONSIVIDADE */
+@media (max-width: 900px) {
+    .circle-wrapper-3 {
+        width: 330px;
+        height: 330px;
+    }
+
+    .hero-circle {
+        width: 150px;
+        height: 150px;
+    }
+
+    .circle-third {
+        top: 20px;
+        right: -10px;
+    }
+}
 .hero-sub {
     color: #555;
     margin-bottom: 40px;

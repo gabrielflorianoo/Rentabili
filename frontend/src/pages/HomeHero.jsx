@@ -48,12 +48,37 @@ export default function HomeHero() {
                     </div>
                 </section>
 
-                <aside className="hero-right">
-                    <img
-                        src="https://img.freepik.com/fotos-gratis/homem-de-negocios-feliz-apontando-para-o-lado_1149-1233.jpg?w=740"
-                        alt="Homem apontando"
-                    />
-                </aside>
+   <aside className="hero-right">
+
+    <div className="circle-wrapper-3">
+
+        {/* Círculo 1 – Principal (topo esquerdo) */}
+        <div className="hero-circle circle-main">
+            <img 
+                src="https://img.freepik.com/fotos-gratis/homem-de-negocios-feliz-apontando-para-o-lado_1149-1233.jpg?w=740"
+                alt="Homem apontando"
+            />
+        </div>
+
+        {/* Círculo 2 – Inferior direito */}
+        <div className="hero-circle circle-secondary">
+            <img 
+                src="https://img.freepik.com/free-photo/happy-entrepreneur-using-digital-tablet-reading-something-while-working-office_637285-806.jpg?w=1480"
+                alt="Empresário usando tablet"
+            />
+        </div>
+
+        {/* Círculo 3 – Superior direito (nova imagem) */}
+        <div className="hero-circle circle-third">
+            <img 
+                src="https://img.freepik.com/free-photo/cheerful-entrepreneur-saying-hello-talking-video-call-using-phone-businessman-course-important-video-conference-while-doing-overtime-office_482257-10312.jpg?w=1480"
+                alt="Empresário acenando em vídeo"
+            />
+        </div>
+
+    </div>
+
+</aside>
             </main>
             <Footer />
         </div>
