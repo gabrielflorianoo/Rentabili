@@ -46,6 +46,7 @@ export function generateInvestment() {
         activeId: String(activeId),
         amount: String(amount),
         date: recentDateISO(365),
+        kind: 'Investimento',
     };
 }
 

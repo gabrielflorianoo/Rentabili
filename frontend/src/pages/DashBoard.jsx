@@ -5,6 +5,7 @@ import './DashBoard.css';
 import Sidebar from '../components/Sidebar';
 
 import { dashboardApi } from '../services/apis';
+import { getInvestments } from '../utils/api';
 
 export default function Dashboard() {
     const navigate = useNavigate();
@@ -13,6 +14,9 @@ export default function Dashboard() {
         totalBalance: 0,
         activesCount: 0,
     });
+    const [investments, setInvestments] = useState([]);
+    const [totalInvested, setTotalInvested] = useState(0);
+    const [totalGain, setTotalGain] = useState(0);
 
     useEffect(() => {
         const user = servicoAutenticacao.obterUsuarioAtual();
@@ -26,21 +30,41 @@ export default function Dashboard() {
 
         // BUSCA DADOS REAIS NO BACK-END
         const getDashboardData = async () => {
-            dashboardApi.getSummary()
-                .then((data) => {
-                    if (data.totalBalance !== undefined) {
-                        setSummary(data);
-                    }
-                })
-                .catch((err) => {
-                    console.error('Erro ao conectar no dashboard:', err);
-                    if (err.response?.status === 401) {
-                        // Se o token venceu, desloga
-                        servicoAutenticacao.sair();
-                        navigate('/');
-                    }
-                });
+            try {
+                const data = await dashboardApi.getSummary();
+                if (data.totalBalance !== undefined) {
+                    setSummary(data);
+                }
+
+                // Busca investimentos para calcular total investido e rentabilidade
+                const invs = await getInvestments().catch(() => []);
+                setInvestments(invs || []);
+                // Somar apenas investimentos do tipo 'Investimento'
+                const invested = (invs || [])
+                    .filter((it) => it.kind === 'Investimento')
+                    .reduce((acc, it) => acc + parseFloat(it.amount || 0), 0);
+
+                console.log((invs || [])
+                    .filter((it) => it.kind === 'Investimento'));
+
+                setTotalInvested(invested);
+
+                // Somar ganhos/perdas apenas do tipo 'Renda'
+                const gain = (invs || [])
+                    .filter((it) => it.kind != 'Investimento')
+                    .reduce((acc, it) => acc + parseFloat(it.amount || 0), 0);
+                // totalBalance pode ser string/number
+                setTotalGain(gain);
+            } catch (err) {
+                console.error('Erro ao conectar no dashboard ou carregar investimentos:', err);
+                if (err.response?.status === 401) {
+                    // Se o token venceu, desloga
+                    servicoAutenticacao.sair();
+                    navigate('/');
+                }
+            }
         }
+
         getDashboardData();
     }, [navigate]);
 
@@ -71,6 +95,18 @@ export default function Dashboard() {
                         <div className="acc">
                             Baseado em <strong>{summary.activesCount}</strong>{' '}
                             ativos encontrados no banco.
+                        </div>
+                        <div style={{ marginTop: 12 }}>
+                            <div className="small-card">
+                                <div className="small-label">Total Investido</div>
+                                <div className="small-value">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalInvested)}</div>
+                            </div>
+                            <div className="small-card" style={{ marginTop: 8 }}>
+                                <div className="small-label">Ganho/Loss Investimentos</div>
+                                <div className="small-value" style={{ color: totalGain >= 0 ? '#2f8a2f' : '#d90429', fontWeight: 700 }}>
+                                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalGain)}
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div className="right">

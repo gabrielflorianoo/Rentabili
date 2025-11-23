@@ -86,6 +86,7 @@ model Transaction {
 model Investment {
     id       Int      @id @default(autoincrement())
     amount   Decimal  @db.Decimal(10, 2)
+    kind     String   @default("Investimento")
     activeId Int
     active   Active   @relation(fields: [activeId], references: [id])
     userId   Int

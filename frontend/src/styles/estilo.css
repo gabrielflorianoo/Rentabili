@@ -102,6 +102,13 @@ body {
 .btn-cancel { background:transparent; color:#333; padding:8px 12px; border-radius:6px; border:1px solid #ddd; cursor:pointer; }
 .btn-edit { background:#ffd966; border:none; padding:6px 8px; border-radius:6px; cursor:pointer; }
 .btn-delete { background:#ffd6d6; border:none; padding:6px 8px; border-radius:6px; cursor:pointer; }
+.btn-simulate { background: linear-gradient(90deg, #e6f4ea, #f0fff5); border: 1px solid #cde9d0; padding:6px 8px; border-radius:6px; cursor:pointer; margin-left:6px; }
+.btn-simulate:hover { transform: translateY(-1px); }
+
+/* Pequenos cards usados no Dashboard (Total Investido / Ganho) */
+.small-card { display:flex; justify-content:space-between; align-items:center; background:#fff; padding:8px 10px; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.04); }
+.small-label { color:#5a7a5a; font-weight:600; font-size:0.9rem; }
+.small-value { font-size:1rem; }
 
 /* Rodapé */
 .footer {

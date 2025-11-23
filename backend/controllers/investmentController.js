@@ -12,6 +12,7 @@ class InvestmentController {
                 date: new Date(),
                 createdAt: new Date(),
                 updatedAt: new Date(),
+                kind: 'Investimento',
             },
             {
                 id: 2,
@@ -21,6 +22,7 @@ class InvestmentController {
                 date: new Date(),
                 createdAt: new Date(),
                 updatedAt: new Date(),
+                kind: 'Investimento',
             },
         ];
 
@@ -96,15 +98,41 @@ class InvestmentController {
         }
         try {
             const prisma = getPrismaClient();
-            const { amount, activeId, date } = req.body;
+            const { amount, activeId, date, kind } = req.body;
             // userId deve vir do token autenticado (req.user)
             const userId = req.user?.id ?? req.body?.userId;
             if (!userId) return res.status(400).json({ error: 'Usuário não autenticado' });
 
-            const newInvestment = await prisma.investment.create({
-                data: { amount, activeId, userId, date },
-            });
-            res.status(201).json(newInvestment);
+            // Tenta criar diretamente incluindo `kind`. Se o Prisma Client estiver desatualizado
+            // e não reconhecer o campo, capturamos o erro e fazemos um fallback seguro.
+            try {
+                const newInvestment = await prisma.investment.create({
+                    data: { amount, activeId, userId, date, kind: kind || 'Investimento' },
+                });
+                return res.status(201).json(newInvestment);
+            } catch (innerErr) {
+                // Se o erro indicar argumento desconhecido (campo não presente no client), fazemos fallback
+                if (innerErr && String(innerErr.message).includes('Unknown argument `kind`')) {
+                    // Cria sem o campo `kind` (o DB tem default 'Investimento')
+                    const newInvestment = await prisma.investment.create({
+                        data: { amount, activeId, userId, date },
+                    });
+
+                    // Se foi passado um kind diferente do default, aplicamos via SQL raw
+                    if (kind && kind !== 'Investimento') {
+                        // Usa $executeRaw com parâmetros para evitar SQL injection
+                        await prisma.$executeRaw`UPDATE "Investment" SET "kind" = ${kind} WHERE id = ${newInvestment.id}`;
+                        // Recarrega o registro recém atualizado
+                        const refreshed = await prisma.investment.findUnique({ where: { id: newInvestment.id } });
+                        return res.status(201).json(refreshed);
+                    }
+
+                    return res.status(201).json(newInvestment);
+                }
+
+                // Caso seja outro erro, repropaga
+                throw innerErr;
+            }
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
@@ -130,13 +158,30 @@ class InvestmentController {
         try {
             const prisma = getPrismaClient();
             const id = Number(req.params.id);
-            const { amount, activeId, date } = req.body;
+            const { amount, activeId, date, kind } = req.body;
             const userId = req.user?.id ?? req.body?.userId;
-            const updatedInvestment = await prisma.investment.update({
-                where: { id },
-                data: { amount, activeId, userId, date },
-            });
-            res.json(updatedInvestment);
+
+            try {
+                const updatedInvestment = await prisma.investment.update({
+                    where: { id },
+                    data: { amount, activeId, userId, date, ...(kind ? { kind } : {}) },
+                });
+                return res.json(updatedInvestment);
+            } catch (innerErr) {
+                if (innerErr && String(innerErr.message).includes('Unknown argument `kind`')) {
+                    // Atualiza sem o campo `kind` e, se necessário, aplica via raw SQL
+                    const updatedInvestment = await prisma.investment.update({
+                        where: { id },
+                        data: { amount, activeId, userId, date },
+                    });
+                    if (kind) {
+                        await prisma.$executeRaw`UPDATE "Investment" SET "kind" = ${kind} WHERE id = ${id}`;
+                    }
+                    const refreshed = await prisma.investment.findUnique({ where: { id } });
+                    return res.json(refreshed);
+                }
+                throw innerErr;
+            }
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
