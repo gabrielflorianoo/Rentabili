@@ -30,6 +30,9 @@ export default function Sidebar({ aoSair = () => {}, paginaAtiva = '' }) {
                 <a onClick={() => navigate('/relatorios')} className={paginaAtiva === 'relatorios' ? 'active' : ''}>
                     Relatórios
                 </a>
+                <a onClick={() => navigate('/simulador')} className={paginaAtiva === 'simulador' ? 'active' : ''}>
+                    Simulador
+                </a>
                 <a
                     onClick={aoSair}
                     style={{ marginTop: 'auto', color: '#d90429', cursor: 'pointer' }}
