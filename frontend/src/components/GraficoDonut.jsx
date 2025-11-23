@@ -1,4 +1,4 @@
-import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts';
 
 const COLORS = ['#27ae60', '#2980b9', '#e67e22', '#7f8c8d'];
 
@@ -13,6 +13,7 @@ export default function GraficoDonut({ data }) {
                     innerRadius={60}
                     outerRadius={90}
                     paddingAngle={3}
+                // Adiciona a prop 'labelLine={false}' e 'label' aqui se quiser mostrar rótulos nos dados
                 >
                     {data.map((_, index) => (
                         <Cell
@@ -21,6 +22,14 @@ export default function GraficoDonut({ data }) {
                         />
                     ))}
                 </Pie>
+                {/* ADICIONA A LEGENDA AQUI 
+                  A prop 'layout="vertical"' e 'verticalAlign="middle"' são comuns para gráficos de rosca
+                */}
+                <Legend
+                    layout="vertical"
+                    verticalAlign="middle"
+                    align="right"
+                />
             </PieChart>
         </ResponsiveContainer>
     );

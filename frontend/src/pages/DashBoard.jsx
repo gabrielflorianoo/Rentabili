@@ -124,10 +124,11 @@ export default function Dashboard() {
                 const processedDonutData = Object.keys(donutDataMap).map(
                     (kind) => ({
                         name: kind,
-                        value: donutDataMap[kind].toFixed(2),
+                        value: donutDataMap[kind],
                     }),
                 );
                 setDonutData(processedDonutData);
+                console.log(donutData);
 
                 // Processar dados para GraficoLinha (evolução do patrimônio ao longo do tempo)
                 // Agrupar por mês e somar os valores
@@ -141,7 +142,7 @@ export default function Dashboard() {
 
                     if (!acc[key]) {
                         acc[key] = {
-                            mes: month,
+                            mes: `${month} - ${year}`,
                             valor: 0,
                             timestamp: date.getTime(),
                         };
