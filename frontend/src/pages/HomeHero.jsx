@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import './HomeHero.css';
+import rentabil from '../assets/rentabil.png';
 
 export default function HomeHero() {
     const navigate = useNavigate();

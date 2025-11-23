@@ -8,7 +8,7 @@ export default function Sobre() {
         width: '100%',
         borderCollapse: 'collapse',
         marginTop: '20px',
-        background: 'white',
+        background: 'transparent',
     };
     const thStyle = {
         background: '#0f7c3a',
@@ -16,7 +16,7 @@ export default function Sobre() {
         padding: '12px',
         textAlign: 'left',
     };
-    const tdStyle = { border: '1px solid #ddd', padding: '12px' };
+    const tdStyle = { border: '1px solid #ddddddff', padding: '12px' };
 
     return (
         <div className="page-container">
@@ -59,7 +59,7 @@ export default function Sobre() {
                         </tr>
                         <tr>
                             <td style={tdStyle}>Wilson de Oliveira Santos</td>
-                            <td style={tdStyle}>Gestão</td>
+                            <td style={tdStyle}>Frontend + UI/UX + Gestão</td>
                         </tr>
                     </tbody>
                 </table>

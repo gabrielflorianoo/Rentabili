@@ -1,0 +1,103 @@
+
+
+.content-head {
+display: flex;
+justify-content: space-between;
+align-items: center;
+width: 100%;
+margin-bottom: 20px;
+}
+
+.user-badge {
+font-size: 1rem;
+font-weight: 500;
+padding: 4px 8px;
+border-radius: 6px;
+margin-bottom: 8px;
+background-color: #2f8a2f;
+color: #fff;
+display: inline-block;
+}
+
+.simuladorTitulo {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.form-section {
+  background: transparent;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  width: 100%;
+  box-shadow: none;
+  border: 1px solid #eee;
+}
+
+.form-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.form-group {
+  flex: 1 1 150px;
+  display: flex;
+  flex-direction: column;
+}
+
+.simuladorInput {
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  width: 100%;
+}
+
+.simuladorInput:focus {
+  outline: none;
+  border-color: #2f8a2f;
+  background-color: #f9fff9;
+}
+
+button.simuladorButton {
+  margin-top: 12px;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 6px;
+  background-color: #2f8a2f;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+button.simuladorButton:hover {
+  background-color: #246f24;
+}
+
+.stats-grid {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.stat-card {
+  padding: 16px;
+  border-radius: 6px;
+  flex: 1 1 180px;
+  text-align: center;
+}
+
+.chartWrapper {
+  margin-top: 20px;
+  max-width: 600px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}

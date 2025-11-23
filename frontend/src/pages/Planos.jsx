@@ -8,7 +8,7 @@ export default function Planos() {
     const navigate = useNavigate();
 
     const cardStyle = {
-        background: '#fff',
+        background: 'transparent',
         padding: '30px',
         borderRadius: '15px',
         boxShadow: '0 5px 20px rgba(0,0,0,0.05)',

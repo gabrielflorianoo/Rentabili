@@ -1,11 +1,16 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import DarkModeToggle from "../components/DarkModeToggle";
+
 
 export default function Sidebar({ aoSair = () => {}, paginaAtiva = '' }) {
     const navigate = useNavigate();
 
     return (
         <aside className="sidebar">
+             <div className="sidebar-darkmode">
+                <DarkModeToggle />
+            </div>
             <div className="logo">
                 📈<strong>RENTABIL</strong>
             </div>
@@ -39,6 +44,9 @@ export default function Sidebar({ aoSair = () => {}, paginaAtiva = '' }) {
                     className={paginaAtiva === 'relatorios' ? 'active' : ''}
                 >
                     Relatórios
+                </a>
+                <a onClick={() => navigate('/simulador')} className={paginaAtiva === 'simulador' ? 'active' : ''}>
+                    Simulador
                 </a>
                 <a
                     onClick={aoSair}
