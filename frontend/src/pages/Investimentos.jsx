@@ -31,6 +31,12 @@ function Sidebar({ aoSair, paginaAtiva }) {
                     Investimentos
                 </a>
                 <a
+                    onClick={() => navigate('/actives')}
+                    className={paginaAtiva === 'actives' ? 'active' : ''}
+                >
+                    Ativos
+                </a>
+                <a
                     onClick={() => navigate('/relatorios')}
                     className={paginaAtiva === 'relatorios' ? 'active' : ''}
                 >

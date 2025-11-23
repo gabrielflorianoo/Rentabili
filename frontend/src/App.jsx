@@ -10,6 +10,9 @@ import Dashboard from './pages/DashBoard';
 import Resumo from './pages/Resumo';
 import Planos from './pages/Planos';
 import Sobre from './pages/Sobre';
+import Investimentos from './pages/Investimentos';
+import Relatorios from './pages/Relatorios';
+import Ativos from './pages/Ativos';
 // -------------------------------------
 
 // Importação dos Componentes e Estilos
@@ -39,6 +42,30 @@ export default function App() {
                             <Dashboard />
                         </RotaProtegida>
                     } 
+                />
+                <Route
+                    path="/investimentos"
+                    element={
+                        <RotaProtegida>
+                            <Investimentos />
+                        </RotaProtegida>
+                    }
+                />
+                <Route
+                    path="/relatorios"
+                    element={
+                        <RotaProtegida>
+                            <Relatorios />
+                        </RotaProtegida>
+                    }
+                />
+                <Route
+                    path="/actives"
+                    element={
+                        <RotaProtegida>
+                            <Ativos />
+                        </RotaProtegida>
+                    }
                 />
             </Routes>
         </Router>
