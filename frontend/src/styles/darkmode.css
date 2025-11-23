@@ -178,3 +178,169 @@ body.dark .iconSun {
 body.dark .iconMoon {
   color: #1e1e1f; /* quase branco */
 }
+/* ============================================
+   DARK MODE – SIDEBAR
+============================================ */
+body.dark .sidebar {
+    background-color: #1a1a1a; /* sidebar escura */
+    color: #0bb91a;
+    border-right: 1px solid #333;
+}
+
+/* Links no sidebar */
+body.dark .sidebar nav a {
+    color: #06b92d;
+}
+
+body.dark .sidebar nav a:hover {
+    background-color: #0a3620; /* verde escuro sutil */
+    color: #3aff7a; /* verde claro forte */
+}
+
+body.dark .sidebar nav a.active {
+    background-color: #0f7c3a;
+    color: white;
+}
+
+/* Logo */
+body.dark .sidebar .logo {
+    color: #0ad648;
+}
+
+/* Botão de sair */
+body.dark .sidebar nav a[style] {
+    color: #ff6b6b !important;
+}
+
+/* ============================================
+   DARK MODE – DASHBOARD
+============================================ */
+body.dark .dashboard-wrap {
+    background-color: #111;
+    color: #e6ffe6; /* cor geral mais clara */
+}
+
+/* Conteúdo principal */
+body.dark .content {
+    color: #e6ffe6;
+}
+
+/* Títulos, big numbers, labels */
+body.dark .big {
+    color: #3aff7a; /* verde claro bonito */
+}
+
+body.dark .acc {
+    color: #9df5b8;
+}
+
+/* Cabeçalho: nome do usuário */
+body.dark .user-badge {
+    background: #0a3620;
+    color: #3aff7a;
+}
+
+/* Sumário */
+body.dark .summary .left,
+body.dark .summary .right {
+    color: #e6ffe6;
+}
+
+/* Widgets (cards) */
+body.dark .widget {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    color: #e6ffe6;
+}
+
+/* Placeholder de gráfico */
+body.dark .chart-placeholder {
+    background: linear-gradient(#1e1e1e, #141414);
+    color: #3aff7a;
+}
+
+/* Links dentro do conteúdo (se houver) */
+body.dark a {
+    color: #3aff7a;
+}
+/* === Ajuste específico: Total Investido no Dark Mode === */
+body.dark-mode .small-card .small-value {
+  color: #2f8a2f !important; /* verde legível */
+  font-weight: 700;
+}
+
+
+/* ============================================
+   DARK MODE – FORM PAGE
+============================================ */
+
+/* Fundo das seções */
+body.dark .form-section {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    color: #e6e6e6;
+}
+
+/* Labels */
+body.dark .form-group label {
+    color: #cfcfcf;
+}
+
+/* Inputs */
+body.dark .form-group input {
+    background: #2a2a2a;
+    border: 1px solid #444;
+    color: #fff;
+}
+body.dark .form-group input::placeholder {
+    color: #999;
+}
+
+/* Switch */
+body.dark .slider {
+    background-color: #555;
+}
+body.dark .switch input:checked + .slider {
+    background-color: #d90429; /* mantém o vermelho */
+}
+
+/* Tabela */
+body.dark .data-table th,
+body.dark .data-table td {
+    border-bottom: 1px solid #444;
+    color: #e6e6e6;
+}
+
+body.dark .data-table {
+    background: #1a1a1a;
+}
+
+/* Badges */
+body.dark .badge-green { background: #1f6d1f; }
+body.dark .badge-red { background: #b40320; }
+
+/* Texto colorido */
+body.dark .text-green { color: #36d436; }
+body.dark .text-red { color: #ff4a4a; }
+
+/* Botão primário */
+body.dark .btn-primary {
+    background: #36a836;
+}
+body.dark table.data-table tbody tr:hover {
+    background: #262626 !important;
+    color: #ffffff !important;
+}
+
+body.dark table.data-table tbody td:hover {
+    color: #ffffff !important;
+}
+/* ============================================
+   CORREÇÃO DEFINITIVA — Total Investido no modo escuro
+============================================ */
+body.dark .small-card .small-value {
+    color: #2f8a2f !important;  /* Verde forte visível */
+    font-weight: 700 !important;
+}
+
+
