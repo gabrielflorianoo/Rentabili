@@ -85,7 +85,7 @@ export default function Dashboard() {
                     }, {});
 
                 // sort investments per active by date asc
-                Object.keys(investmentsByActive).forEach(k => investmentsByActive[k].sort((a,b) => new Date(a.date) - new Date(b.date)));
+                Object.keys(investmentsByActive).forEach(k => investmentsByActive[k].sort((a, b) => new Date(a.date) - new Date(b.date)));
 
                 const gain = (normalized || [])
                     .filter(it => it.kind === 'Renda')
@@ -167,9 +167,14 @@ export default function Dashboard() {
                         >
                             Evolução
                         </div>
-                        <div className="chart-placeholder">
-                            (Gráfico de Performance)
-                        </div>
+                        <GraficoLinha
+                            data={[
+                                { mes: "JAN", valor: 2 },
+                                { mes: "FEB", valor: 4 },
+                                { mes: "MAR", valor: 6 },
+                                { mes: "APR", valor: 8 }
+                            ]}
+                        />
                     </div>
                 </section>
 
@@ -188,10 +193,15 @@ export default function Dashboard() {
                         <div>Rentabilidade Mensal</div>
                     </div>
                     <div className="widget">
-                        <div className="donut" style={{ fontSize: '2rem' }}>
-                            📊
-                        </div>
-                        <div>Carteira Diversificada</div>
+                        <GraficoDonut
+                            data={[
+                                { name: "Ações", value: 40 },
+                                { name: "Fundos", value: 25 },
+                                { name: "Renda Fixa", value: 20 },
+                                { name: "Criptomoedas", value: 15 }
+                            ]}
+                        />
+                        <div style={{ marginTop: -10 }}>Carteira Diversificada</div>
                     </div>
                 </section>
             </div>

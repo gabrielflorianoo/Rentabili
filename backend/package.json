@@ -34,8 +34,10 @@
         "jsonwebtoken": "^9.0.2",
         "morgan": "~1.9.1",
         "nodemon": "^3.1.10",
+        "react-google-charts": "^5.2.1",
         "swagger-jsdoc": "^6.2.8",
-        "swagger-ui-express": "^5.0.1"
+        "swagger-ui-express": "^5.0.1",
+        "typescript": "^5.9.3"
     },
     "devDependencies": {
         "prisma": "^5.22.0"
