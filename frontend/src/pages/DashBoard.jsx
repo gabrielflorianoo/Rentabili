@@ -16,10 +16,15 @@ export default function Dashboard() {
         totalBalance: 0,
         activesCount: 0,
     });
-    const [investments, setInvestments] = useState([]);
+    const [investmentos, setInvestmentos] = useState([]);
     const [totalInvested, setTotalInvested] = useState(0);
     const [totalGain, setTotalGain] = useState(0);
+    const [loadingInvestments, setLoadingInvestments] = useState(true);
     const [rentabilidade, setRentabilidade] = useState(0);
+    const [graphData, setGraphData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [donutData, setDonutData] = useState([]);
 
     useEffect(() => {
         const user = servicoAutenticacao.obterUsuarioAtual();
@@ -31,98 +36,140 @@ export default function Dashboard() {
         }
         setUserData(user);
 
-        // BUSCA DADOS REAIS NO BACK-END
         const getDashboardData = async () => {
+            setLoading(true);
+            setError(null);
+            setLoadingInvestments(true);
             try {
                 const data = await dashboardApi.getSummary();
                 if (data.totalBalance !== undefined) {
                     setSummary(data);
                 }
 
-                // Busca investimentos para calcular total investido e rentabilidade
+                // Fetch total invested and gain/loss from backend
+                const [totalInvestedData, gainLossData] = await Promise.all([
+                    investmentsApi
+                        .getTotalInvested()
+                        .catch(() => ({ totalInvested: 0 })),
+                    investmentsApi.getGainLoss().catch(() => ({ gainLoss: 0 })),
+                ]);
+
+                setTotalInvested(totalInvestedData.totalInvested || 0);
+                setTotalGain(gainLossData.gainLoss || 0);
+
                 const invs = await investmentsApi.list().catch(() => []);
 
-                // Normaliza kind e amount para evitar problemas de tipagem/formatos
                 const parseAmount = (val) => {
                     if (val === null || val === undefined) return 0;
                     if (typeof val === 'number') return val;
                     const s = String(val).trim();
                     if (s === '') return 0;
                     try {
-                        // Caso o número venha com separador de milhares e vírgula decimal (ex: "10.000,00")
                         if (s.indexOf(',') > -1 && s.indexOf('.') > -1) {
-                            // assume '.' milhares e ',' decimal
-                            return parseFloat(s.replace(/\./g, '').replace(',', '.')) || 0;
+                            return (
+                                parseFloat(
+                                    s.replace(/\./g, '').replace(',', '.'),
+                                ) || 0
+                            );
                         }
-                        // caso venha com vírgula decimal (ex: "1000,50")
                         if (s.indexOf(',') > -1 && s.indexOf('.') === -1) {
                             return parseFloat(s.replace(',', '.')) || 0;
                         }
-                        // caso padrão inglês (ex: "13284.81")
                         return parseFloat(s) || 0;
                     } catch (e) {
                         return 0;
                     }
                 };
 
-                const normalized = invs.map(i => {
-                    const rawKind = (i.kind ?? 'Investimento') + '';
-                    const kindNorm = rawKind.toLowerCase() === 'renda' ? 'Renda' : 'Investimento';
-                    return { ...i, kind: kindNorm, amountNum: parseAmount(i.amount) };
+                const normalized = invs.map((i) => {
+                    const rawKind = (i.kind ?? 'Outros') + '';
+                    // Mapeia tipos de investimento para categorias mais genéricas para o gráfico de donut
+                    let kindNorm;
+                    if (
+                        rawKind.toLowerCase().includes('cdb') ||
+                        rawKind.toLowerCase().includes('renda fixa')
+                    ) {
+                        kindNorm = 'Renda Fixa';
+                    } else if (rawKind.toLowerCase().includes('fundo')) {
+                        kindNorm = 'Fundos';
+                    } else if (rawKind.toLowerCase().includes('ação')) {
+                        kindNorm = 'Ações';
+                    } else {
+                        kindNorm = 'Outros';
+                    }
+                    return {
+                        ...i,
+                        kind: kindNorm,
+                        amountNum: parseAmount(i.amount),
+                    };
                 });
 
-                // mantemos a lista normalizada no estado para debug/uso futuro
-                setInvestments(normalized || []);
+                setInvestmentos(normalized || []);
 
-                const invested = (normalized || [])
-                    .filter(it => it.kind === 'Investimento')
-                    .reduce((acc, it) => acc + (it.amountNum || 0), 0);
-
-                // Somar ganhos/perdas como DELTA entre cada 'Renda' e o investimento anterior do mesmo ativo
-                const investmentsByActive = (normalized || [])
-                    .filter(it => it.kind === 'Investimento')
-                    .reduce((map, it) => {
-                        if (!map[it.activeId]) map[it.activeId] = [];
-                        map[it.activeId].push(it);
-                        return map;
-                    }, {});
-
-                // sort investments per active by date asc
-                Object.keys(investmentsByActive).forEach(k => investmentsByActive[k].sort((a, b) => new Date(a.date) - new Date(b.date)));
-
-                const gain = (normalized || [])
-                    .filter(it => it.kind === 'Renda')
-                    .reduce((acc, renda) => {
-                        const list = investmentsByActive[renda.activeId] || [];
-                        // find latest investment with date <= renda.date
-                        const base = list.slice().reverse().find(inv => new Date(inv.date) <= new Date(renda.date));
-                        if (base) {
-                            const delta = (renda.amountNum || 0) - (base.amountNum || 0);
-                            return acc + delta;
-                        }
-                        // fallback: if no base found, assume renda.amountNum is already the delta
-                        return acc + (renda.amountNum || 0);
-                    }, 0);
-
-                console.log('Investimentos normalizados:', normalized);
-
-                setTotalInvested(invested);
-                // totalBalance pode ser string/number
-                setTotalGain(gain);
-
-                const rentabilidadePorcentagem = Math.floor(gain / invested) / 100;
-
+                const rentabilidadePorcentagem =
+                    totalInvested > 0
+                        ? ((totalGain / totalInvested) * 100).toFixed(2)
+                        : 0;
                 setRentabilidade(rentabilidadePorcentagem);
+
+                // Processar dados para GraficoDonut
+                const donutDataMap = normalized.reduce((acc, item) => {
+                    if (item.kind !== 'Renda') {
+                        // Excluir 'Renda' do gráfico de distribuição
+                        acc[item.kind] = (acc[item.kind] || 0) + item.amountNum;
+                    }
+                    return acc;
+                }, {});
+
+                const processedDonutData = Object.keys(donutDataMap).map(
+                    (kind) => ({
+                        name: kind,
+                        value: donutDataMap[kind].toFixed(2),
+                    }),
+                );
+                setDonutData(processedDonutData);
+
+                // Processar dados para GraficoLinha (evolução do patrimônio ao longo do tempo)
+                // Agrupar por mês e somar os valores
+                const monthlyEvolution = normalized.reduce((acc, item) => {
+                    const date = new Date(item.date);
+                    const month = date
+                        .toLocaleString('pt-BR', { month: 'short' })
+                        .toUpperCase();
+                    const year = date.getFullYear();
+                    const key = `${month}-${year}`;
+
+                    if (!acc[key]) {
+                        acc[key] = {
+                            mes: month,
+                            valor: 0,
+                            timestamp: date.getTime(),
+                        };
+                    }
+                    acc[key].valor += item.amountNum;
+                    return acc;
+                }, {});
+
+                const sortedLineGraphData = Object.values(monthlyEvolution)
+                    .sort((a, b) => a.timestamp - b.timestamp)
+                    .map((item) => ({ mes: item.mes, valor: Number(item.valor).toFixed(2) }));
+
+                setGraphData(sortedLineGraphData);
             } catch (err) {
-                console.error('Erro ao conectar no dashboard ou carregar investimentos:', err);
+                console.error(
+                    'Erro ao conectar no dashboard ou carregar investimentos:',
+                    err,
+                );
+                setError('Erro ao carregar dados do dashboard.');
                 if (err.response?.status === 401) {
-                    // Se o token venceu, desloga
                     servicoAutenticacao.sair();
                     navigate('/');
                 }
+            } finally {
+                setLoading(false);
+                setLoadingInvestments(false);
             }
-        }
-
+        };
         getDashboardData();
     }, [navigate]);
 
@@ -156,15 +203,43 @@ export default function Dashboard() {
                         </div>
                         <div style={{ marginTop: 12 }}>
                             <div className="small-card">
-                                <div className="small-label">Total Investido</div>
-                                <div className="small-value">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalInvested)}</div>
-                            </div>
-                            <div className="small-card" style={{ marginTop: 8 }}>
-                                <div className="small-label">Ganho/Perda Investimentos</div>
-                                <div className="small-value" style={{ color: totalGain >= 0 ? '#2f8a2f' : '#d90429', fontWeight: 700 }}>
-                                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalGain)}
+                                <div className="small-label">
+                                    Total Investido
+                                </div>
+                                <div className="small-value">
+                                    {new Intl.NumberFormat('pt-BR', {
+                                        style: 'currency',
+                                        currency: 'BRL',
+                                    }).format(totalInvested)}
                                 </div>
                             </div>
+                            {loadingInvestments ? (
+                                <p>Carregando...</p>
+                            ) : (
+                                <div
+                                    className="small-card"
+                                    style={{ marginTop: 8 }}
+                                >
+                                    <div className="small-label">
+                                        Ganho/Perda Investimentos
+                                    </div>
+                                    <div
+                                        className="small-value"
+                                        style={{
+                                            color:
+                                                totalGain >= 0
+                                                    ? '#2f8a2f'
+                                                    : '#d90429',
+                                            fontWeight: 700,
+                                        }}
+                                    >
+                                        {new Intl.NumberFormat('pt-BR', {
+                                            style: 'currency',
+                                            currency: 'BRL',
+                                        }).format(totalGain)}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                     <div className="right">
@@ -174,14 +249,13 @@ export default function Dashboard() {
                         >
                             Evolução
                         </div>
-                        <GraficoLinha
-                            data={[
-                                { mes: "JAN", valor: 2 },
-                                { mes: "FEB", valor: 4 },
-                                { mes: "MAR", valor: 6 },
-                                { mes: "APR", valor: 8 }
-                            ]}
-                        />
+                        {error && <p style={{ color: 'red' }}>{error}</p>}
+                        {!loading && !error && graphData.length > 0 && (
+                            <GraficoLinha data={graphData} />
+                        )}
+                        {!loading && !error && graphData.length === 0 && (
+                            <p>Nenhum dado de evolução disponível.</p>
+                        )}
                     </div>
                 </section>
 
@@ -191,11 +265,12 @@ export default function Dashboard() {
                             className="pie"
                             style={{
                                 fontSize: '2rem',
-                                color: rentabilidade > 0
-                                    ? '#2f8a2f'
-                                    : rentabilidade === 0
-                                        ? '#808080'
-                                        : '#ff0000',
+                                color:
+                                    rentabilidade > 0
+                                        ? '#2f8a2f'
+                                        : rentabilidade === 0
+                                          ? '#808080'
+                                          : '#ff0000',
                                 fontWeight: 'bold',
                             }}
                         >
@@ -204,15 +279,16 @@ export default function Dashboard() {
                         <div>Rentabilidade Mensal</div>
                     </div>
                     <div className="widget">
-                        <GraficoDonut
-                            data={[
-                                { name: "Ações", value: 40 },
-                                { name: "Fundos", value: 25 },
-                                { name: "Renda Fixa", value: 20 },
-                                { name: "Criptomoedas", value: 15 }
-                            ]}
-                        />
-                        <div style={{ marginTop: -10 }}>Carteira Diversificada</div>
+                        {error && <p style={{ color: 'red' }}>{error}</p>}
+                        {!loading && !error && donutData.length > 0 && (
+                            <GraficoDonut data={donutData} />
+                        )}
+                        {!loading && !error && donutData.length === 0 && (
+                            <p>Nenhum dado de distribuição disponível.</p>
+                        )}
+                        <div style={{ marginTop: -10 }}>
+                            Carteira Diversificada
+                        </div>
                     </div>
                 </section>
             </div>

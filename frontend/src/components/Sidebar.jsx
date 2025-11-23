@@ -10,24 +10,43 @@ export default function Sidebar({ aoSair = () => {}, paginaAtiva = '' }) {
                 📈<strong>RENTABIL</strong>
             </div>
             <nav>
-                <a onClick={() => navigate('/dashboard')} className={paginaAtiva === 'dashboard' ? 'active' : ''}>
+                <a
+                    onClick={() => navigate('/dashboard')}
+                    className={paginaAtiva === 'dashboard' ? 'active' : ''}
+                >
                     Dashboard
                 </a>
-                <a onClick={() => navigate('/investimentos')} className={paginaAtiva === 'investimentos' ? 'active' : ''}>
+                <a
+                    onClick={() => navigate('/investimentos')}
+                    className={paginaAtiva === 'investimentos' ? 'active' : ''}
+                >
                     Investimentos
                 </a>
-                <a onClick={() => navigate('/actives')} className={paginaAtiva === 'actives' ? 'active' : ''}>
+                <a
+                    onClick={() => navigate('/actives')}
+                    className={paginaAtiva === 'actives' ? 'active' : ''}
+                >
                     Ativos
                 </a>
-                <a onClick={() => navigate('/transacoes')} className={paginaAtiva === 'transacoes' ? 'active' : ''}>
+                <a
+                    onClick={() => navigate('/transacoes')}
+                    className={paginaAtiva === 'transacoes' ? 'active' : ''}
+                >
                     Transações
                 </a>
-                <a onClick={() => navigate('/relatorios')} className={paginaAtiva === 'relatorios' ? 'active' : ''}>
+                <a
+                    onClick={() => navigate('/relatorios')}
+                    className={paginaAtiva === 'relatorios' ? 'active' : ''}
+                >
                     Relatórios
                 </a>
                 <a
                     onClick={aoSair}
-                    style={{ marginTop: 'auto', color: '#d90429', cursor: 'pointer' }}
+                    style={{
+                        marginTop: 'auto',
+                        color: '#d90429',
+                        cursor: 'pointer',
+                    }}
                 >
                     Sair da Conta
                 </a>

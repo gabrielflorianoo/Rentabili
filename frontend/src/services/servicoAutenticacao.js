@@ -11,7 +11,10 @@ export const servicoAutenticacao = {
                 localStorage.setItem('rentabil_token', data.token);
             }
             if (data.user) {
-                localStorage.setItem('rentabil_user', JSON.stringify(data.user));
+                localStorage.setItem(
+                    'rentabil_user',
+                    JSON.stringify(data.user),
+                );
             }
 
             return { sucesso: true, usuario: data.user };
@@ -34,7 +37,11 @@ export const servicoAutenticacao = {
             if (response.user) {
                 return { sucesso: true };
             }
-            return { sucesso: false, erro: response.data?.error || 'Erro ao cadastrar', campo: 'email' };
+            return {
+                sucesso: false,
+                erro: response.data?.error || 'Erro ao cadastrar',
+                campo: 'email',
+            };
         } catch (error) {
             const msg = error?.response?.data?.error || 'Erro de conexão.';
             return { sucesso: false, erro: msg, campo: 'email' };

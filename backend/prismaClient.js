@@ -31,7 +31,10 @@ function getPrismaClient() {
             prismaInstance = global.__prisma;
         }
     } catch (error) {
-        console.error('❌ [Prisma] Erro ao inicializar Prisma Client:', error.message);
+        console.error(
+            '❌ [Prisma] Erro ao inicializar Prisma Client:',
+            error.message,
+        );
         console.error('Stack:', error.stack);
         throw error;
     }

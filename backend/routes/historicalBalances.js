@@ -1,5 +1,11 @@
 import { Router } from 'express';
-import { createHistoricalBalance, getHistoricalBalancesByActive, getHistoricalBalanceById, updateHistoricalBalance, deleteHistoricalBalance } from '../controllers/historicalBalanceController.js';
+import {
+    createHistoricalBalance,
+    getHistoricalBalancesByActive,
+    getHistoricalBalanceById,
+    updateHistoricalBalance,
+    deleteHistoricalBalance,
+} from '../controllers/historicalBalanceController.js';
 import { authenticateToken } from '../middlewares/authMiddleware.js';
 
 const router = Router();

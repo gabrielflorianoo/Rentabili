@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { servicoAutenticacao } from '../services/servicoAutenticacao';
-import { transactionsApi, dashboardApi, investmentsApi } from '../services/apis';
+import {
+    transactionsApi,
+    dashboardApi,
+    investmentsApi,
+} from '../services/apis';
 import Sidebar from '../components/Sidebar';
 import './Relatorios.css';
 

@@ -49,7 +49,11 @@ class AuthController {
 
             res.status(201).json({
                 message: 'Usuário registrado com sucesso',
-                user: { id: newUser.id, name: newUser.name, email: newUser.email },
+                user: {
+                    id: newUser.id,
+                    name: newUser.name,
+                    email: newUser.email,
+                },
             });
         } catch (error) {
             res.status(500).json({ error: error.message });

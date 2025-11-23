@@ -1,7 +1,9 @@
 // Utilitário para gerar dados plausíveis e aleatórios para preencher formulários durante desenvolvimento
 const randomFrom = (arr) => arr[Math.floor(Math.random() * arr.length)];
-const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-const randomFloat = (min, max, decimals = 2) => (Math.random() * (max - min) + min).toFixed(decimals);
+const randomInt = (min, max) =>
+    Math.floor(Math.random() * (max - min + 1)) + min;
+const randomFloat = (min, max, decimals = 2) =>
+    (Math.random() * (max - min) + min).toFixed(decimals);
 
 const recentDateISO = (daysBack = 120) => {
     const days = randomInt(0, daysBack);
@@ -28,7 +30,9 @@ export function generateTransaction() {
 
     const isExpense = Math.random() > 0.5;
     const type = isExpense ? 'expense' : 'income';
-    const description = isExpense ? randomFrom(expenseDescriptions) : randomFrom(incomeDescriptions);
+    const description = isExpense
+        ? randomFrom(expenseDescriptions)
+        : randomFrom(incomeDescriptions);
     const amount = isExpense ? randomFloat(5, 1200) : randomFloat(200, 8000);
 
     return {

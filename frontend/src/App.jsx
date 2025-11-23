@@ -2,8 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 // Importação das Páginas
-import HomeHero from './pages/HomeHero';           
-import PaginaAutenticacao from './pages/PaginaAutenticacao'; 
+import HomeHero from './pages/HomeHero';
+import PaginaAutenticacao from './pages/PaginaAutenticacao';
 import Dashboard from './pages/DashBoard';
 
 // --- NOVAS IMPORTAÇÕES NECESSÁRIAS ---
@@ -18,7 +18,7 @@ import Transacoes from './pages/Transacoes';
 
 // Importação dos Componentes e Estilos
 import RotaProtegida from './components/ProtectRout'; // Mantive como você mandou
-import './styles/estilo.css'; 
+import './styles/estilo.css';
 
 export default function App() {
     return (
@@ -26,7 +26,7 @@ export default function App() {
             <Routes>
                 {/* Rota Principal (Home) */}
                 <Route path="/" element={<HomeHero />} />
-                
+
                 {/* Rota de Login */}
                 <Route path="/login" element={<PaginaAutenticacao />} />
 
@@ -36,13 +36,13 @@ export default function App() {
                 <Route path="/sobre" element={<Sobre />} />
 
                 {/* --- ROTA PROTEGIDA (DASHBOARD) --- */}
-                <Route 
-                    path="/dashboard" 
+                <Route
+                    path="/dashboard"
                     element={
                         <RotaProtegida>
                             <Dashboard />
                         </RotaProtegida>
-                    } 
+                    }
                 />
                 <Route
                     path="/investimentos"

@@ -16,7 +16,11 @@ export async function createHistoricalBalance(req, res) {
         });
 
         if (!active) {
-            return res.status(404).json({ error: 'Active not found or does not belong to the user' });
+            return res
+                .status(404)
+                .json({
+                    error: 'Active not found or does not belong to the user',
+                });
         }
 
         const historicalBalance = await prisma.historicalBalance.create({
@@ -47,7 +51,11 @@ export async function getHistoricalBalancesByActive(req, res) {
         });
 
         if (!active) {
-            return res.status(404).json({ error: 'Active not found or does not belong to the user' });
+            return res
+                .status(404)
+                .json({
+                    error: 'Active not found or does not belong to the user',
+                });
         }
 
         const historicalBalances = await prisma.historicalBalance.findMany({
@@ -74,7 +82,11 @@ export async function getHistoricalBalanceById(req, res) {
         });
 
         if (!historicalBalance || historicalBalance.active.userId !== userId) {
-            return res.status(404).json({ error: 'Historical balance not found or does not belong to the user' });
+            return res
+                .status(404)
+                .json({
+                    error: 'Historical balance not found or does not belong to the user',
+                });
         }
         res.status(200).json(historicalBalance);
     } catch (error) {
@@ -95,7 +107,11 @@ export async function updateHistoricalBalance(req, res) {
         });
 
         if (!existingBalance || existingBalance.active.userId !== userId) {
-            return res.status(404).json({ error: 'Historical balance not found or does not belong to the user' });
+            return res
+                .status(404)
+                .json({
+                    error: 'Historical balance not found or does not belong to the user',
+                });
         }
 
         const historicalBalance = await prisma.historicalBalance.update({
@@ -123,7 +139,11 @@ export async function deleteHistoricalBalance(req, res) {
         });
 
         if (!existingBalance || existingBalance.active.userId !== userId) {
-            return res.status(404).json({ error: 'Historical balance not found or does not belong to the user' });
+            return res
+                .status(404)
+                .json({
+                    error: 'Historical balance not found or does not belong to the user',
+                });
         }
 
         await prisma.historicalBalance.delete({

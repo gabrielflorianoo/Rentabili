@@ -21,11 +21,11 @@ const handleResponse = async (responsePromise) => {
         return response.data;
     } catch (error) {
         // Você pode adicionar tratamento de erro específico aqui (ex: redirecionar no 401)
-        console.error("Erro na Requisição API:", error);
+        console.error('Erro na Requisição API:', error);
         // Lança o erro novamente para que o código de chamada possa tratá-lo (opcional, mas recomendado)
-        throw error; 
+        throw error;
     }
-}
+};
 
 // Interceptor para adicionar token quando presente
 apiClient.interceptors.request.use((config) => {
@@ -45,10 +45,11 @@ apiClient.interceptors.request.use((config) => {
 // Cria uma função auxiliar para aplicar o handleResponse a todas as chamadas.
 
 const get = (url, config) => handleResponse(apiClient.get(url, config));
-const post = (url, data, config) => handleResponse(apiClient.post(url, data, config));
-const put = (url, data, config) => handleResponse(apiClient.put(url, data, config));
+const post = (url, data, config) =>
+    handleResponse(apiClient.post(url, data, config));
+const put = (url, data, config) =>
+    handleResponse(apiClient.put(url, data, config));
 const remove = (url, config) => handleResponse(apiClient.delete(url, config));
-
 
 // Auth API
 export const authApi = {
@@ -81,6 +82,8 @@ export const investmentsApi = {
     create: (payload) => post('/investments', payload),
     update: (id, payload) => put(`/investments/${id}`, payload),
     remove: (id) => remove(`/investments/${id}`),
+    getTotalInvested: () => get('/investments/total-invested'),
+    getGainLoss: () => get('/investments/gain-loss'),
 };
 
 // Wallets API

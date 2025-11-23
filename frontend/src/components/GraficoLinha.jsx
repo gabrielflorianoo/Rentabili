@@ -1,4 +1,11 @@
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import {
+    LineChart,
+    Line,
+    XAxis,
+    YAxis,
+    Tooltip,
+    ResponsiveContainer,
+} from 'recharts';
 
 export default function GraficoLinha({ data }) {
     return (
@@ -7,11 +14,11 @@ export default function GraficoLinha({ data }) {
                 <XAxis dataKey="mes" />
                 <YAxis />
                 <Tooltip />
-                <Line 
-                    type="monotone" 
-                    dataKey="valor" 
-                    stroke="#2ecc71" 
-                    strokeWidth={3} 
+                <Line
+                    type="monotone"
+                    dataKey="valor"
+                    stroke="#2ecc71"
+                    strokeWidth={3}
                 />
             </LineChart>
         </ResponsiveContainer>

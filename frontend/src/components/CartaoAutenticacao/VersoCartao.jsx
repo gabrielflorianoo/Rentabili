@@ -47,13 +47,11 @@ const VersoCartao = ({ aoVirar }) => {
             const resposta = await servicoAutenticacao.cadastrar(dadosForm);
             console.log(resposta);
 
-            if (resposta.sucesso)
-                setSucesso(true);
-            else
-                setErros({ geral: resposta.erro });
+            if (resposta.sucesso) setSucesso(true);
+            else setErros({ geral: resposta.erro });
         } catch (err) {
             setErros({ geral: 'Erro ao criar conta' });
-            opcional: console.error(err);
+            console.error(err);
         } finally {
             setCarregando(false);
         }
@@ -140,10 +138,15 @@ const VersoCartao = ({ aoVirar }) => {
                             />
 
                             {erros.geral && (
-                                <div className="erro-geral">{erros.geral}</div>
+                                <div className="error-message">
+                                    {erros.geral}
+                                </div>
                             )}
 
-                            <button type="submit" className={`holo-button ${carregando ?? ' carregando'}`}>
+                            <button
+                                type="submit"
+                                className={`holo-button ${carregando ?? ' carregando'}`}
+                            >
                                 {carregando ? 'Enviando...' : 'Criar Conta'}
                             </button>
                             <button

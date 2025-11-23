@@ -1,5 +1,11 @@
 import { Router } from 'express';
-import { createActive, getActives, getActiveById, updateActive, deleteActive } from '../controllers/activeController.js';
+import {
+    createActive,
+    getActives,
+    getActiveById,
+    updateActive,
+    deleteActive,
+} from '../controllers/activeController.js';
 import { authenticateToken } from '../middlewares/authMiddleware.js';
 
 const router = Router();

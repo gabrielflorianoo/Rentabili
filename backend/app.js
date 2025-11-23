@@ -18,7 +18,10 @@ import historicalBalancesRouter from './routes/historicalBalances.js';
 // Log para verificar se o .env está sendo lido
 console.log('🔧 Configuração do ambiente:');
 console.log('   USE_DB:', process.env.USE_DB);
-console.log('   DATABASE_URL:', process.env.DATABASE_URL ? '✅ Configurado' : '❌ Não configurado');
+console.log(
+    '   DATABASE_URL:',
+    process.env.DATABASE_URL ? '✅ Configurado' : '❌ Não configurado',
+);
 console.log('   PORT:', process.env.PORT || 3000);
 
 const app = express();

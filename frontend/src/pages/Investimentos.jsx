@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { servicoAutenticacao } from '../services/servicoAutenticacao';
-import {
-    investmentsApi,
-    activesApi,
-} from '../services/apis';
+import { investmentsApi, activesApi } from '../services/apis';
 import { generateInvestment } from '../utils/fakeData';
 import './Investimentos.css';
 import Sidebar from '../components/Sidebar';
@@ -125,7 +122,7 @@ export default function Investimentos() {
             console.error('Erro ao salvar investimento:', err);
             alert(
                 'Erro ao salvar investimento: ' +
-                (err.response?.data?.error || err.message),
+                    (err.response?.data?.error || err.message),
             );
         }
     };
@@ -143,7 +140,7 @@ export default function Investimentos() {
             console.error('Erro ao excluir investimento:', err);
             alert(
                 'Erro ao excluir investimento: ' +
-                (err.response?.data?.error || err.message),
+                    (err.response?.data?.error || err.message),
             );
         }
     };
@@ -168,7 +165,9 @@ export default function Investimentos() {
             const pct = Math.random() * (max - min) + min;
 
             const currentAmount = parseFloat(inv.amount);
-            const newAmount = parseFloat((currentAmount * (1 + pct)).toFixed(2));
+            const newAmount = parseFloat(
+                (currentAmount * (1 + pct)).toFixed(2),
+            );
 
             // Criar entrada do tipo 'Renda' contendo somente o ganho/perda (delta)
             const payload = {
@@ -189,20 +188,25 @@ export default function Investimentos() {
                 navigate('/');
                 return;
             }
-            alert('Erro ao simular investimento: ' + (err.response?.data?.error || err.message));
+            alert(
+                'Erro ao simular investimento: ' +
+                    (err.response?.data?.error || err.message),
+            );
         }
     };
 
     // Helper maps
     const activeById = React.useMemo(() => {
         const map = new Map();
-        (actives || []).forEach(a => map.set(a.id, a));
+        (actives || []).forEach((a) => map.set(a.id, a));
         return map;
     }, [actives]);
 
     const tiposAtivos = React.useMemo(() => {
         const set = new Set();
-        (actives || []).forEach(a => { if (a.type) set.add(a.type); });
+        (actives || []).forEach((a) => {
+            if (a.type) set.add(a.type);
+        });
         return Array.from(set);
     }, [actives]);
 
@@ -227,7 +231,10 @@ export default function Investimentos() {
                 <div className="filters-row">
                     <div className="filter-item">
                         <label>Mostrar:</label>
-                        <select value={filterKind} onChange={(e) => setFilterKind(e.target.value)}>
+                        <select
+                            value={filterKind}
+                            onChange={(e) => setFilterKind(e.target.value)}
+                        >
                             <option value="Todos">Todos</option>
                             <option value="Investimento">Investimentos</option>
                             <option value="Renda">Rendas</option>
@@ -235,10 +242,17 @@ export default function Investimentos() {
                     </div>
                     <div className="filter-item">
                         <label>Tipo do Ativo:</label>
-                        <select value={filterActiveType} onChange={(e) => setFilterActiveType(e.target.value)}>
+                        <select
+                            value={filterActiveType}
+                            onChange={(e) =>
+                                setFilterActiveType(e.target.value)
+                            }
+                        >
                             <option value="Todos">Todos</option>
                             {tiposAtivos.map((t) => (
-                                <option key={t} value={t}>{t}</option>
+                                <option key={t} value={t}>
+                                    {t}
+                                </option>
                             ))}
                         </select>
                     </div>
@@ -250,15 +264,30 @@ export default function Investimentos() {
                     <div className="table-container">
                         {/** Prepare filtered lists **/}
                         {(() => {
-                            const filtered = (investimentos || []).filter(inv => {
-                                const kindMatch = filterKind === 'Todos' ? true : (inv.kind === filterKind);
-                                const ativo = inv.active || activeById.get(inv.activeId);
-                                const tipoMatch = filterActiveType === 'Todos' ? true : (ativo && ativo.type === filterActiveType);
-                                return kindMatch && tipoMatch;
-                            });
+                            const filtered = (investimentos || []).filter(
+                                (inv) => {
+                                    const kindMatch =
+                                        filterKind === 'Todos'
+                                            ? true
+                                            : inv.kind === filterKind;
+                                    const ativo =
+                                        inv.active ||
+                                        activeById.get(inv.activeId);
+                                    const tipoMatch =
+                                        filterActiveType === 'Todos'
+                                            ? true
+                                            : ativo &&
+                                              ativo.type === filterActiveType;
+                                    return kindMatch && tipoMatch;
+                                },
+                            );
 
-                            const investimentosSomente = filtered.filter(i => i.kind !== 'Renda');
-                            const rendas = filtered.filter(i => i.kind === 'Renda');
+                            const investimentosSomente = filtered.filter(
+                                (i) => i.kind !== 'Renda',
+                            );
+                            const rendas = filtered.filter(
+                                (i) => i.kind === 'Renda',
+                            );
 
                             return (
                                 <>
@@ -273,7 +302,8 @@ export default function Investimentos() {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {investimentosSomente.length === 0 ? (
+                                            {investimentosSomente.length ===
+                                            0 ? (
                                                 <tr>
                                                     <td
                                                         colSpan="5"
@@ -282,29 +312,78 @@ export default function Investimentos() {
                                                             padding: '40px',
                                                         }}
                                                     >
-                                                        Nenhum investimento cadastrado
+                                                        Nenhum investimento
+                                                        cadastrado
                                                     </td>
                                                 </tr>
                                             ) : (
-                                                investimentosSomente.map((inv) => (
-                                                    <tr key={inv.id}>
-                                                        <td>{inv.id}</td>
-                                                        <td>
-                                                            {(inv.active?.name) || (activeById.get(inv.activeId)?.name) || `Ativo #${inv.activeId}`}
-                                                        </td>
-                                                        <td>
-                                                            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(inv.amount)}
-                                                        </td>
-                                                        <td>
-                                                            {new Date(inv.date).toLocaleDateString('pt-BR')}
-                                                        </td>
-                                                        <td>
-                                                            <button className="btn-edit" onClick={() => abrirModal(inv)}>✏️</button>
-                                                            <button className="btn-delete" onClick={() => handleDelete(inv.id)}>🗑️</button>
-                                                            <button className="btn-simulate" onClick={() => handleSimular(inv)} title="Simular mercado (cria nova renda para o próximo mês)">🔁</button>
-                                                        </td>
-                                                    </tr>
-                                                ))
+                                                investimentosSomente.map(
+                                                    (inv) => (
+                                                        <tr key={inv.id}>
+                                                            <td>{inv.id}</td>
+                                                            <td>
+                                                                {inv.active
+                                                                    ?.name ||
+                                                                    activeById.get(
+                                                                        inv.activeId,
+                                                                    )?.name ||
+                                                                    `Ativo #${inv.activeId}`}
+                                                            </td>
+                                                            <td>
+                                                                {new Intl.NumberFormat(
+                                                                    'pt-BR',
+                                                                    {
+                                                                        style: 'currency',
+                                                                        currency:
+                                                                            'BRL',
+                                                                    },
+                                                                ).format(
+                                                                    inv.amount,
+                                                                )}
+                                                            </td>
+                                                            <td>
+                                                                {new Date(
+                                                                    inv.date,
+                                                                ).toLocaleDateString(
+                                                                    'pt-BR',
+                                                                )}
+                                                            </td>
+                                                            <td>
+                                                                <button
+                                                                    className="btn-edit"
+                                                                    onClick={() =>
+                                                                        abrirModal(
+                                                                            inv,
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    ✏️
+                                                                </button>
+                                                                <button
+                                                                    className="btn-delete"
+                                                                    onClick={() =>
+                                                                        handleDelete(
+                                                                            inv.id,
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    🗑️
+                                                                </button>
+                                                                <button
+                                                                    className="btn-simulate"
+                                                                    onClick={() =>
+                                                                        handleSimular(
+                                                                            inv,
+                                                                        )
+                                                                    }
+                                                                    title="Simular mercado (cria nova renda para o próximo mês)"
+                                                                >
+                                                                    🔁
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    ),
+                                                )
                                             )}
                                         </tbody>
                                     </table>
@@ -313,24 +392,99 @@ export default function Investimentos() {
                                         <div className="renda-section">
                                             <h3>Rendas</h3>
                                             <ul className="renda-list">
-                                                {rendas.map(r => {
+                                                {rendas.map((r) => {
                                                     // tenta achar o investimento base (último investimento deste ativo antes da renda)
-                                                    const base = investimentosSomente
-                                                        .filter(i => i.activeId === r.activeId && new Date(i.date) <= new Date(r.date))
-                                                        .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
-                                                    let displayAmount = r.amount;
+                                                    const base =
+                                                        investimentosSomente
+                                                            .filter(
+                                                                (i) =>
+                                                                    i.activeId ===
+                                                                        r.activeId &&
+                                                                    new Date(
+                                                                        i.date,
+                                                                    ) <=
+                                                                        new Date(
+                                                                            r.date,
+                                                                        ),
+                                                            )
+                                                            .sort(
+                                                                (a, b) =>
+                                                                    new Date(
+                                                                        b.date,
+                                                                    ) -
+                                                                    new Date(
+                                                                        a.date,
+                                                                    ),
+                                                            )[0];
+                                                    let displayAmount =
+                                                        r.amount;
                                                     // se encontrarmos base e ambos tiverem amount numérico, mostramos apenas o delta
-                                                    const amtR = parseFloat(r.amount) || (typeof r.amountNum === 'number' ? r.amountNum : NaN);
-                                                    const amtBase = base ? (parseFloat(base.amount) || (typeof base.amountNum === 'number' ? base.amountNum : NaN)) : NaN;
-                                                    if (!isNaN(amtR) && !isNaN(amtBase)) {
-                                                        const delta = +(amtR - amtBase).toFixed(2);
+                                                    const amtR =
+                                                        parseFloat(r.amount) ||
+                                                        (typeof r.amountNum ===
+                                                        'number'
+                                                            ? r.amountNum
+                                                            : NaN);
+                                                    const amtBase = base
+                                                        ? parseFloat(
+                                                              base.amount,
+                                                          ) ||
+                                                          (typeof base.amountNum ===
+                                                          'number'
+                                                              ? base.amountNum
+                                                              : NaN)
+                                                        : NaN;
+                                                    if (
+                                                        !isNaN(amtR) &&
+                                                        !isNaN(amtBase)
+                                                    ) {
+                                                        const delta = +(
+                                                            amtR - amtBase
+                                                        ).toFixed(2);
                                                         displayAmount = delta;
                                                     }
 
                                                     return (
-                                                        <li key={r.id} className="renda-item">
-                                                            {'\u00A0'}{(r.active?.name) || (activeById.get(r.activeId)?.name) || `Ativo #${r.activeId}`} — {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(displayAmount)} — {new Date(r.date).toLocaleDateString('pt-BR')}
-                                                            <button className="btn-delete" style={{ marginLeft: 8 }} onClick={() => handleDelete(r.id)}>🗑️</button>
+                                                        <li
+                                                            key={r.id}
+                                                            className="renda-item"
+                                                        >
+                                                            {'\u00A0'}
+                                                            {r.active?.name ||
+                                                                activeById.get(
+                                                                    r.activeId,
+                                                                )?.name ||
+                                                                `Ativo #${r.activeId}`}{' '}
+                                                            —{' '}
+                                                            {new Intl.NumberFormat(
+                                                                'pt-BR',
+                                                                {
+                                                                    style: 'currency',
+                                                                    currency:
+                                                                        'BRL',
+                                                                },
+                                                            ).format(
+                                                                displayAmount,
+                                                            )}{' '}
+                                                            —{' '}
+                                                            {new Date(
+                                                                r.date,
+                                                            ).toLocaleDateString(
+                                                                'pt-BR',
+                                                            )}
+                                                            <button
+                                                                className="btn-delete"
+                                                                style={{
+                                                                    marginLeft: 8,
+                                                                }}
+                                                                onClick={() =>
+                                                                    handleDelete(
+                                                                        r.id,
+                                                                    )
+                                                                }
+                                                            >
+                                                                🗑️
+                                                            </button>
                                                         </li>
                                                     );
                                                 })}
@@ -387,8 +541,18 @@ export default function Investimentos() {
                                 </div>
                                 <div className="form-group">
                                     <label>Tipo</label>
-                                    <select value={formData.kind} onChange={(e) => setFormData({ ...formData, kind: e.target.value })}>
-                                        <option value="Investimento">Investimento</option>
+                                    <select
+                                        value={formData.kind}
+                                        onChange={(e) =>
+                                            setFormData({
+                                                ...formData,
+                                                kind: e.target.value,
+                                            })
+                                        }
+                                    >
+                                        <option value="Investimento">
+                                            Investimento
+                                        </option>
                                         <option value="Renda">Renda</option>
                                     </select>
                                 </div>
@@ -413,16 +577,36 @@ export default function Investimentos() {
                                         onClick={async () => {
                                             // Tenta buscar ativos válidos do backend
                                             try {
-                                                const actives = await getActives().catch(() => []);
-                                                const fake = generateInvestment();
-                                                if (Array.isArray(actives) && actives.length > 0) {
-                                                    const pick = actives[Math.floor(Math.random() * actives.length)];
-                                                    fake.activeId = String(pick.id);
+                                                const actives =
+                                                    await getActives().catch(
+                                                        () => [],
+                                                    );
+                                                const fake =
+                                                    generateInvestment();
+                                                if (
+                                                    Array.isArray(actives) &&
+                                                    actives.length > 0
+                                                ) {
+                                                    const pick =
+                                                        actives[
+                                                            Math.floor(
+                                                                Math.random() *
+                                                                    actives.length,
+                                                            )
+                                                        ];
+                                                    fake.activeId = String(
+                                                        pick.id,
+                                                    );
                                                 }
                                                 setFormData(fake);
                                             } catch (err) {
-                                                console.error('Erro ao auto-preencher investimentos:', err);
-                                                setFormData(generateInvestment());
+                                                console.error(
+                                                    'Erro ao auto-preencher investimentos:',
+                                                    err,
+                                                );
+                                                setFormData(
+                                                    generateInvestment(),
+                                                );
                                             }
                                         }}
                                         style={{ marginRight: 8 }}
