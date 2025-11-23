@@ -22,23 +22,10 @@ export default function Transacoes() {
         type: 'income', // 'income' ou 'expense'
     });
 
-    useEffect(() => {
-        const user = servicoAutenticacao.obterUsuarioAtual();
-        const token = servicoAutenticacao.obterToken();
-
-        if (!user || !token) {
-            navigate('/');
-            return;
-        }
-        setUserData(user);
-
-        transactionsApi.list();
-    }, [navigate]);
-
     const carregarTransacoes = async () => {
         try {
             setCarregando(true);
-            const data = await getTransactions().catch(() => []);
+            const data = await transactionsApi.list().catch(() => []);
             setTransacoes(data || []);
         } catch (err) {
             console.error('Erro ao carregar transações:', err);
@@ -49,7 +36,20 @@ export default function Transacoes() {
         } finally {
             setCarregando(false);
         }
-    };
+    }
+
+    useEffect(() => {
+        const user = servicoAutenticacao.obterUsuarioAtual();
+        const token = servicoAutenticacao.obterToken();
+
+        if (!user || !token) {
+            navigate('/');
+            return;
+        }
+        setUserData(user);
+
+        carregarTransacoes();
+    }, [navigate]);
 
     const handleLogout = () => {
         servicoAutenticacao.sair();

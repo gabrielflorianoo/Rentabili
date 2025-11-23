@@ -31,7 +31,7 @@ export default function Ativos() {
         try {
             setLoading(true);
             const res = await activesApi.list();
-            setActives(res.data || []);
+            setActives(res || []);
         } catch (err) {
             console.error('Erro ao carregar ativos:', err);
             if (err?.response?.status === 401) {

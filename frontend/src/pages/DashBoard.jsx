@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { servicoAutenticacao } from '../services/servicoAutenticacao';
 import './DashBoard.css';
 import Sidebar from '../components/Sidebar';
+import GraficoLinha from '../components/GraficoLinha';
+import GraficoDonut from '../components/GraficoDonut';
 
 import { dashboardApi } from '../services/apis';
 import { investmentsApi } from '../services/apis';
@@ -17,6 +19,7 @@ export default function Dashboard() {
     const [investments, setInvestments] = useState([]);
     const [totalInvested, setTotalInvested] = useState(0);
     const [totalGain, setTotalGain] = useState(0);
+    const [rentabilidade, setRentabilidade] = useState(0);
 
     useEffect(() => {
         const user = servicoAutenticacao.obterUsuarioAtual();
@@ -62,7 +65,7 @@ export default function Dashboard() {
                     }
                 };
 
-                const normalized = (invs || []).map(i => {
+                const normalized = invs.map(i => {
                     const rawKind = (i.kind ?? 'Investimento') + '';
                     const kindNorm = rawKind.toLowerCase() === 'renda' ? 'Renda' : 'Investimento';
                     return { ...i, kind: kindNorm, amountNum: parseAmount(i.amount) };
@@ -106,6 +109,10 @@ export default function Dashboard() {
                 setTotalInvested(invested);
                 // totalBalance pode ser string/number
                 setTotalGain(gain);
+
+                const rentabilidadePorcentagem = Math.floor(gain / invested) / 100;
+
+                setRentabilidade(rentabilidadePorcentagem);
             } catch (err) {
                 console.error('Erro ao conectar no dashboard ou carregar investimentos:', err);
                 if (err.response?.status === 401) {
@@ -184,11 +191,15 @@ export default function Dashboard() {
                             className="pie"
                             style={{
                                 fontSize: '2rem',
-                                color: '#2f8a2f',
+                                color: rentabilidade > 0
+                                    ? '#2f8a2f'
+                                    : rentabilidade === 0
+                                        ? '#808080'
+                                        : '#ff0000',
                                 fontWeight: 'bold',
                             }}
                         >
-                            +12%
+                            +{rentabilidade}%
                         </div>
                         <div>Rentabilidade Mensal</div>
                     </div>

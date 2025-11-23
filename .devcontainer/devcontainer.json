@@ -16,5 +16,12 @@
             "onAutoForward": "notify",
             "visibility": "public"
         }
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "kilocode.kilo-code"
+            ]
+        }
     }
 }
