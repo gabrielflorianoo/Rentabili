@@ -18,6 +18,7 @@
         "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
         "start": "concurrently \"npm start --prefix backend\" \"npm start --prefix frontend\"",
         "install": "concurrently \"npm install --prefix backend && (cd backend && npx prisma generate)\" \"npm install --prefix frontend\"",
+        "build": "npm install --prefix backend && npm run build --prefix backend",
         "install:run": "npm run install && npm run dev"
     },
     "repository": {
