@@ -10,7 +10,7 @@
     "scripts": {
         "dev": "node app.js",
         "start": "node app.js",
-        "build": "npm run prisma:generate && node app.js",
+        "build": "npm run prisma:generate",
         "test:routes": "node tests/test_routes.js",
         "prisma:generate": "prisma generate",
         "setup": "node setup.js",
