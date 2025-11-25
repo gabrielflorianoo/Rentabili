@@ -1,14 +1,29 @@
 import express from 'express';
 import DashboardController from '../controllers/dashboardController.js';
 import { authenticateToken } from '../middlewares/authMiddleware.js';
+import { cacheMiddleware } from '../middlewares/cacheMiddleware.js';
 
 const router = express.Router();
 const dashboardController = new DashboardController();
 
-// Rota antiga para resumo (compatibilidade)
-router.get('/summary', authenticateToken, dashboardController.getSummary);
 
-// Nova rota: GET /dashboard -> retorna todos os dados do dashboard do usuário
-router.get('/', authenticateToken, dashboardController.getDashboard);
+const DASHBOARD_CACHE_KEY = 'dashboard_data';
+const DASHBOARD_TTL = 60;
+
+
+router.get(
+    '/summary',
+    authenticateToken,
+    cacheMiddleware(`${DASHBOARD_CACHE_KEY}_summary`, DASHBOARD_TTL),
+    dashboardController.getSummary,
+);
+
+
+router.get(
+    '/',
+    authenticateToken,
+    cacheMiddleware(DASHBOARD_CACHE_KEY, DASHBOARD_TTL),
+    dashboardController.getDashboard,
+);
 
 export default router;
