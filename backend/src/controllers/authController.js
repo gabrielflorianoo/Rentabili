@@ -82,8 +82,11 @@ class AuthController {
                         email: 'local@example.com',
                         name: 'Usuário Local',
                     };
-                    const token = jwt.sign(payload, JWT_SECRET, {
-                        expiresIn: JWT_EXPIRES_IN,
+
+                    const secret = process.env.JWT_SECRET;
+                    const expiresIn = process.env.JWT_EXPIRES_IN || '15m';
+                    const token = jwt.sign(payload, secret, {
+                        expiresIn: expiresIn,
                     });
                     return res.json({ token, user: payload });
                 } else {

@@ -7,8 +7,8 @@ export const servicoAutenticacao = {
             const data = response;
 
             // Salva token e usuário
-            if (data.token) {
-                localStorage.setItem('rentabil_token', data.token);
+            if (data.accessToken) {
+                localStorage.setItem('rentabil_token', data.accessToken);
             }
             if (data.user) {
                 localStorage.setItem(

@@ -1,8 +1,9 @@
+import 'dotenv/config';
+
 import validateEnv from './src/config/validateEnv.js';
 validateEnv();
 
 import 'express-async-errors';
-import 'dotenv/config';
 import createError from 'http-errors';
 import express, { json, urlencoded } from 'express';
 import cookieParser from 'cookie-parser';
@@ -47,10 +48,22 @@ logger.info({ PORT: process.env.PORT || 3001 }, '    PORT:');
 
 const app = express();
 
+const allowedOrigins = [
+    process.env.FRONTEND_URL,
+    process.env.BACKEND_RUL,
+];
+
 app.use(helmet());
 app.use(
     cors({
-        origin: process.env.FRONTEND_URL,
+        origin: function (origin, callback) {
+            if (!origin) return callback(null, true);
+            if (allowedOrigins.includes(origin)) {
+                callback(null, true);
+            } else {
+                callback(new Error('Not allowed by CORS'));
+            }
+        },
         credentials: true,
     }),
 );

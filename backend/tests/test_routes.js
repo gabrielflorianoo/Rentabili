@@ -21,7 +21,7 @@ async function req(method, path, body, requiresAuth = true) {
         let data = text;
         try {
             data = JSON.parse(text);
-        } catch (e) {}
+        } catch (e) { }
         return { ok: res.ok, status: res.status, data };
     } catch (err) {
         return { error: err.message };
