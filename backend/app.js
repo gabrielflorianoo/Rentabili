@@ -4,9 +4,12 @@ import express, { json, urlencoded } from 'express';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import cors from 'cors';
+import { getRedisClient } from './redisClient.js';
+import { initializeRateLimiter } from './middlewares/rateLimiter.js';
 import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
-import { getRedisClient } from './redisClient.js';
+import fs from 'fs';
+import path from 'path';
 
 import usersRouter from './routes/users.js';
 import investmentsRouter from './routes/investments.js';
@@ -48,9 +51,32 @@ app.use(json());
 app.use(urlencoded({ extended: false }));
 app.use(cookieParser());
 
-// Swagger Documentation
-const swaggerDocument = YAML.load('./swagger.yaml');
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+let swaggerDocument;
+
+try {
+    const swaggerPath = path.resolve(process.cwd(), 'swagger.yaml');
+    
+    // Verifica se o arquivo existe antes de tentar ler
+    if (!fs.existsSync(swaggerPath)) {
+         throw new Error(`Swagger file not found at: ${swaggerPath}`);
+    }
+
+    const swaggerContent = fs.readFileSync(swaggerPath, 'utf8');
+    swaggerDocument = YAML.parse(swaggerContent);
+
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+    console.log("📘 Swagger/OpenAPI carregado com sucesso.");
+
+} catch (e) {
+    console.error("ERRO FATAL AO CARREGAR SWAGGER/OPENAPI:", e.message);
+    
+    // Middleware de fallback para /api-docs em caso de falha de carregamento
+    app.use('/api-docs', (req, res) => res.status(500).json({ 
+        error: "Documentação da API indisponível (Erro de carregamento do arquivo YAML).",
+        detail: e.message 
+    }));
+}
+
 
 app.use('/users', usersRouter);
 app.use('/investments', investmentsRouter);
@@ -75,25 +101,23 @@ app.use(function (err, req, res, next) {
 });
 
 async function startServer() {
-    const PORT = process.env.PORT || 3001;
-
-    let rateLimiterMiddleware = (req, res, next) => next();
+    const PORT = process.env.PORT || 3001; 
 
     if (process.env.USE_CACHE === 'true' && process.env.NODE_ENV !== 'test') {
         try {
             await getRedisClient();
-
-            rateLimiterMiddleware = await initializeRateLimiter();
+            await initializeRateLimiter(); 
         } catch (error) {
             console.error('FATAL: Failed to initialize Redis. Rate Limiter will be disabled.', error);
         }
     }
-
-    app.use(rateLimiterMiddleware);
-
+    
     if (process.env.NODE_ENV !== 'test') {
         app.listen(PORT, () => {
             console.log(`🚀 Servidor rodando na porta ${PORT}`);
+            if (swaggerDocument) {
+                console.log(`📘 Documentação da API disponível em: http://localhost:${PORT}/api-docs`);
+            }
         });
     }
 }
