@@ -93,11 +93,9 @@ class UserController {
             }
             // Erro de restrição de chave estrangeira (usuário tem dados)
             if (error.code === 'P2003') {
-                return res
-                    .status(400)
-                    .json({
-                        error: 'O usuário possui dados associados (ativos, carteiras, etc.) e não pode ser excluído diretamente.',
-                    });
+                return res.status(400).json({
+                    error: 'O usuário possui dados associados (ativos, carteiras, etc.) e não pode ser excluído diretamente.',
+                });
             }
             res.status(500).json({ error: error.message });
         }

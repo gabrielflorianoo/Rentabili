@@ -1,5 +1,4 @@
-// backend/src/repositories/investmentRepository.js
-import getPrismaClient from '../../prismaClient.js.js';
+import getPrismaClient from '../../prismaClient.js';
 const prisma = getPrismaClient();
 
 class InvestmentRepository {

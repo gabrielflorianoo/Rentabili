@@ -1,8 +1,7 @@
 // backend/src/services/dashboardService.js
 import dashboardRepository from '../repositories/dashboardRepository.js';
-import DashboardServiceInterface from '../interfaces/DashboardServiceInterface.js';
 
-class DashboardService implements DashboardServiceInterface {
+class DashboardService {
     async getSummary(userId) {
         try {
             if (!userId) {
@@ -17,7 +16,8 @@ class DashboardService implements DashboardServiceInterface {
                 };
             }
 
-            const actives = await dashboardRepository.findActivesWithBalances(userId);
+            const actives =
+                await dashboardRepository.findActivesWithBalances(userId);
 
             let totalBalance = 0;
             actives.forEach((active) => {
@@ -62,7 +62,9 @@ class DashboardService implements DashboardServiceInterface {
                             latestBalance: 1500,
                         },
                     ],
-                    wallets: [{ id: 1, name: 'Carteira Principal', balance: 2500 }],
+                    wallets: [
+                        { id: 1, name: 'Carteira Principal', balance: 2500 },
+                    ],
                     investments: [{ id: 1, amount: 1000, activeId: 1 }],
                     recentTransactions: [
                         {
@@ -75,15 +77,22 @@ class DashboardService implements DashboardServiceInterface {
                 };
             }
 
-            const [actives, wallets, transactions, investments] = await Promise.all([
-                dashboardRepository.findActivesWithLatestBalances(userId),
-                dashboardRepository.findWallets(userId),
-                dashboardRepository.findTransactions(userId),
-                dashboardRepository.findInvestments(userId),
-            ]);
+            const [actives, wallets, transactions, investments] =
+                await Promise.all([
+                    dashboardRepository.findActivesWithLatestBalances(userId),
+                    dashboardRepository.findWallets(userId),
+                    dashboardRepository.findTransactions(userId),
+                    dashboardRepository.findInvestments(userId),
+                ]);
 
-            const totalActives = actives.reduce((s, a) => s + a.latestBalance, 0);
-            const walletsTotal = wallets.reduce((s, w) => s + Number(w.balance || 0), 0);
+            const totalActives = actives.reduce(
+                (s, a) => s + a.latestBalance,
+                0,
+            );
+            const walletsTotal = wallets.reduce(
+                (s, w) => s + Number(w.balance || 0),
+                0,
+            );
             const totalBalance = totalActives + walletsTotal;
 
             return {

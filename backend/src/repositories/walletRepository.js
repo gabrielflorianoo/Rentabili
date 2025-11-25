@@ -1,5 +1,5 @@
 // backend/src/repositories/walletRepository.js
-import getPrismaClient from '../../prismaClient.js.js';
+import getPrismaClient from '../../prismaClient.js';
 const prisma = getPrismaClient();
 
 class WalletRepository {

@@ -1,7 +1,9 @@
-import { sign, verify } from 'jsonwebtoken';
+import pkg from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
+
+const { sign, verify } = pkg;
 
 const generateAccessToken = (userId) => {
     return sign({ userId }, process.env.ACCESS_TOKEN_SECRET, {
@@ -81,7 +83,7 @@ const revokeRefreshToken = async (refreshToken) => {
     }
 };
 
-export default {
+export {
     generateAccessToken,
     generateRefreshToken,
     storeRefreshToken,
