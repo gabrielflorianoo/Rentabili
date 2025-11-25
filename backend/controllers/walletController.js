@@ -57,9 +57,12 @@ class WalletController {
     }
 
     async create(req, res) {
+        // O userId deve vir do token
+        const userId = req.user?.id;
+
         if (process.env.USE_DB !== 'true') {
-            const { name, balance, userId } = req.body || {};
-            if (!name || !userId)
+            const { name, balance } = req.body || {};
+            if (!name || !userId) // Usa userId do req.user para o mock
                 return res
                     .status(400)
                     .json({ error: 'name e userId são obrigatórios' });
@@ -69,7 +72,7 @@ class WalletController {
             const newItem = {
                 id,
                 name,
-                balance: balance ?? 0,
+                balance: req.body.balance ?? 0,
                 userId,
                 createdAt: new Date(),
                 updatedAt: new Date(),
@@ -78,7 +81,10 @@ class WalletController {
             return res.status(201).json(newItem);
         }
         try {
-            const { name, balance, userId } = req.body;
+            const { name, balance } = req.body;
+            if (!userId) {
+                return res.status(401).json({ error: 'Unauthorized' });
+            }
             const newWallet = await prisma.wallet.create({
                 data: { name, balance, userId },
             });

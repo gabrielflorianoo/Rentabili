@@ -9,7 +9,7 @@ class UserController {
                 id: 1,
                 name: 'Usuário Local',
                 email: 'local@example.com',
-                phone: '123456789',
+                // Removido phone para compatibilidade
                 password: 'localpassword',
                 createdAt: new Date(),
                 updatedAt: new Date(),
@@ -30,7 +30,7 @@ class UserController {
                     id: u.id,
                     name: u.name,
                     email: u.email,
-                    phone: u.phone,
+                    // phone: u.phone, REMOVIDO
                     createdAt: u.createdAt,
                 })),
             );
@@ -41,7 +41,7 @@ class UserController {
                     id: true,
                     name: true,
                     email: true,
-                    phone: true,
+                    // phone: true, REMOVIDO
                     createdAt: true,
                 },
             });
@@ -60,7 +60,7 @@ class UserController {
                     id: user.id,
                     name: user.name,
                     email: user.email,
-                    phone: user.phone,
+                    // phone: user.phone, REMOVIDO
                     createdAt: user.createdAt,
                 });
             } else {
@@ -77,7 +77,7 @@ class UserController {
                     id: true,
                     name: true,
                     email: true,
-                    phone: true,
+                    // phone: true, REMOVIDO
                     createdAt: true,
                 },
             });
@@ -124,7 +124,7 @@ class UserController {
                     name,
                     email,
                     password: hashedPassword,
-                    phone,
+                    // phone, REMOVIDO
                 },
             });
 
@@ -162,12 +162,12 @@ class UserController {
 
             const updatedUser = await prisma.user.update({
                 where: { id },
-                data: { name, email, phone },
+                data: { name, email /* , phone */ },
                 select: {
                     id: true,
                     name: true,
                     email: true,
-                    phone: true,
+                    // phone: true, REMOVIDO
                     createdAt: true,
                 },
             });
@@ -183,9 +183,33 @@ class UserController {
     }
 
     async remove(req, res) {
+        const id = Number(req.params.id);
+
         if (process.env.USE_DB !== 'true') {
-            const id = Number(req.params.id);
-            if (id === 1) {
+            // Mock delete
+            const initialLength = this.users.length;
+            this.users = this.users.filter(u => u.id !== id);
+            if (this.users.length === initialLength) {
+                return res.status(404).json({ error: 'Usuário não encontrado no mock' });
+            }
+            return res.status(204).send();
+        }
+
+        try {
+            // Deleção no banco de dados
+            await prisma.user.delete({
+                where: { id },
+            });
+            return res.status(204).send();
+        } catch (error) {
+            if (error.code === 'P2025') {
+                return res
+                    .status(404)
+                    .json({ error: 'Usuário não encontrado' });
+            }
+            // Erro de restrição de chave estrangeira (usuário tem dados)
+            if (error.code === 'P2003') {
+                return res.status(400).json({ error: 'O usuário possui dados associados (ativos, carteiras, etc.) e não pode ser excluído diretamente.' });
             }
             res.status(500).json({ error: error.message });
         }

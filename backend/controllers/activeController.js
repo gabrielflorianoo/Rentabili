@@ -93,6 +93,17 @@ export async function deleteActive(req, res) {
     const userId = req.user.id;
 
     try {
+        // 1. DELETE Historical Balances (Foreign Key dependency)
+        await prisma.historicalBalance.deleteMany({
+            where: { activeId: parseInt(id) },
+        });
+
+        // 2. DELETE Investments (if any, dependency check)
+        await prisma.investment.deleteMany({
+            where: { activeId: parseInt(id) },
+        });
+
+        // 3. DELETE the Active
         await prisma.active.delete({
             where: {
                 id: parseInt(id),
