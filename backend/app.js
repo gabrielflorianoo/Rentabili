@@ -16,12 +16,8 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// === Início do Bloco de Compatibilidade ESM para __dirname e __filename ===
-// Necessário para que path.join(__dirname, 'swagger.yaml') funcione no Node.js ESM e no Vercel
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-// === Fim do Bloco de Compatibilidade ESM ===
-
 
 import usersRouter from './routes/users.js';
 import investmentsRouter from './routes/investments.js';
