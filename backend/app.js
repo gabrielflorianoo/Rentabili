@@ -85,9 +85,9 @@ try {
             customJs: '/api-docs/swagger-ui-bundle.js',
 
             customSiteTitle: "Rentabili - API de Gestão Financeira", // Opcional, mas útil
-            // swaggerOptions: {
-            //     url: "https://backend-rentabili.vercel.app/swagger.yaml" 
-            // }
+            swaggerOptions: {
+                url: "https://backend-rentabili.vercel.app/swagger.yaml" 
+            }
         })
     );
     console.log("📘 Swagger/OpenAPI carregado com sucesso.");
