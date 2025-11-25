@@ -41,7 +41,8 @@
         "redis-server": "^1.2.2",
         "swagger-jsdoc": "^6.2.8",
         "swagger-ui-express": "^5.0.1",
-        "typescript": "^5.9.3"
+        "typescript": "^5.9.3",
+        "yamljs": "^0.3.0"
     },
     "devDependencies": {
         "prisma": "^5.22.0"
