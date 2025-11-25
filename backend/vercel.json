@@ -1,11 +1,11 @@
 {
     "builds": [
         {
-            "src": "backend/app.js",
+            "src": "app.js",
             "use": "@vercel/node",
             "config": {
                 "includeFiles": [
-                    "backend/swagger.yaml"
+                    "swagger.yaml"
                 ]
             }
         }
@@ -13,7 +13,7 @@
     "routes": [
         {
             "src": "/(.*)",
-            "dest": "backend/app.js"
+            "dest": "app.js"
         }
     ]
 }
