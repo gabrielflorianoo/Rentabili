@@ -12,7 +12,7 @@
         "dev": "nodemon -e js,json app.js",
         "test:routes": "node tests/test_routes.js",
         "setup": "node setup.js",
-        "build": "prisma generate",
+        "build": "npm run prisma:generate && node app.js",
         "db:migrate": "prisma migrate dev",
         "db:reset": "prisma migrate reset",
         "db:studio": "prisma studio"
