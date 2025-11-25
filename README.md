@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-
 # Rentabili
 
 # O Rentabili é um sistema de gerenciamento de rentabilidade de investimentos. Ele ajuda investidores a monitorar o desempenho de seus ativos (renda fixa e fundos), calculando ganhos percentuais e exibindo gráficos comparativos para facilitar a tomada de decisões.
@@ -212,5 +210,3 @@ Este projeto está sob a licença MIT.
 ## 👨‍💻 Desenvolvedores
 
 _Ver página de contribuidores_
-
-> > > > > > > 185bbc386d9d7ce8349774df67455fcb8001ad8f
