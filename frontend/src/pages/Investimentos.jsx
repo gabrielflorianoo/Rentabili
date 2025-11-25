@@ -172,7 +172,7 @@ export default function Investimentos() {
                 kind: 'Renda',
             };
 
-            await createInvestment(payload);
+            await investmentsApi.create(payload); // Corrigido: chamando a API correta
             carregarInvestimentos();
         } catch (err) {
             console.error('Erro ao simular investimento:', err);

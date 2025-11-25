@@ -23,7 +23,7 @@ class WalletController {
 
     async getAll(req, res) {
         try {
-            const userId = req.user?.id;
+            const userId = req.user?.userId;
             if (!userId) {
                 return res.status(401).json({ error: 'Unauthorized' });
             }
@@ -50,7 +50,7 @@ class WalletController {
 
     async create(req, res) {
         // O userId deve vir do token
-        const userId = req.user?.id;
+        const userId = req.user?.userId;
 
         try {
             const { name, balance } = req.body;

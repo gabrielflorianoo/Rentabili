@@ -9,7 +9,7 @@ class DashboardController {
 
     async getSummary(req, res) {
         try {
-            const userId = req.user?.id;
+            const userId = req.user?.userId;
             const summary = await dashboardService.getSummary(userId);
             res.json(summary);
         } catch (error) {
@@ -20,7 +20,7 @@ class DashboardController {
     // Retorna todos os dados do dashboard para o usuário autenticado
     async getDashboard(req, res) {
         try {
-            const userId = req.user?.id;
+            const userId = req.user?.userId;
             const dashboardData = await dashboardService.getDashboard(userId);
             res.json(dashboardData);
         } catch (error) {

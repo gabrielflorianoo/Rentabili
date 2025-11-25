@@ -4,7 +4,7 @@ export const cacheMiddleware = (keyPrefix, durationTTL = 3600) => {
     return async (req, res, next) => {
         const redis = await getRedisClient();
 
-        const userId = req.user?.id;
+        const userId = req.user?.userId;
         if (!userId) {
             return next();
         }
@@ -42,7 +42,7 @@ export const invalidateCache = (keyPrefix) => {
     return async (req, res, next) => {
         const redis = await getRedisClient();
 
-        const userId = req.user?.id;
+        const userId = req.user?.userId;
         if (!userId) {
             return next();
         }

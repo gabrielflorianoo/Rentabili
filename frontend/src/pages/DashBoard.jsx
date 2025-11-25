@@ -47,16 +47,14 @@ export default function Dashboard() {
 
                 // Fetch total invested and gain/loss from backend
                 const [totalInvestedData, gainLossData] = await Promise.all([
-                    investmentsApi
-                        .getTotalInvested()
-                        .catch(() => ({ totalInvested: 0 })),
-                    investmentsApi.getGainLoss().catch(() => ({ gainLoss: 0 })),
+                    investmentsApi.getTotalInvested(),
+                    investmentsApi.getGainLoss(),
                 ]);
-
+    
                 setTotalInvested(totalInvestedData.totalInvested || 0);
                 setTotalGain(gainLossData.gainLoss || 0);
-
-                const invs = await investmentsApi.list().catch(() => []);
+    
+                const invs = await investmentsApi.list();
 
                 const parseAmount = (val) => {
                     if (val === null || val === undefined) return 0;

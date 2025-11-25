@@ -53,7 +53,6 @@ export default function Transacoes() {
 
         try {
             const payload = {
-                userId: userData.id,
                 description: form.description,
                 amount: parseFloat(form.amount),
                 date: new Date(form.date).toISOString(),

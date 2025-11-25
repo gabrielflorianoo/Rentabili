@@ -35,12 +35,9 @@ export default function Relatorios() {
         try {
             setCarregando(true);
             const [transData, invData, dashData] = await Promise.all([
-                transactionsApi.list().catch(() => []),
-                investmentsApi.list().catch(() => []),
-                dashboardApi.getSummary().catch(() => ({
-                    totalBalance: 0,
-                    activesCount: 0,
-                })),
+                transactionsApi.list(),
+                investmentsApi.list(),
+                dashboardApi.getSummary(),
             ]);
 
             setTransacoes(transData || []);

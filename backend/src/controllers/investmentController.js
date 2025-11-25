@@ -56,7 +56,7 @@ class InvestmentController {
 
     async getAll(req, res) {
         try {
-            const userId = req.user?.id;
+            const userId = req.user?.userId;
             if (!userId) {
                 return res
                     .status(401)
@@ -71,7 +71,7 @@ class InvestmentController {
 
     async getTotalInvested(req, res) {
         try {
-            const userId = req.user?.id;
+            const userId = req.user?.userId;
             if (!userId) {
                 return res
                     .status(401)
@@ -88,7 +88,7 @@ class InvestmentController {
 
     async getGainLoss(req, res) {
         try {
-            const userId = req.user?.id;
+            const userId = req.user?.userId;
             if (!userId) {
                 return res
                     .status(401)
@@ -121,7 +121,7 @@ class InvestmentController {
     async create(req, res) {
         try {
             const { amount, activeId, date, kind } = req.body;
-            const userId = req.user?.id;
+            const userId = req.user?.userId;
             if (!userId) {
                 return res
                     .status(400)
@@ -144,7 +144,7 @@ class InvestmentController {
         try {
             const id = Number(req.params.id);
             const { amount, activeId, date, kind } = req.body;
-            const userId = req.user?.id;
+            const userId = req.user?.userId;
             if (!userId) {
                 return res
                     .status(400)
