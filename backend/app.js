@@ -78,12 +78,6 @@ try {
         '/api-docs',
         swaggerUi.serve,
         swaggerUi.setup(swaggerDocument, {
-            customCssUrl: '/api-docs/swagger-ui.css',
-            customJs: '/api-docs/swagger-ui-bundle.js',
-            customJs: [
-                '/api-docs/swagger-ui-bundle.js',
-                '/api-docs/swagger-ui-standalone-preset.js'
-            ],
             customSiteTitle: "Rentabili - API de Gestão Financeira",
         })
     );
