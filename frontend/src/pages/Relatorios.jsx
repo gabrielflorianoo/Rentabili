@@ -6,7 +6,6 @@ import {
     dashboardApi,
     investmentsApi,
 } from '../services/apis';
-import Sidebar from '../components/Sidebar';
 import './Relatorios.css';
 
 export default function Relatorios() {
@@ -58,11 +57,6 @@ export default function Relatorios() {
         }
     };
 
-    const handleLogout = () => {
-        servicoAutenticacao.sair();
-        navigate('/');
-    };
-
     // Cálculos de estatísticas
     const calcularEstatisticas = () => {
         const totalReceitas = transacoes
@@ -98,7 +92,6 @@ export default function Relatorios() {
 
     return (
         <div className="dashboard-wrap">
-            <Sidebar aoSair={handleLogout} paginaAtiva="relatorios" />
             <div className="content">
                 <header className="content-head">
                     <h2>Relatórios Financeiros</h2>

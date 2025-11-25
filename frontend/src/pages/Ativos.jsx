@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { servicoAutenticacao } from '../services/servicoAutenticacao';
 import { activesApi } from '../services/apis';
 import { generateActive } from '../utils/fakeData';
+import { servicoAutenticacao } from '../services/servicoAutenticacao';
 import './Ativos.css';
-import Sidebar from '../components/Sidebar';
 
 export default function Ativos() {
     const navigate = useNavigate();
@@ -41,11 +40,6 @@ export default function Ativos() {
         } finally {
             setLoading(false);
         }
-    };
-
-    const handleLogout = () => {
-        servicoAutenticacao.sair();
-        navigate('/');
     };
 
     const openModal = (item = null) => {
@@ -100,7 +94,6 @@ export default function Ativos() {
 
     return (
         <div className="dashboard-wrap">
-            <Sidebar aoSair={handleLogout} paginaAtiva="actives" />
             <div className="content">
                 <header className="content-head">
                     <h2>Ativos</h2>

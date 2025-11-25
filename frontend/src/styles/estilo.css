@@ -16,6 +16,11 @@ body {
     overflow-y: auto;
 }
 
+.app-container {
+    display: flex;
+    justify-content: center;
+}
+
 .page-container {
   display: flex;
   flex-direction: column;

@@ -86,6 +86,7 @@ export const investmentsApi = {
     remove: (id) => remove(`/investments/${id}`),
     getTotalInvested: () => get('/investments/total-invested'),
     getGainLoss: () => get('/investments/gain-loss'),
+    simulateInvestment: (payload) => post('/investments/simulate', payload),
 };
 
 // Wallets API

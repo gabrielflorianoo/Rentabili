@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { servicoAutenticacao } from '../services/servicoAutenticacao';
 import { transactionsApi } from '../services/apis';
+import { servicoAutenticacao } from '../services/servicoAutenticacao';
 import './Transacoes.css';
 import { generateTransaction } from '../utils/fakeData';
-import Sidebar from '../components/Sidebar';
-
-// Sidebar function removed, now using shared Sidebar component
 
 export default function Transacoes() {
     const navigate = useNavigate();
@@ -51,11 +48,6 @@ export default function Transacoes() {
         carregarTransacoes();
     }, [navigate]);
 
-    const handleLogout = () => {
-        servicoAutenticacao.sair();
-        navigate('/');
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -89,8 +81,6 @@ export default function Transacoes() {
 
     return (
         <div className="dashboard-wrap">
-            <Sidebar aoSair={handleLogout} paginaAtiva="transacoes" />{' '}
-            {/* Using shared Sidebar component */}
             <div className="content">
                 <header className="content-head">
                     <h2>Transações</h2>

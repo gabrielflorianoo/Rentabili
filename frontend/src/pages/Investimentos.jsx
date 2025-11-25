@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { servicoAutenticacao } from '../services/servicoAutenticacao';
 import { investmentsApi, activesApi } from '../services/apis';
 import { generateInvestment } from '../utils/fakeData';
+import { servicoAutenticacao } from '../services/servicoAutenticacao';
 import './Investimentos.css';
 import Sidebar from '../components/Sidebar';
 
@@ -60,11 +60,6 @@ export default function Investimentos() {
         } finally {
             setCarregando(false);
         }
-    };
-
-    const handleLogout = () => {
-        servicoAutenticacao.sair();
-        navigate('/');
     };
 
     const abrirModal = (investimento = null) => {
@@ -212,7 +207,6 @@ export default function Investimentos() {
 
     return (
         <div className="dashboard-wrap">
-            <Sidebar aoSair={handleLogout} paginaAtiva="investimentos" />
             <div className="content">
                 <header className="content-head">
                     <h2>Investimentos</h2>

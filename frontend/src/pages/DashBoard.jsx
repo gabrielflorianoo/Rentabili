@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { servicoAutenticacao } from '../services/servicoAutenticacao';
 import './DashBoard.css';
-import Sidebar from '../components/Sidebar';
 import GraficoLinha from '../components/GraficoLinha';
 import GraficoDonut from '../components/GraficoDonut';
 
@@ -174,14 +173,8 @@ export default function Dashboard() {
         getDashboardData();
     }, [navigate]);
 
-    const handleLogout = () => {
-        servicoAutenticacao.sair();
-        navigate('/');
-    };
-
     return (
         <div className="dashboard-wrap">
-            <Sidebar aoSair={handleLogout} paginaAtiva="dashboard" />
             <div className="content">
                 <header className="content-head">
                     <h2>Dashboard</h2>

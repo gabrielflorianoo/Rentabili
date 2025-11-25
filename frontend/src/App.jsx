@@ -1,5 +1,6 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom'; // Importe o Outlet também (embora só seja necessário no Layout, teremos ele no App.js)
+import { servicoAutenticacao } from './services/servicoAutenticacao';
 
 // Importação das Páginas
 import HomeHero from './pages/HomeHero';
@@ -15,76 +16,53 @@ import Relatorios from './pages/Relatorios';
 import Ativos from './pages/Ativos';
 import Transacoes from './pages/Transacoes';
 import Simulador from './pages/Simulador';
-// -------------------------------------
 
-// Importação dos Componentes e Estilos
-import RotaProtegida from './components/ProtectRout'; // Mantive como você mandou
+// --- IMPORTAÇÃO DE COMPONENTES DE LAYOUT E ROTA ---
+import RotaProtegida from './components/ProtectRout'; // Mantido
+import Sidebar from './components/Sidebar'; // Ainda precisamos dele aqui se não usarmos o LayoutComponent
+import SidebarLayout from './layouts/SidebarLayout'; // Adicione a importação do Layout
 import './styles/estilo.css';
+
+const handleLogout = () => {
+    if (window.confirm("Tem certeza que deseja sair?")) {
+        servicoAutenticacao.sair();
+        window.location.href = "/login";
+    }
+}
+
+const ProtectedLayout = ({ aoSair }) => (
+    <RotaProtegida>
+        <SidebarLayout aoSair={aoSair} />
+    </RotaProtegida>
+);
 
 export default function App() {
     return (
         <Router>
             <Routes>
-                {/* Rota Principal (Home) */}
+                {/* ROTAS PÚBLICAS SEM SIDEBAR */}
                 <Route path="/" element={<HomeHero />} />
-
-                {/* Rota de Login */}
                 <Route path="/login" element={<PaginaAutenticacao />} />
-
-                {/* --- ROTAS DOS MENUS (PÚBLICAS) --- */}
                 <Route path="/resumo" element={<Resumo />} />
                 <Route path="/planos" element={<Planos />} />
                 <Route path="/sobre" element={<Sobre />} />
 
-                {/* --- ROTA PROTEGIDA (DASHBOARD) --- */}
-                <Route
-                    path="/dashboard"
-                    element={
-                        <RotaProtegida>
-                            <Dashboard />
-                        </RotaProtegida>
-                    }
-                />
-                <Route
-                    path="/investimentos"
-                    element={
-                        <RotaProtegida>
-                            <Investimentos />
-                        </RotaProtegida>
-                    }
-                />
-                <Route
-                    path="/transacoes"
-                    element={
-                        <RotaProtegida>
-                            <Transacoes />
-                        </RotaProtegida>
-                    }
-                />
-                <Route
-                    path="/relatorios"
-                    element={
-                        <RotaProtegida>
-                            <Relatorios />
-                        </RotaProtegida>
-                    }
-                />
-                <Route
-                    path="/actives"
-                    element={
-                        <RotaProtegida>
-                            <Ativos />
-                        </RotaProtegida>
-                    }
-                />
-                 <Route
-                    path="/simulador"
-                    element={
-                        <RotaProtegida>
-                            <Simulador />
-                        </RotaProtegida>
-                    }
-                /> 
+                {/* -------------------------------------------------------------------- */}
+
+                {/* ROTA PAI COM LAYOUT E PROTEÇÃO - O ProtectedLayout define o Sidebar e o Auth Guard */}
+                <Route element={<ProtectedLayout aoSair={handleLogout} />}>
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/investimentos" element={<Investimentos />} />
+                    <Route path="/transacoes" element={<Transacoes />} />
+                    <Route path="/relatorios" element={<Relatorios />} />
+                    <Route path="/actives" element={<Ativos />} />
+                    <Route path="/simulador" element={<Simulador />} />
+
+                </Route>
+
+                {/* Rota 404 de fallback */}
+                <Route path="*" element={<h1>404 | Página Não Encontrada</h1>} />
+
             </Routes>
         </Router>
     );

@@ -14,6 +14,11 @@ router.get(
     investmentController.getTotalInvested,
 );
 router.get('/gain-loss', authenticateToken, investmentController.getGainLoss);
+router.post(
+    '/simulate',
+    authenticateToken,
+    investmentController.simulateInvestment,
+)
 
 // 2. Rotas Genéricas com ID (MENOS ESPECÍFICAS: devem vir por último)
 router.get('/:id', authenticateToken, investmentController.getById); // Agora só casará com números/IDs

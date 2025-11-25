@@ -355,6 +355,30 @@ class InvestmentController {
             res.status(500).json({ error: error.message });
         }
     }
+
+    async simulateInvestment(req, res) {
+        const {
+            initialAmount,
+            taxRate,
+            periodMonths,
+            monthlyContribution,
+        } = req.body;
+
+        let balance = initialAmount || 0;
+        const monthlyRate = (taxRate || 0) / 100 / 12;
+        const history = [];
+
+        for (let month = 1; month <= periodMonths; month++) {
+            balance += monthlyContribution || 0;
+            balance += balance * monthlyRate;
+            history.push({
+                month,
+                balance: parseFloat(balance.toFixed(2)),
+            });
+        }
+
+        res.json({ finalBalance: parseFloat(balance.toFixed(2)), history });
+    }
 }
 
 export default InvestmentController;
