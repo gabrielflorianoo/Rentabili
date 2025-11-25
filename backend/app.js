@@ -64,26 +64,41 @@ let swaggerDocument;
 try {
     // CORREÇÃO FINAL: Usamos __dirname para o caminho absoluto, garantindo que o Vercel encontre o arquivo.
     const swaggerPath = path.join(__dirname, 'swagger.yaml');
-    
+
     // Verifica se o arquivo existe antes de tentar ler
     if (!fs.existsSync(swaggerPath)) {
-         // Lança um erro detalhado para o log
-         throw new Error(`Swagger file not found at: ${swaggerPath}. Check vercel.json includeFiles.`); 
+        // Lança um erro detalhado para o log
+        throw new Error(`Swagger file not found at: ${swaggerPath}. Check vercel.json includeFiles.`);
     }
 
     const swaggerContent = fs.readFileSync(swaggerPath, 'utf8');
     swaggerDocument = YAML.parse(swaggerContent);
 
-    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+    app.use(
+        '/api-docs',
+        swaggerUi.serve,
+        swaggerUi.setup(swaggerDocument, {
+            customCssUrl: [
+                '/api-docs/swagger-ui.css',
+                '/api-docs/swagger-ui-standalone-preset.js' // Usado como fallback ou em ambientes específicos
+            ],
+            customJs: '/api-docs/swagger-ui-bundle.js',
+
+            customSiteTitle: "Rentabili - API de Gestão Financeira", // Opcional, mas útil
+            // swaggerOptions: {
+            //     url: "https://backend-rentabili.vercel.app/swagger.yaml" 
+            // }
+        })
+    );
     console.log("📘 Swagger/OpenAPI carregado com sucesso.");
 
 } catch (e) {
     console.error("ERRO FATAL AO CARREGAR SWAGGER/OPENAPI:", e.message);
-    
+
     // Middleware de fallback para /api-docs em caso de falha de carregamento
-    app.use('/api-docs', (req, res) => res.status(500).json({ 
+    app.use('/api-docs', (req, res) => res.status(500).json({
         error: "Documentação da API indisponível (Erro de carregamento do arquivo YAML).",
-        detail: e.message 
+        detail: e.message
     }));
 }
 
@@ -111,17 +126,17 @@ app.use(function (err, req, res, next) {
 });
 
 async function startServer() {
-    const PORT = process.env.PORT || 3001; 
+    const PORT = process.env.PORT || 3001;
 
     if (process.env.USE_CACHE === 'true' && process.env.NODE_ENV !== 'test') {
         try {
             await getRedisClient();
-            await initializeRateLimiter(); 
+            await initializeRateLimiter();
         } catch (error) {
             console.error('FATAL: Failed to initialize Redis. Rate Limiter will be disabled.', error);
         }
     }
-    
+
     if (process.env.NODE_ENV !== 'test') {
         app.listen(PORT, () => {
             console.log(`🚀 Servidor rodando na porta ${PORT}`);
