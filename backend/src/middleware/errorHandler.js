@@ -1,7 +1,7 @@
-import { error } from '../logger';
+import logger from '../logger.js';
 
 function errorHandler(err, req, res, next) {
-    error({ err, reqId: req.id }, 'Error Handler Middleware');
+    logger.error({ err, reqId: req.id }, 'Error Handler Middleware');
 
     let status = err.status || 500;
     let message = err.message || 'Internal Server Error';

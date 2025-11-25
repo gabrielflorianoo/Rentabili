@@ -10,11 +10,13 @@ import loggerMorgan from 'morgan';
 import cors from 'cors';
 import { getRedisClient } from './redisClient.js';
 import { initializeRateLimiter } from './src/middlewares/rateLimiter.js';
+import errorHandler from './src/middleware/errorHandler.js';
 import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import helmet from "helmet";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -112,7 +114,7 @@ app.use('/dashboard', dashboardRouter);
 app.use('/actives', activesRouter);
 app.use('/historical-balances', historicalBalancesRouter);
 
-app.use(require('./src/middleware/errorHandler').default);
+app.use(errorHandler);
 
 app.use(function (req, res, next) {
     next(createError(404));
