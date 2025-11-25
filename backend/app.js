@@ -10,6 +10,14 @@ import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+// === Início do Bloco de Compatibilidade ESM para __dirname e __filename ===
+// Necessário para que path.join(__dirname, 'swagger.yaml') funcione no Node.js ESM e no Vercel
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+// === Fim do Bloco de Compatibilidade ESM ===
+
 
 import usersRouter from './routes/users.js';
 import investmentsRouter from './routes/investments.js';
@@ -54,11 +62,13 @@ app.use(cookieParser());
 let swaggerDocument;
 
 try {
-    const swaggerPath = path.resolve(process.cwd(), 'swagger.yaml');
+    // CORREÇÃO FINAL: Usamos __dirname para o caminho absoluto, garantindo que o Vercel encontre o arquivo.
+    const swaggerPath = path.join(__dirname, 'swagger.yaml');
     
     // Verifica se o arquivo existe antes de tentar ler
     if (!fs.existsSync(swaggerPath)) {
-         throw new Error(`Swagger file not found at: ${swaggerPath}`);
+         // Lança um erro detalhado para o log
+         throw new Error(`Swagger file not found at: ${swaggerPath}. Check vercel.json includeFiles.`); 
     }
 
     const swaggerContent = fs.readFileSync(swaggerPath, 'utf8');
