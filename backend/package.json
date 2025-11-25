@@ -8,15 +8,17 @@
     "type": "module",
     "main": "app.js",
     "scripts": {
+        "dev": "node app.js",
         "start": "node app.js",
-        "dev": "nodemon -e js,json app.js",
-        "test:routes": "node tests/test_routes.js",
-        "setup": "node setup.js",
         "build": "npm run prisma:generate && node app.js",
+        "test:routes": "node tests/test_routes.js",
+        "prisma:generate": "prisma generate",
+        "setup": "node setup.js",
         "db:migrate": "prisma migrate dev",
         "db:reset": "prisma migrate reset",
         "db:studio": "prisma studio"
     },
+    "postinstall": "npm run prisma:generate",
     "prisma": {
         "seed": "node prisma/seed.js"
     },
