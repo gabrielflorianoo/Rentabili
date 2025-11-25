@@ -35,7 +35,10 @@ const storeRefreshToken = async (token, userId) => {
 
 const rotateRefreshToken = async (oldRefreshToken) => {
     try {
-        const decoded = verify(oldRefreshToken, process.env.REFRESH_TOKEN_SECRET);
+        const decoded = verify(
+            oldRefreshToken,
+            process.env.REFRESH_TOKEN_SECRET,
+        );
         const userId = decoded.userId;
 
         // Revoke old refresh token

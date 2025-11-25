@@ -1,13 +1,12 @@
 import bcrypt from 'bcryptjs';
-import getPrismaClient from '../prismaClient.js';
+import getPrismaClient from '../../prismaClient.js';
 import {
-  generateAccessToken,
-  generateRefreshToken,
-  storeRefreshToken,
-  rotateRefreshToken,
-  revokeRefreshToken,
-} from '../src/services/tokenService.js';
-
+    generateAccessToken,
+    generateRefreshToken,
+    storeRefreshToken,
+    rotateRefreshToken,
+    revokeRefreshToken,
+} from '../services/tokenService.js';
 
 class AuthController {
     constructor() {
@@ -110,9 +109,9 @@ class AuthController {
             await storeRefreshToken(refreshToken, user.id);
 
             res.cookie('refreshToken', refreshToken, {
-              httpOnly: true,
-              secure: true, // Defina como true em produção com HTTPS
-              sameSite: 'strict',
+                httpOnly: true,
+                secure: true, // Defina como true em produção com HTTPS
+                sameSite: 'strict',
             });
 
             res.json({ accessToken, user: payload });
@@ -121,51 +120,54 @@ class AuthController {
         }
     }
 
-  async refresh(req, res) {
-    try {
-      const refreshToken = req.cookies.refreshToken;
+    async refresh(req, res) {
+        try {
+            const refreshToken = req.cookies.refreshToken;
 
-      if (!refreshToken) {
-        return res.status(401).json({ error: 'Refresh token não encontrado' });
-      }
+            if (!refreshToken) {
+                return res
+                    .status(401)
+                    .json({ error: 'Refresh token não encontrado' });
+            }
 
-      const { accessToken, refreshToken: newRefreshToken } = await rotateRefreshToken(refreshToken);
+            const { accessToken, refreshToken: newRefreshToken } =
+                await rotateRefreshToken(refreshToken);
 
-      res.cookie('refreshToken', newRefreshToken, {
-        httpOnly: true,
-        secure: true, // Defina como true em produção com HTTPS
-        sameSite: 'strict',
-      });
+            res.cookie('refreshToken', newRefreshToken, {
+                httpOnly: true,
+                secure: true, // Defina como true em produção com HTTPS
+                sameSite: 'strict',
+            });
 
-      res.json({ accessToken });
-    } catch (error) {
-      console.error('Erro ao atualizar o token:', error);
-      res.status(401).json({ error: 'Refresh token inválido' });
+            res.json({ accessToken });
+        } catch (error) {
+            console.error('Erro ao atualizar o token:', error);
+            res.status(401).json({ error: 'Refresh token inválido' });
+        }
     }
-  }
 
-  async logout(req, res) {
-    try {
-      const refreshToken = req.cookies.refreshToken;
+    async logout(req, res) {
+        try {
+            const refreshToken = req.cookies.refreshToken;
 
-      if (!refreshToken) {
-        return res.status(204).send(); // No content, but successful
-      }
+            if (!refreshToken) {
+                return res.status(204).send(); // No content, but successful
+            }
 
-      await revokeRefreshToken(refreshToken);
+            await revokeRefreshToken(refreshToken);
 
-      res.clearCookie('refreshToken', {
-        httpOnly: true,
-        secure: true, // Defina como true em produção com HTTPS
-        sameSite: 'strict',
-      });
+            res.clearCookie('refreshToken', {
+                httpOnly: true,
+                secure: true, // Defina como true em produção com HTTPS
+                sameSite: 'strict',
+            });
 
-      res.status(204).send(); // No content, but successful
-    } catch (error) {
-      console.error('Erro ao fazer logout:', error);
-      res.status(500).json({ error: 'Erro ao fazer logout' });
+            res.status(204).send(); // No content, but successful
+        } catch (error) {
+            console.error('Erro ao fazer logout:', error);
+            res.status(500).json({ error: 'Erro ao fazer logout' });
+        }
     }
-  }
 }
 
 export default AuthController;

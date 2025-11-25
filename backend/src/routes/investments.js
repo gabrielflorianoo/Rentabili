@@ -5,7 +5,6 @@ import { authenticateToken } from '../middlewares/authMiddleware.js';
 const investmentController = new InvestmentController();
 const router = express.Router();
 
-
 router.get(
     '/total-invested',
     authenticateToken,
@@ -16,11 +15,9 @@ router.post(
     '/simulate',
     authenticateToken,
     investmentController.simulateInvestment,
-)
-
+);
 
 router.get('/:id', authenticateToken, investmentController.getById);
-
 
 router.get('/', authenticateToken, investmentController.getAll);
 router.post('/', authenticateToken, investmentController.create);

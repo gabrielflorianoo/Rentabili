@@ -21,8 +21,7 @@ async function req(method, path, body, requiresAuth = true) {
         let data = text;
         try {
             data = JSON.parse(text);
-        } catch (e) {
-        }
+        } catch (e) {}
         return { ok: res.ok, status: res.status, data };
     } catch (err) {
         return { error: err.message };
@@ -48,26 +47,48 @@ function show(res, successMsg = 'Sucesso', errorMsg = 'Falha') {
 
 async function testAuth() {
     print('AUTENTICAÇÃO: POST /auth/register (Criando Usuário para Teste)');
-    const regRes = await req('POST', '/auth/register', {
-        name: 'Auth Test User',
-        email: AUTH_TEST_EMAIL,
-        password: AUTH_TEST_PASSWORD,
-    }, false);
-    
-    show(regRes, 'Usuário de teste registrado', 'Falha no registro do usuário de teste');
+    const regRes = await req(
+        'POST',
+        '/auth/register',
+        {
+            name: 'Auth Test User',
+            email: AUTH_TEST_EMAIL,
+            password: AUTH_TEST_PASSWORD,
+        },
+        false,
+    );
+
+    show(
+        regRes,
+        'Usuário de teste registrado',
+        'Falha no registro do usuário de teste',
+    );
 
     if (!regRes.ok) {
-        console.error('🛑 Falha ao registrar usuário de teste. Não é possível prosseguir com o login.');
+        console.error(
+            '🛑 Falha ao registrar usuário de teste. Não é possível prosseguir com o login.',
+        );
         return;
     }
 
-    print('AUTENTICAÇÃO: POST /auth/login (Obtendo Token com credenciais registradas)');
-    const res = await req('POST', '/auth/login', {
-        email: AUTH_TEST_EMAIL,
-        password: AUTH_TEST_PASSWORD,
-    }, false);
+    print(
+        'AUTENTICAÇÃO: POST /auth/login (Obtendo Token com credenciais registradas)',
+    );
+    const res = await req(
+        'POST',
+        '/auth/login',
+        {
+            email: AUTH_TEST_EMAIL,
+            password: AUTH_TEST_PASSWORD,
+        },
+        false,
+    );
 
-    show(res, 'Login bem-sucedido. Token obtido.', '❌ Falha no login (401 persistente)');
+    show(
+        res,
+        'Login bem-sucedido. Token obtido.',
+        '❌ Falha no login (401 persistente)',
+    );
 
     if (res.data?.token) {
         authToken = res.data.token;
@@ -92,7 +113,9 @@ async function testActivesAndBalances() {
     mockActiveId = createdActive.data?.id;
 
     if (!mockActiveId) {
-        console.error("Não foi possível continuar os testes de Ativos/Balanços.");
+        console.error(
+            'Não foi possível continuar os testes de Ativos/Balanços.',
+        );
         return;
     }
 
@@ -111,9 +134,13 @@ async function testActivesAndBalances() {
     show(await req('GET', `/historical-balances/active/${mockActiveId}`));
 
     print('ACTIVES: DELETE /actives/:id (Limpar Ativo)');
-    show(await req('DELETE', `/actives/${mockActiveId}`), 'Ativo deletado', 'Falha ao deletar Ativo');
-    
-    mockActiveId = null; 
+    show(
+        await req('DELETE', `/actives/${mockActiveId}`),
+        'Ativo deletado',
+        'Falha ao deletar Ativo',
+    );
+
+    mockActiveId = null;
 }
 
 async function testWalletsAndTransactions() {
@@ -127,7 +154,9 @@ async function testWalletsAndTransactions() {
     const walletId = createdWallet.data?.id;
 
     if (!walletId) {
-        console.error("Não foi possível continuar os testes de Carteira/Transações.");
+        console.error(
+            'Não foi possível continuar os testes de Carteira/Transações.',
+        );
         return;
     }
 
@@ -145,7 +174,11 @@ async function testWalletsAndTransactions() {
     show(await req('GET', '/wallets'));
 
     print('WALLETS: DELETE /wallets/:id');
-    show(await req('DELETE', `/wallets/${walletId}`), 'Carteira deletada', 'Falha ao deletar Carteira');
+    show(
+        await req('DELETE', `/wallets/${walletId}`),
+        'Carteira deletada',
+        'Falha ao deletar Carteira',
+    );
 }
 
 async function testPublicRoutes() {
@@ -153,42 +186,59 @@ async function testPublicRoutes() {
     show(await req('GET', '/users', undefined, false));
 
     print('PUBLIC: POST /users (Criar Novo Usuário - Acesso Público)');
-    show(await req('POST', '/users', {
-        name: 'User Public',
-        email: `public_${Date.now()}@example.com`,
-        password: 'publicpassword',
-    }, false));
+    show(
+        await req(
+            'POST',
+            '/users',
+            {
+                name: 'User Public',
+                email: `public_${Date.now()}@example.com`,
+                password: 'publicpassword',
+            },
+            false,
+        ),
+    );
 }
 
 async function testRateLimiterAndCaching() {
     print('RATE LIMITER: Teste de Força Bruta (5 tentativas em 5 minutos)');
     // Usamos um email inválido para garantir que o login falhe e o rate limit seja acionado
-    const loginPayload = { email: 'invalid@test.com', password: 'wrong' }; 
-    const maxAttempts = 5; 
+    const loginPayload = { email: 'invalid@test.com', password: 'wrong' };
+    const maxAttempts = 5;
     let limitReached = false;
 
     for (let i = 1; i <= maxAttempts + 1; i++) {
         const attempt = await req('POST', '/auth/login', loginPayload, false);
         console.log(`Tentativa ${i}: Status ${attempt.status}`);
-        
+
         if (attempt.status === 429) {
-            show(attempt, 'Limite de Requisições ATINGIDO', 'Status inesperado na tentativa de limite');
+            show(
+                attempt,
+                'Limite de Requisições ATINGIDO',
+                'Status inesperado na tentativa de limite',
+            );
             limitReached = true;
             break;
         }
         if (i === maxAttempts && attempt.status !== 429) {
-             console.error("❌ Falha: O limite de taxa não foi atingido após o número máximo de tentativas.");
+            console.error(
+                '❌ Falha: O limite de taxa não foi atingido após o número máximo de tentativas.',
+            );
         }
     }
-    
+
     if (!limitReached) {
-        console.error("🛑 Teste de Rate Limiter falhou: O status 429 não foi retornado.");
+        console.error(
+            '🛑 Teste de Rate Limiter falhou: O status 429 não foi retornado.',
+        );
     }
-    
+
     print('CACHING: Teste de Desempenho (HIT vs MISS)');
 
     if (!authToken) {
-        console.log("🛑 Caching test skipped: Authentication token is required.");
+        console.log(
+            '🛑 Caching test skipped: Authentication token is required.',
+        );
         return;
     }
 
@@ -197,14 +247,13 @@ async function testRateLimiterAndCaching() {
     console.timeEnd('Tempo MISS');
     show(miss, 'Dashboard MISS (Primeira chamada)', 'Falha na requisição MISS');
 
-    await new Promise(resolve => setTimeout(resolve, 500)); 
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     console.time('Tempo HIT');
     const hit = await req('GET', '/dashboard');
     console.timeEnd('Tempo HIT');
     show(hit, 'Dashboard HIT (Segunda chamada)', 'Falha na requisição HIT');
 }
-
 
 (async function main() {
     console.log(
@@ -223,18 +272,20 @@ async function testRateLimiterAndCaching() {
     await testAuth();
 
     if (!authToken) {
-        console.error('\n🛑 Não foi possível obter o token. Testes autenticados CANCELADOS.');
-        
+        console.error(
+            '\n🛑 Não foi possível obter o token. Testes autenticados CANCELADOS.',
+        );
+
         // Tentativa de limpar o usuário de teste após falha, se existir
         await req('DELETE', `/users/${AUTH_TEST_EMAIL}`, undefined, false);
         return;
     }
-    
+
     // Testes autenticados
     await testDashboard();
     await testActivesAndBalances();
     await testWalletsAndTransactions();
-    
+
     // Teste de Limitação de Taxa e Cache
     await testRateLimiterAndCaching();
 

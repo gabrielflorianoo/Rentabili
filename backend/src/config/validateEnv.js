@@ -8,8 +8,11 @@ const envSchema = Joi.object({
     REFRESH_TOKEN_EXP: Joi.string().default('7d'),
     FRONTEND_URL: Joi.string().required(),
     REDIS_URL: Joi.string().required(),
-    NODE_ENV: Joi.string().valid('development', 'production', 'test').default('development'),
-}).unknown()
+    NODE_ENV: Joi.string()
+        .valid('development', 'production', 'test')
+        .default('development'),
+})
+    .unknown()
     .required();
 
 function validateEnv() {

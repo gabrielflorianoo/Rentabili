@@ -1,4 +1,4 @@
-import { getRedisClient } from '../redisClient.js';
+import { getRedisClient } from '../../redisClient.js';
 
 export const cacheMiddleware = (keyPrefix, durationTTL = 3600) => {
     return async (req, res, next) => {
@@ -54,7 +54,10 @@ export const invalidateCache = (keyPrefix) => {
             console.log(`Cache INVALIDATED for key: ${cacheKey}`);
             next();
         } catch (error) {
-            console.error('Redis Invalidation Error (skipping invalidation)', error);
+            console.error(
+                'Redis Invalidation Error (skipping invalidation)',
+                error,
+            );
             next();
         }
     };

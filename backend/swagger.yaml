@@ -126,9 +126,9 @@ paths:
                                 password:
                                     type: string
             responses:
-                "201":
+                '201':
                     description: Usuário registrado
-                "400":
+                '400':
                     description: Dados inválidos ou email já em uso
     /auth/login:
         post:
@@ -147,7 +147,7 @@ paths:
                                 password:
                                     type: string
             responses:
-                "200":
+                '200':
                     description: Login bem-sucedido
                     content:
                         application/json:
@@ -156,7 +156,7 @@ paths:
                                 properties:
                                     token:
                                         type: string
-                "401":
+                '401':
                     description: Credenciais inválidas
 
     /users:
@@ -166,14 +166,14 @@ paths:
             summary: Lista todos os usuários (Acesso Público, usado para testes)
             security: []
             responses:
-                "200":
+                '200':
                     description: Lista de usuários
                     content:
                         application/json:
                             schema:
                                 type: array
                                 items:
-                                    $ref: "#/components/schemas/User"
+                                    $ref: '#/components/schemas/User'
         post:
             tags:
                 - Usuários
@@ -193,7 +193,7 @@ paths:
                                 password:
                                     type: string
             responses:
-                "201":
+                '201':
                     description: Usuário criado
     /users/{id}:
         get:
@@ -207,9 +207,9 @@ paths:
                       type: integer
                   required: true
             responses:
-                "200":
+                '200':
                     description: Detalhes do usuário
-                "404":
+                '404':
                     description: Usuário não encontrado
         put:
             tags:
@@ -225,9 +225,9 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/User"
+                            $ref: '#/components/schemas/User'
             responses:
-                "200":
+                '200':
                     description: Usuário atualizado
         delete:
             tags:
@@ -240,7 +240,7 @@ paths:
                       type: integer
                   required: true
             responses:
-                "204":
+                '204':
                     description: Usuário deletado com sucesso
 
     /dashboard:
@@ -249,9 +249,9 @@ paths:
                 - Dashboard
             summary: Retorna um resumo completo do dashboard do usuário
             responses:
-                "200":
+                '200':
                     description: Dados do dashboard
-                "401":
+                '401':
                     description: Não autorizado
     /dashboard/summary:
         get:
@@ -259,9 +259,9 @@ paths:
                 - Dashboard
             summary: Retorna um resumo rápido (saldo total, contagem de ativos)
             responses:
-                "200":
+                '200':
                     description: Dados de resumo
-                "401":
+                '401':
                     description: Não autorizado
 
     /wallets:
@@ -270,15 +270,15 @@ paths:
                 - Carteiras
             summary: Lista todas as carteiras do usuário
             responses:
-                "200":
+                '200':
                     description: Lista de carteiras
                     content:
                         application/json:
                             schema:
                                 type: array
                                 items:
-                                    $ref: "#/components/schemas/Wallet"
-                "401":
+                                    $ref: '#/components/schemas/Wallet'
+                '401':
                     description: Não autorizado
         post:
             tags:
@@ -296,9 +296,9 @@ paths:
                                 balance:
                                     type: number
             responses:
-                "201":
+                '201':
                     description: Carteira criada
-                "401":
+                '401':
                     description: Não autorizado
     /wallets/{id}:
         get:
@@ -312,9 +312,9 @@ paths:
                       type: integer
                   required: true
             responses:
-                "200":
+                '200':
                     description: Detalhes da carteira
-                "404":
+                '404':
                     description: Carteira não encontrada
         put:
             tags:
@@ -330,9 +330,9 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/Wallet"
+                            $ref: '#/components/schemas/Wallet'
             responses:
-                "200":
+                '200':
                     description: Carteira atualizada
         delete:
             tags:
@@ -345,7 +345,7 @@ paths:
                       type: integer
                   required: true
             responses:
-                "204":
+                '204':
                     description: Carteira deletada com sucesso
 
     /actives:
@@ -354,15 +354,15 @@ paths:
                 - Ativos
             summary: Lista todos os ativos do usuário
             responses:
-                "200":
+                '200':
                     description: Lista de ativos
                     content:
                         application/json:
                             schema:
                                 type: array
                                 items:
-                                    $ref: "#/components/schemas/Active"
-                "401":
+                                    $ref: '#/components/schemas/Active'
+                '401':
                     description: Não autorizado
         post:
             tags:
@@ -373,11 +373,11 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/Active"
+                            $ref: '#/components/schemas/Active'
             responses:
-                "201":
+                '201':
                     description: Ativo criado
-                "401":
+                '401':
                     description: Não autorizado
     /actives/{id}:
         get:
@@ -391,9 +391,9 @@ paths:
                       type: integer
                   required: true
             responses:
-                "200":
+                '200':
                     description: Detalhes do ativo
-                "404":
+                '404':
                     description: Ativo não encontrado
         put:
             tags:
@@ -409,9 +409,9 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/Active"
+                            $ref: '#/components/schemas/Active'
             responses:
-                "200":
+                '200':
                     description: Ativo atualizado
         delete:
             tags:
@@ -424,7 +424,7 @@ paths:
                       type: integer
                   required: true
             responses:
-                "204":
+                '204':
                     description: Ativo deletado com sucesso
 
     /historical-balances:
@@ -437,11 +437,11 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/HistoricalBalance"
+                            $ref: '#/components/schemas/HistoricalBalance'
             responses:
-                "201":
+                '201':
                     description: Balanço criado
-                "401":
+                '401':
                     description: Não autorizado
     /historical-balances/{id}:
         get:
@@ -455,9 +455,9 @@ paths:
                       type: integer
                   required: true
             responses:
-                "200":
+                '200':
                     description: Detalhes do balanço
-                "404":
+                '404':
                     description: Balanço não encontrado
         put:
             tags:
@@ -473,9 +473,9 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/HistoricalBalance"
+                            $ref: '#/components/schemas/HistoricalBalance'
             responses:
-                "200":
+                '200':
                     description: Balanço atualizado
         delete:
             tags:
@@ -488,7 +488,7 @@ paths:
                       type: integer
                   required: true
             responses:
-                "204":
+                '204':
                     description: Balanço deletado com sucesso
     /historical-balances/active/{activeId}:
         get:
@@ -502,15 +502,15 @@ paths:
                       type: integer
                   required: true
             responses:
-                "200":
+                '200':
                     description: Lista de balanços
                     content:
                         application/json:
                             schema:
                                 type: array
                                 items:
-                                    $ref: "#/components/schemas/HistoricalBalance"
-                "401":
+                                    $ref: '#/components/schemas/HistoricalBalance'
+                '401':
                     description: Não autorizado
 
     /transactions:
@@ -519,15 +519,15 @@ paths:
                 - Transações
             summary: Lista todas as transações do usuário
             responses:
-                "200":
+                '200':
                     description: Lista de transações
                     content:
                         application/json:
                             schema:
                                 type: array
                                 items:
-                                    $ref: "#/components/schemas/Transaction"
-                "401":
+                                    $ref: '#/components/schemas/Transaction'
+                '401':
                     description: Não autorizado
         post:
             tags:
@@ -538,11 +538,11 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/Transaction"
+                            $ref: '#/components/schemas/Transaction'
             responses:
-                "201":
+                '201':
                     description: Transação criada
-                "401":
+                '401':
                     description: Não autorizado
     /transactions/{id}:
         get:
@@ -556,9 +556,9 @@ paths:
                       type: integer
                   required: true
             responses:
-                "200":
+                '200':
                     description: Detalhes da transação
-                "404":
+                '404':
                     description: Transação não encontrada
         put:
             tags:
@@ -574,9 +574,9 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/Transaction"
+                            $ref: '#/components/schemas/Transaction'
             responses:
-                "200":
+                '200':
                     description: Transação atualizada
         delete:
             tags:
@@ -589,7 +589,7 @@ paths:
                       type: integer
                   required: true
             responses:
-                "204":
+                '204':
                     description: Transação deletada com sucesso
 
     /investments:
@@ -598,15 +598,15 @@ paths:
                 - Investimentos
             summary: Lista todos os investimentos do usuário
             responses:
-                "200":
+                '200':
                     description: Lista de investimentos
                     content:
                         application/json:
                             schema:
                                 type: array
                                 items:
-                                    $ref: "#/components/schemas/Investment"
-                "401":
+                                    $ref: '#/components/schemas/Investment'
+                '401':
                     description: Não autorizado
         post:
             tags:
@@ -617,11 +617,11 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/Investment"
+                            $ref: '#/components/schemas/Investment'
             responses:
-                "201":
+                '201':
                     description: Investimento criado
-                "401":
+                '401':
                     description: Não autorizado
     /investments/{id}:
         get:
@@ -635,9 +635,9 @@ paths:
                       type: integer
                   required: true
             responses:
-                "200":
+                '200':
                     description: Detalhes do investimento
-                "404":
+                '404':
                     description: Investimento não encontrado
         put:
             tags:
@@ -653,9 +653,9 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/Investment"
+                            $ref: '#/components/schemas/Investment'
             responses:
-                "200":
+                '200':
                     description: Investimento atualizado
         delete:
             tags:
@@ -668,7 +668,7 @@ paths:
                       type: integer
                   required: true
             responses:
-                "204":
+                '204':
                     description: Investimento deletado com sucesso
     /investments/total-invested:
         get:
@@ -676,7 +676,7 @@ paths:
                 - Investimentos
             summary: Calcula e retorna o total investido pelo usuário (excluindo rendas)
             responses:
-                "200":
+                '200':
                     description: Total investido
                     content:
                         application/json:
@@ -691,7 +691,7 @@ paths:
                 - Investimentos
             summary: Calcula e retorna o ganho/perda de capital (sem considerar valorização de mercado)
             responses:
-                "200":
+                '200':
                     description: Ganho/perda calculado
                     content:
                         application/json:
@@ -721,7 +721,7 @@ paths:
                                 monthlyContribution:
                                     type: number
             responses:
-                "200":
+                '200':
                     description: Resultado da simulação
                     content:
                         application/json:

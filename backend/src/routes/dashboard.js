@@ -6,10 +6,8 @@ import { cacheMiddleware } from '../middlewares/cacheMiddleware.js';
 const router = express.Router();
 const dashboardController = new DashboardController();
 
-
 const DASHBOARD_CACHE_KEY = 'dashboard_data';
 const DASHBOARD_TTL = 60;
-
 
 router.get(
     '/summary',
@@ -17,7 +15,6 @@ router.get(
     cacheMiddleware(`${DASHBOARD_CACHE_KEY}_summary`, DASHBOARD_TTL),
     dashboardController.getSummary,
 );
-
 
 router.get(
     '/',
