@@ -16,7 +16,8 @@
         "setup": "node setup.js",
         "db:migrate": "prisma migrate dev",
         "db:reset": "prisma migrate reset",
-        "db:studio": "prisma studio"
+        "db:studio": "prisma studio",
+        "postinstall": "prisma generate"
     },
     "prisma": {
         "seed": "node prisma/seed.js"
