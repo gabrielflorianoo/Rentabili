@@ -20,6 +20,8 @@ model User {
     transactions Transaction[]
     investments  Investment[]
 
+    refreshTokens RefreshToken[]
+
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
@@ -35,6 +37,8 @@ model Active {
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+
+
 
     @@index([userId])
 }
@@ -99,4 +103,16 @@ model Investment {
 
     @@index([userId])
     @@index([activeId])
+}
+
+model RefreshToken {
+    id        String   @id @default(cuid())
+    token     String   @unique
+    userId    Int
+    user      User     @relation(fields: [userId], references: [id])
+    revoked   Boolean  @default(false)
+    expiresAt DateTime
+    createdAt DateTime @default(now())
+
+    @@index([userId])
 }
