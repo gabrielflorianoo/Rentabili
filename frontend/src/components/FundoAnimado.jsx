@@ -58,7 +58,7 @@ const FundoAnimado = () => {
 
             // Espessura aleatória — OBS: "Maath" está escrito errado no código original (erro)
             // Mantive sem alterar a lógica, conforme solicitado.
-            linha.espessura = 1 + Maath.random() * 2;
+            linha.espessura = 1 + Math.random() * 2;
 
             // Transparência da linha
             linha.opacidade = 0.15 + Math.random() * 0.35;

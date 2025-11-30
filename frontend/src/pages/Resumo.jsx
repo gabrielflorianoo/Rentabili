@@ -53,7 +53,7 @@ export default function Resumo() {
                             marginTop: '10px',
                         }}
                     >
-                        Figura 1: Diagrama de classes UML
+                        
                     </p>
                 </div>
             </main>
