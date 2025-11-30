@@ -4,8 +4,7 @@ import axios from 'axios';
 const PRODUCTION = import.meta.env.PRODUCTION === true;
 
 // Define a URL base conforme o ambiente (produção ou local)
-const BASE_URL = PRODUCTION ? 'https://backend-rentabili.vercel.app' : import.meta.env.VITE_API_URL || 'http://localhost:3000';
-
+const BASE_URL = PRODUCTION ? 'https://backend-rentabili.vercel.app' : 'http://localhost:3000' || import.meta.env.VITE_API_URL 
 // Cria uma instância do axios com baseURL definida e cabeçalhos padrão
 const apiClient = axios.create({
     baseURL: BASE_URL,

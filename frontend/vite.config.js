@@ -7,6 +7,6 @@ export default defineConfig({
         'import.meta.env.VITE_API_URL': JSON.stringify(
             'https://crispy-bassoon-5gjqwp7pj5r9hj76-3000.app.github.dev/',
         ),
-        'import.meta.env.PRODUCTION': true,
+        'import.meta.env.PRODUCTION': false,
     },
 });
