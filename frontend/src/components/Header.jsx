@@ -3,12 +3,15 @@ import { Link, useNavigate } from 'react-router-dom';
 import DarkModeToggle from "../components/DarkModeToggle";
 
 export default function Header() {
+    // Hook do React Router para navegação programática
     const navigate = useNavigate();
 
     return (
         <header className="header">
+            {/* Marca / Logo */}
             <div className="brand">
                 <div className="logo-icon">
+                    {/* Ícone SVG da marca */}
                     <svg
                         width="24"
                         height="24"
@@ -26,18 +29,27 @@ export default function Header() {
                 <span className="logo-text">RENTABIL</span>
             </div>
 
-      <nav className="menu">
-        <Link to="/">Início</Link>
-        <Link to="/resumo">Resumo</Link>
-        <Link to="/planos">Planos</Link>
-        <Link to="/sobre">Sobre</Link>
-      </nav>
-        <div className="header-right"> 
-          <DarkModeToggle /> 
-          <button onClick={() => navigate('/login')} className="btn-acesso"> 
-            ACESSE AQUI 
-          </button> 
-        </div>
-    </header>
-  );
+            {/* Menu de navegação */}
+            <nav className="menu">
+                <Link to="/">Início</Link>
+                <Link to="/resumo">Resumo</Link>
+                <Link to="/planos">Planos</Link>
+                <Link to="/sobre">Sobre</Link>
+            </nav>
+
+            {/* Lado direito do header: dark mode e botão de acesso */}
+            <div className="header-right">
+                {/* Componente para alternar tema dark/light */}
+                <DarkModeToggle />
+
+                {/* Botão que navega para a página de login */}
+                <button
+                    onClick={() => navigate('/login')}
+                    className="btn-acesso"
+                >
+                    ACESSE AQUI
+                </button>
+            </div>
+        </header>
+    );
 }

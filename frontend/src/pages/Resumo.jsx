@@ -6,9 +6,15 @@ import '../styles/estilo.css';
 export default function Resumo() {
     return (
         <div className="page-container">
+            {/* Componente de cabeçalho compartilhado */}
             <Header />
+
+            {/* Conteúdo principal da página */}
             <main className="page-content">
+                {/* Título principal da página */}
                 <h1 className="page-title">Resumo do Projeto Rentabili</h1>
+
+                {/* Parágrafo introdutório descrevendo a continuidade do projeto */}
                 <p className="page-text">
                     Este documento é a continuação do projeto Rentabili. A Fase
                     1 apresentou o entendimento do negócio e a proposta inicial
@@ -16,6 +22,7 @@ export default function Resumo() {
                     incluindo o modelo de dados revisado.
                 </p>
 
+                {/* Seção: Entendimento do negócio */}
                 <h2 className="section-title">Entendimento do Negócio</h2>
                 <p className="page-text">
                     O problema central é a falta de visibilidade e o
@@ -23,6 +30,7 @@ export default function Resumo() {
                     por parte de investidores.
                 </p>
 
+                {/* Seção: Requisitos do projeto */}
                 <h2 className="section-title">Requisitos</h2>
                 <ul className="page-list">
                     <li>
@@ -36,6 +44,7 @@ export default function Resumo() {
                     </li>
                 </ul>
 
+                {/* Área centralizada para figura/diagrama UML */}
                 <div style={{ textAlign: 'center', marginTop: '40px' }}>
                     <p
                         style={{
@@ -48,6 +57,8 @@ export default function Resumo() {
                     </p>
                 </div>
             </main>
+
+            {/* Componente de rodapé compartilhado */}
             <Footer />
         </div>
     );

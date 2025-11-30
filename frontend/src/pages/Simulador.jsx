@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import "../styles/simulador.css";
-import Sidebar from "../components/Sidebar";
-import { investmentsApi } from "../services/apis";
+import Sidebar from "../components/Sidebar"; // Componente de navegação lateral (sidebar)
+import { investmentsApi } from "../services/apis"; // API de investimentos (não usada aqui diretamente)
 
+// Importações e registro do Chart.js para gráficos de linha
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -26,22 +27,28 @@ ChartJS.register(
 );
 
 export default function Simulador() {
+    // Dados do usuário (mock inicial)
     const [userData] = useState({ name: "Usuário" });
+
+    // Estados dos inputs do simulador
     const [valorInicial, setValorInicial] = useState(null);
     const [taxa, setTaxa] = useState(null);
     const [tempo, setTempo] = useState(null);
 
+    // Estados dos resultados do cálculo
     const [resultado, setResultado] = useState(null);
     const [jurosTotais, setJurosTotais] = useState(null);
     const [crescimento, setCrescimento] = useState(null);
-    const [evolucao, setEvolucao] = useState([]);
+    const [evolucao, setEvolucao] = useState([]); // Array para evolução mês a mês
 
+    // Função que calcula a evolução do investimento
     const calcularEvolucao = () => {
-        if (!valorInicial || !taxa || !tempo) return;
+        if (!valorInicial || !taxa || !tempo) return; // validação simples
 
         const valores = [];
         let atual = valorInicial;
 
+        // Calcula crescimento composto mês a mês
         for (let i = 0; i <= tempo; i++) {
             valores.push(atual);
             atual *= 1 + taxa / 100;
@@ -51,12 +58,14 @@ export default function Simulador() {
         const juros = final - valorInicial;
         const crescimentoPct = (juros / valorInicial) * 100;
 
+        // Atualiza estados com os resultados
         setResultado(final);
         setJurosTotais(juros);
         setCrescimento(crescimentoPct);
         setEvolucao(valores);
     };
 
+    // Detecta tema escuro para adaptar cores do gráfico
     const dark = document.body.classList.contains("dark");
     const chartTextColor = dark ? "#0ed41fff" : "#11bb44ff";
     const chartBorderColor = dark ? "#4ade80" : "#166534";
@@ -65,14 +74,17 @@ export default function Simulador() {
     return (
         <div className="dashboard-wrap">
             <div className="content">
+                {/* Cabeçalho do dashboard */}
                 <header className="content-head">
                     <h2>Simulador</h2>
                     <div className="user-badge">👤 {userData.name}</div>
                 </header>
 
+                {/* Seção do formulário do simulador */}
                 <div className="form-section">
                     <h1 className="simuladorTitulo">Simulador de Investimentos</h1>
                     <div className="form-row">
+                        {/* Input Valor Inicial */}
                         <div className="form-group">
                             <label>Valor Inicial</label>
                             <input
@@ -83,6 +95,7 @@ export default function Simulador() {
                             />
                         </div>
 
+                        {/* Input Taxa mensal */}
                         <div className="form-group">
                             <label>Taxa (% ao mês)</label>
                             <input
@@ -93,6 +106,7 @@ export default function Simulador() {
                             />
                         </div>
 
+                        {/* Input Tempo em meses */}
                         <div className="form-group">
                             <label>Tempo (meses)</label>
                             <input
@@ -104,11 +118,13 @@ export default function Simulador() {
                         </div>
                     </div>
 
+                    {/* Botão para calcular */}
                     <button onClick={calcularEvolucao} className="simuladorButton">
                         Simular
                     </button>
                 </div>
 
+                {/* Cards de resultado */}
                 {resultado !== null && (
                     <section className="stats-grid">
                         <div className="stat-card green">
@@ -147,6 +163,7 @@ export default function Simulador() {
                     </section>
                 )}
 
+                {/* Gráfico de evolução */}
                 {evolucao.length > 0 && (
                     <div className="chartWrapper">
                         <Line

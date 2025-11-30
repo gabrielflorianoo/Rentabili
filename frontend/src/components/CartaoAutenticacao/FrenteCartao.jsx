@@ -6,25 +6,35 @@ import imgLogo from '../../assets/logo.jpeg';
 
 const FrenteCartao = ({ aoVirar }) => {
     const navegar = useNavigate();
-    // Voltamos a usar os estados de visualização para alternar as telas
-    const [visualizacao, setVisualizacao] = useState('login'); // 'login', 'recuperar', 'validar'
+
+    // Controla qual tela está sendo exibida: login, recuperar senha ou validar código
+    const [visualizacao, setVisualizacao] = useState('login');
+
+    // Armazena dados preenchidos pelo usuário
     const [dadosForm, setDadosForm] = useState({
         email: '',
         senha: '',
         codigo: '',
         novaSenha: '',
     });
+
+    // Guardará mensagens de erro específicas para cada campo
     const [erros, setErros] = useState({});
+
+    // Estado de loading para evitar múltiplos envios no login
     const [carregando, setCarregando] = useState(false);
+
+    // Armazena o e-mail usado no processo de recuperação (usado para simulação)
     const [emailRecuperacao, setEmailRecuperacao] = useState('');
 
+    // Atualiza o campo no formulário conforme o usuário digita
     const lidarComMudanca = (e) => {
         setDadosForm({ ...dadosForm, [e.target.id]: e.target.value });
-        setErros({ ...erros, [e.target.id]: '' });
+        setErros({ ...erros, [e.target.id]: '' }); // Limpa erro do campo editado
     };
 
+    // Preenche automaticamente com um usuário de testes
     const preencherAutomaticamente = () => {
-        // Usuário padrão do sistema
         setDadosForm({
             ...dadosForm,
             email: 'email@example.com',
@@ -35,63 +45,77 @@ const FrenteCartao = ({ aoVirar }) => {
         setErros({});
     };
 
-    // --- LOGIN REAL (Conectado ao Banco) ---
+    // --- LOGIN REAL (conecta ao backend) ---
     const lidarComLogin = async (e) => {
         e.preventDefault();
         setCarregando(true);
 
+        // Chama o serviço de autenticação
         const resposta = await servicoAutenticacao.entrar(
             dadosForm.email,
             dadosForm.senha,
         );
+
         setCarregando(false);
 
+        // Login bem-sucedido → redireciona para o dashboard
         if (resposta.sucesso) {
             navegar('/dashboard');
         } else {
+            // Exibe o erro devolvido pelo backend no campo correspondente
             setErros({ [resposta.campo]: resposta.erro });
         }
     };
 
-    // --- RECUPERAÇÃO SIMULADA (Para UX) ---
+    // --- INÍCIO DA RECUPERAÇÃO DE SENHA (simulada) ---
     const lidarComEsqueciSenha = (e) => {
         e.preventDefault();
+
+        // O e-mail precisa estar preenchido
         if (!dadosForm.email) {
             setErros({ email: 'Digite seu e-mail para continuar.' });
             return;
         }
 
-        // Simula o envio de código
+        // Simula envio de código de verificação
         setEmailRecuperacao(dadosForm.email);
         alert(
-            `SIMULAÇÃO: Um código de verificação foi enviado para ${dadosForm.email}.\n\nSeu código de teste é: 123456`,
+            `SIMULAÇÃO: Um código foi enviado para ${dadosForm.email}.\n\nCódigo de teste: 123456`,
         );
 
-        setVisualizacao('validar'); // Troca para a tela de código
+        // Troca tela → vai para validação
+        setVisualizacao('validar');
         setErros({});
     };
 
+    // --- VALIDAÇÃO DO CÓDIGO E NOVA SENHA (simulada) ---
     const lidarComValidacao = (e) => {
         e.preventDefault();
 
+        // Verifica se o código digitado é o simulado
         if (dadosForm.codigo !== '123456') {
             setErros({ codigo: 'Código inválido.' });
             return;
         }
 
+        // Verifica força mínima da senha
         if (dadosForm.novaSenha.length < 6) {
             setErros({ novaSenha: 'A senha deve ter no mínimo 6 caracteres.' });
             return;
         }
 
         alert('Senha redefinida com sucesso! (Simulação)');
-        setVisualizacao('login'); // Volta para o login
+
+        // Volta para a tela de login após redefinir
+        setVisualizacao('login');
+
+        // Limpa campos relacionados à validação
         setDadosForm({ ...dadosForm, senha: '', codigo: '', novaSenha: '' });
     };
 
     return (
         <div className="card-face card-front">
-            {/* Lado Esquerdo: Boas Vindas */}
+            {/* Lado Esquerdo: Apresentação e botão de criar conta */}
             <div className="card-section welcome-section">
                 <div className="welcome-content fade-in-up">
                     <div className="logo-container">
@@ -102,14 +126,17 @@ const FrenteCartao = ({ aoVirar }) => {
                         Bem-vindo ao futuro dos investimentos
                     </p>
                 </div>
+
+                {/* Botão que vira o cartão para a tela de cadastro */}
                 <button className="flip-button" onClick={aoVirar}>
                     Criar Conta →
                 </button>
             </div>
 
-            {/* Lado Direito: Formulários Dinâmicos */}
+            {/* Lado Direito: Formulários trocados dinamicamente */}
             <div className="card-section form-section">
-                {/* TELA 1: LOGIN */}
+
+                {/* TELA 1 → LOGIN */}
                 {visualizacao === 'login' && (
                     <div className="form-content fade-in-up">
                         <div className="form-header">
@@ -118,6 +145,7 @@ const FrenteCartao = ({ aoVirar }) => {
                                 Entre com suas credenciais
                             </p>
                         </div>
+
                         <form onSubmit={lidarComLogin}>
                             <InputFlutuante
                                 id="email"
@@ -128,6 +156,7 @@ const FrenteCartao = ({ aoVirar }) => {
                                 erro={erros.email}
                                 required
                             />
+
                             <InputFlutuante
                                 id="senha"
                                 type="password"
@@ -137,6 +166,7 @@ const FrenteCartao = ({ aoVirar }) => {
                                 erro={erros.senha}
                                 required
                             />
+
                             <button
                                 type="submit"
                                 className="holo-button"
@@ -145,6 +175,7 @@ const FrenteCartao = ({ aoVirar }) => {
                                 {carregando ? 'Entrando...' : 'Entrar na Conta'}
                             </button>
 
+                            {/* Botão para inserir credenciais automaticamente */}
                             <button
                                 type="button"
                                 className="holo-button secondary-button"
@@ -154,6 +185,8 @@ const FrenteCartao = ({ aoVirar }) => {
                                 Preencher Automaticamente
                             </button>
                         </form>
+
+                        {/* Link para trocar para o fluxo de recuperação de senha */}
                         <a
                             href="#"
                             className="form-link"
@@ -167,7 +200,7 @@ const FrenteCartao = ({ aoVirar }) => {
                     </div>
                 )}
 
-                {/* TELA 2: PEDIR E-MAIL */}
+                {/* TELA 2 → INSERIR E-MAIL PARA RECUPERAÇÃO */}
                 {visualizacao === 'recuperar' && (
                     <div className="form-content fade-in-up">
                         <div className="form-header">
@@ -176,6 +209,7 @@ const FrenteCartao = ({ aoVirar }) => {
                                 Insira seu e-mail para receber o código
                             </p>
                         </div>
+
                         <form onSubmit={lidarComEsqueciSenha}>
                             <InputFlutuante
                                 id="email"
@@ -186,10 +220,13 @@ const FrenteCartao = ({ aoVirar }) => {
                                 erro={erros.email}
                                 required
                             />
+
                             <button type="submit" className="holo-button">
                                 Enviar Código
                             </button>
                         </form>
+
+                        {/* Voltar ao login */}
                         <a
                             href="#"
                             className="form-link"
@@ -203,7 +240,7 @@ const FrenteCartao = ({ aoVirar }) => {
                     </div>
                 )}
 
-                {/* TELA 3: VALIDAR CÓDIGO */}
+                {/* TELA 3 → VALIDAR CÓDIGO E ALTERAR SENHA */}
                 {visualizacao === 'validar' && (
                     <div className="form-content fade-in-up">
                         <div className="form-header">
@@ -212,6 +249,7 @@ const FrenteCartao = ({ aoVirar }) => {
                                 Código enviado para seu e-mail
                             </p>
                         </div>
+
                         <form onSubmit={lidarComValidacao}>
                             <InputFlutuante
                                 id="codigo"
@@ -222,6 +260,7 @@ const FrenteCartao = ({ aoVirar }) => {
                                 erro={erros.codigo}
                                 required
                             />
+
                             <InputFlutuante
                                 id="novaSenha"
                                 type="password"
@@ -231,10 +270,13 @@ const FrenteCartao = ({ aoVirar }) => {
                                 erro={erros.novaSenha}
                                 required
                             />
+
                             <button type="submit" className="holo-button">
                                 Salvar Nova Senha
                             </button>
                         </form>
+
+                        {/* Cancelar processo e voltar ao login */}
                         <a
                             href="#"
                             className="form-link"

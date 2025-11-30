@@ -1,50 +1,53 @@
 import axios from 'axios';
 
-const PRODUCTION = true;
-const BASE_URL = PRODUCTION ? 'https://backend-rentabili.vercel.app' : import.meta.env.VITE_API_URL || 'http://localhost:3000';
+// Flag para alternar entre ambiente de produção e desenvolvimento
+const PRODUCTION = false;
 
-// Cria uma instância do axios com baseURL e headers padrão
+// Define a URL base conforme o ambiente (produção ou local)
+const BASE_URL = PRODUCTION ? 'https://backend-rentabili.vercel.app' : 'http://localhost:3000' || import.meta.env.VITE_API_URL;
+
+// Cria uma instância do axios com baseURL definida e cabeçalhos padrão
 const apiClient = axios.create({
     baseURL: BASE_URL,
     headers: {
         'Content-Type': 'application/json',
     },
-    withCredentials: true,
+    withCredentials: true, // Permite envio automático de cookies/sessões
 });
 
 /**
- * Função para tratar a resposta de uma requisição Axios.
- * @param {Promise} responsePromise - A promessa retornada por uma chamada do axios.
- * @returns {Promise<any>} O dado da resposta ou null em caso de erro.
+ * Função genérica para tratar respostas de requisições Axios.
+ * Envolve a chamada em um try/catch para capturar possíveis erros.
+ * @param {Promise} responsePromise - Promessa retornada por uma chamada axios.
+ * @returns {Promise<any>} Retorna os dados da resposta ou lança um erro.
  */
 const handleResponse = async (responsePromise) => {
     try {
         const response = await responsePromise;
-        return response.data;
+        return response.data; // Retorna apenas o "data", simplificando o consumo
     } catch (error) {
-        // Você pode adicionar tratamento de erro específico aqui (ex: redirecionar no 401)
         console.error('Erro na Requisição API:', error);
-        // Lança o erro novamente para que o código de chamada possa tratá-lo (opcional, mas recomendado)
+        // Lança o erro novamente para que quem chamou possa decidir o que fazer
         throw error;
     }
 };
 
-// Interceptor para adicionar token quando presente
+// Interceptor de requisição para adicionar o token JWT automaticamente
 apiClient.interceptors.request.use((config) => {
     try {
-        const token = localStorage.getItem('rentabil_token');
+        const token = localStorage.getItem('rentabil_token'); // Recupera token salvo
         if (token) {
             config.headers = config.headers || {};
-            config.headers.Authorization = `Bearer ${token}`;
+            config.headers.Authorization = `Bearer ${token}`; // Adiciona Authorization
         }
     } catch (e) {
-        // localStorage pode falhar em ambientes não-browser
+        // Caso localStorage não esteja disponível (ex: SSR)
     }
-    return config;
+    return config; // Retorna a config modificada
 });
 
 // --- Funções Auxiliares Genéricas ---
-// Cria uma função auxiliar para aplicar o handleResponse a todas as chamadas.
+// Todas as chamadas usam handleResponse para padronizar o retorno e erros
 
 const get = (url, config) => handleResponse(apiClient.get(url, config));
 const post = (url, data, config) =>
@@ -53,22 +56,22 @@ const put = (url, data, config) =>
     handleResponse(apiClient.put(url, data, config));
 const remove = (url, config) => handleResponse(apiClient.delete(url, config));
 
-// Auth API
+// Auth API – Funções relacionadas à autenticação
 export const authApi = {
     login: (email, password) => post('/auth/login', { email, password }),
     register: (payload) => post('/auth/register', payload),
 };
 
-// Users API
+// Users API – CRUD de usuários
 export const userApi = {
-    list: () => get('/users'),
-    getById: (id) => get(`/users/${id}`),
-    create: (payload) => post('/users', payload),
-    update: (id, payload) => put(`/users/${id}`, payload),
-    remove: (id) => remove(`/users/${id}`),
+    list: () => get('/users'), // Lista todos os usuários
+    getById: (id) => get(`/users/${id}`), // Busca por ID
+    create: (payload) => post('/users', payload), // Criação
+    update: (id, payload) => put(`/users/${id}`, payload), // Atualização
+    remove: (id) => remove(`/users/${id}`), // Remoção
 };
 
-// Transactions API
+// Transactions API – CRUD de transações financeiras
 export const transactionsApi = {
     list: () => get('/transactions'),
     getById: (id) => get(`/transactions/${id}`),
@@ -77,19 +80,19 @@ export const transactionsApi = {
     remove: (id) => remove(`/transactions/${id}`),
 };
 
-// Investments API
+// Investments API – Operações financeiras e cálculos de investimentos
 export const investmentsApi = {
     list: () => get('/investments'),
     getById: (id) => get(`/investments/${id}`),
     create: (payload) => post('/investments', payload),
     update: (id, payload) => put(`/investments/${id}`, payload),
     remove: (id) => remove(`/investments/${id}`),
-    getTotalInvested: () => get('/investments/total-invested'),
-    getGainLoss: () => get('/investments/gain-loss'),
-    simulateInvestment: (payload) => post('/investments/simulate', payload),
+    getTotalInvested: () => get('/investments/total-invested'), // Soma total investida
+    getGainLoss: () => get('/investments/gain-loss'), // Ganhos e perdas
+    simulateInvestment: (payload) => post('/investments/simulate', payload), // Simulações
 };
 
-// Wallets API
+// Wallets API – Para gerenciamento de carteiras
 export const walletsApi = {
     list: () => get('/wallets'),
     getById: (id) => get(`/wallets/${id}`),
@@ -98,12 +101,12 @@ export const walletsApi = {
     remove: (id) => remove(`/wallets/${id}`),
 };
 
-// Dashboard API
+// Dashboard API – Dados consolidados do painel
 export const dashboardApi = {
     getSummary: () => get('/dashboard/summary'),
 };
 
-// Actives API
+// Actives API – Gerenciamento de ativos financeiros
 export const activesApi = {
     list: () => get('/actives'),
     getById: (id) => get(`/actives/${id}`),
@@ -112,7 +115,7 @@ export const activesApi = {
     remove: (id) => remove(`/actives/${id}`),
 };
 
-// Historical Balances API
+// Historical Balances API – Histórico de valores dos ativos
 export const historicalBalancesApi = {
     listByActive: (activeId) => get(`/historical-balances/active/${activeId}`),
     getById: (id) => get(`/historical-balances/${id}`),

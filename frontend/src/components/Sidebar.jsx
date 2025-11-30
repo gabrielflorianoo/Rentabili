@@ -2,19 +2,25 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import DarkModeToggle from "../components/DarkModeToggle";
 
-
 export default function Sidebar({ aoSair = () => {}, paginaAtiva = '' }) {
+    // Hook do React Router para navegação programática
     const navigate = useNavigate();
 
     return (
         <aside className="sidebar">
-             <div className="sidebar-darkmode">
+            {/* Componente para alternar entre modo claro e escuro */}
+            <div className="sidebar-darkmode">
                 <DarkModeToggle />
             </div>
+
+            {/* Logo / marca da aplicação */}
             <div className="logo">
                 📈<strong>RENTABIL</strong>
             </div>
+
+            {/* Menu de navegação lateral */}
             <nav>
+                {/* Links de navegação com destaque para página ativa */}
                 <a
                     onClick={() => navigate('/dashboard')}
                     className={paginaAtiva === 'dashboard' ? 'active' : ''}
@@ -45,13 +51,18 @@ export default function Sidebar({ aoSair = () => {}, paginaAtiva = '' }) {
                 >
                     Relatórios
                 </a>
-                <a onClick={() => navigate('/simulador')} className={paginaAtiva === 'simulador' ? 'active' : ''}>
+                <a
+                    onClick={() => navigate('/simulador')}
+                    className={paginaAtiva === 'simulador' ? 'active' : ''}
+                >
                     Simulador
                 </a>
+
+                {/* Botão de logout / sair da conta */}
                 <a
-                    onClick={aoSair}
+                    onClick={aoSair} // Callback passado pelo componente pai
                     style={{
-                        marginTop: 'auto',
+                        marginTop: 'auto', // Empurra para o fim da barra
                         color: '#d90429',
                         cursor: 'pointer',
                     }}

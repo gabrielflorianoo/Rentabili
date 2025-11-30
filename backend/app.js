@@ -50,7 +50,7 @@ const app = express();
 
 const allowedOrigins = [
     process.env.FRONTEND_URL,
-    process.env.BACKEND_RUL,
+    process.env.BACKEND_URL,
 ];
 
 app.use(helmet());

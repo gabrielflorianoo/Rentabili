@@ -1,12 +1,14 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import '../styles/estilo.css';
+import Header from '../components/Header'; // Cabeçalho compartilhado da página
+import Footer from '../components/Footer'; // Rodapé compartilhado da página
+import '../styles/estilo.css'; // Estilos globais da aplicação
 
+// Componente da página de Planos
 export default function Planos() {
-    const navigate = useNavigate();
+    const navigate = useNavigate(); // Hook do React Router para navegação programática
 
+    // Estilo padrão dos cards de plano
     const cardStyle = {
         background: 'transparent',
         padding: '30px',
@@ -21,12 +23,14 @@ export default function Planos() {
 
     return (
         <div className="page-container">
-            <Header />
+            <Header /> {/* Cabeçalho comum a todas as páginas */}
+
             <main className="page-content">
                 <h1 className="page-title" style={{ textAlign: 'center' }}>
                     Nossos Planos
                 </h1>
 
+                {/* Container flexível para os cards de planos */}
                 <div
                     style={{
                         display: 'flex',
@@ -35,7 +39,7 @@ export default function Planos() {
                         marginTop: '40px',
                     }}
                 >
-                    {/* Plano Grátis */}
+                    {/* Card do Plano Grátis */}
                     <div style={cardStyle}>
                         <h2 style={{ color: '#0f7c3a' }}>Grátis</h2>
                         <div
@@ -55,6 +59,7 @@ export default function Planos() {
                             <li>Cálculo de rentabilidade simples</li>
                             <li>Uma carteira de investimentos</li>
                         </ul>
+                        {/* Botão que leva o usuário para a tela de login */}
                         <button
                             onClick={() => navigate('/login')}
                             className="btn-acesso"
@@ -64,7 +69,7 @@ export default function Planos() {
                         </button>
                     </div>
 
-                    {/* Plano Avançado */}
+                    {/* Card do Plano Avançado */}
                     <div style={{ ...cardStyle, border: '2px solid #0f7c3a' }}>
                         <h2 style={{ color: '#0f7c3a' }}>Avançado</h2>
                         <div
@@ -85,6 +90,7 @@ export default function Planos() {
                             <li>Gráficos avançados e relatórios</li>
                             <li>Suporte prioritário</li>
                         </ul>
+                        {/* Botão que leva o usuário para a tela de login para assinatura */}
                         <button
                             onClick={() => navigate('/login')}
                             className="btn-acesso"
@@ -95,7 +101,8 @@ export default function Planos() {
                     </div>
                 </div>
             </main>
-            <Footer />
+
+            <Footer /> {/* Rodapé comum a todas as páginas */}
         </div>
     );
 }
