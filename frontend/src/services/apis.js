@@ -1,10 +1,10 @@
 import axios from 'axios';
 
 // Flag para alternar entre ambiente de produção e desenvolvimento
-const PRODUCTION = false;
+const PRODUCTION = import.meta.env.PRODUCTION === true;
 
 // Define a URL base conforme o ambiente (produção ou local)
-const BASE_URL = PRODUCTION ? 'https://backend-rentabili.vercel.app' : 'http://localhost:3000' || import.meta.env.VITE_API_URL;
+const BASE_URL = PRODUCTION ? 'https://backend-rentabili.vercel.app' : import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 // Cria uma instância do axios com baseURL definida e cabeçalhos padrão
 const apiClient = axios.create({

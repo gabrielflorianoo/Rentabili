@@ -4,7 +4,6 @@ import { investmentsApi, activesApi } from '../services/apis';
 import { generateInvestment } from '../utils/fakeData';
 import { servicoAutenticacao } from '../services/servicoAutenticacao';
 import './Investimentos.css';
-import Sidebar from '../components/Sidebar';
 
 export default function Investimentos() {
     const navigate = useNavigate();
@@ -16,6 +15,7 @@ export default function Investimentos() {
     const [carregando, setCarregando] = useState(true);
     const [mostrarModal, setMostrarModal] = useState(false);
     const [investimentoEditando, setInvestimentoEditando] = useState(null);
+    const [autoPreencherErro, setAutoPreencherErro] = useState("");
     const [formData, setFormData] = useState({
         activeId: '',
         amount: '',
@@ -115,10 +115,8 @@ export default function Investimentos() {
             carregarInvestimentos();
         } catch (err) {
             console.error('Erro ao salvar investimento:', err);
-            alert(
-                'Erro ao salvar investimento: ' +
-                    (err.response?.data?.error || err.message),
-            );
+            
+            setAutoPreencherErro(err.response.data.error);
         }
     };
 
@@ -135,10 +133,26 @@ export default function Investimentos() {
             console.error('Erro ao excluir investimento:', err);
             alert(
                 'Erro ao excluir investimento: ' +
-                    (err.response?.data?.error || err.message),
+                (err.response?.data?.error || err.message),
             );
         }
     };
+
+    const handleAutoPreencher = async () => {
+        try {
+            const actives = await activesApi.list().catch(() => []);
+            const fake = generateInvestment(actives);
+
+            setFormData(fake);
+        } catch (err) {
+            console.error(
+                'Erro ao auto-preencher investimentos:',
+                err
+            );
+
+            setAutoPreencherErro(err.message);
+        }
+    }
 
     const handleSimular = async (inv) => {
         try {
@@ -185,7 +199,7 @@ export default function Investimentos() {
             }
             alert(
                 'Erro ao simular investimento: ' +
-                    (err.response?.data?.error || err.message),
+                (err.response?.data?.error || err.message),
             );
         }
     };
@@ -271,7 +285,7 @@ export default function Investimentos() {
                                         filterActiveType === 'Todos'
                                             ? true
                                             : ativo &&
-                                              ativo.type === filterActiveType;
+                                            ativo.type === filterActiveType;
                                     return kindMatch && tipoMatch;
                                 },
                             );
@@ -297,7 +311,7 @@ export default function Investimentos() {
                                         </thead>
                                         <tbody>
                                             {investimentosSomente.length ===
-                                            0 ? (
+                                                0 ? (
                                                 <tr>
                                                     <td
                                                         colSpan="5"
@@ -393,13 +407,13 @@ export default function Investimentos() {
                                                             .filter(
                                                                 (i) =>
                                                                     i.activeId ===
-                                                                        r.activeId &&
+                                                                    r.activeId &&
                                                                     new Date(
                                                                         i.date,
                                                                     ) <=
-                                                                        new Date(
-                                                                            r.date,
-                                                                        ),
+                                                                    new Date(
+                                                                        r.date,
+                                                                    ),
                                                             )
                                                             .sort(
                                                                 (a, b) =>
@@ -416,17 +430,17 @@ export default function Investimentos() {
                                                     const amtR =
                                                         parseFloat(r.amount) ||
                                                         (typeof r.amountNum ===
-                                                        'number'
+                                                            'number'
                                                             ? r.amountNum
                                                             : NaN);
                                                     const amtBase = base
                                                         ? parseFloat(
-                                                              base.amount,
-                                                          ) ||
-                                                          (typeof base.amountNum ===
-                                                          'number'
-                                                              ? base.amountNum
-                                                              : NaN)
+                                                            base.amount,
+                                                        ) ||
+                                                        (typeof base.amountNum ===
+                                                            'number'
+                                                            ? base.amountNum
+                                                            : NaN)
                                                         : NaN;
                                                     if (
                                                         !isNaN(amtR) &&
@@ -564,45 +578,12 @@ export default function Investimentos() {
                                         required
                                     />
                                 </div>
+                                <p className="error-message">{autoPreencherErro}</p>
                                 <div className="modal-actions">
                                     <button
                                         type="button"
                                         className="btn-secondary"
-                                        onClick={async () => {
-                                            // Tenta buscar ativos válidos do backend
-                                            try {
-                                                const actives =
-                                                    await getActives().catch(
-                                                        () => [],
-                                                    );
-                                                const fake =
-                                                    generateInvestment();
-                                                if (
-                                                    Array.isArray(actives) &&
-                                                    actives.length > 0
-                                                ) {
-                                                    const pick =
-                                                        actives[
-                                                            Math.floor(
-                                                                Math.random() *
-                                                                    actives.length,
-                                                            )
-                                                        ];
-                                                    fake.activeId = String(
-                                                        pick.id,
-                                                    );
-                                                }
-                                                setFormData(fake);
-                                            } catch (err) {
-                                                console.error(
-                                                    'Erro ao auto-preencher investimentos:',
-                                                    err,
-                                                );
-                                                setFormData(
-                                                    generateInvestment(),
-                                                );
-                                            }
-                                        }}
+                                        onClick={handleAutoPreencher}
                                         style={{ marginRight: 8 }}
                                     >
                                         Auto-preencher

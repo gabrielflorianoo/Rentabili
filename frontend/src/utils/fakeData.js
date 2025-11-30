@@ -43,8 +43,12 @@ export function generateTransaction() {
     };
 }
 
-export function generateInvestment() {
-    const activeId = randomInt(1, 50);
+export function generateInvestment(actives = []) {
+    if (actives.length < 1) {
+        throw new Error("Nenhum ativo encontrado, porfavor crie ativos antes de criar algum investimento.");
+    }
+
+    const activeId = actives[randomInt(0, actives.length - 1)];
     const amount = randomFloat(50, 20000);
     return {
         activeId: String(activeId),
