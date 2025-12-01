@@ -1,4 +1,3 @@
-// backend/src/services/authService.js
 import userRepository from '../repositories/userRepository.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -34,6 +33,7 @@ const login = async (username, password) => {
     const token = jwt.sign({ id: user.id, username: user.username }, secret, {
         expiresIn: expiresIn,
     });
+
 
     return token;
 };

@@ -23,15 +23,16 @@ export default function Ativos() {
     // Controle do ativo sendo editado
     const [editing, setEditing] = useState(null);
 
-    // Estado do formulário de criação/edição de ativo
-    const [form, setForm] = useState({ name: '', type: '' });
+    // ALTERAÇÃO: Estado do formulário usando chaves em inglês (name, type, userId)
+    const [form, setForm] = useState({ name: '', type: '', userId: '' });
+
+    const [erro, setErro] = useState("");
 
     // Carrega usuário e ativos ao montar o componente
     useEffect(() => {
         const user = servicoAutenticacao.obterUsuarioAtual();
         const token = servicoAutenticacao.obterToken();
 
-        // Redireciona para login se não houver usuário ou token
         if (!user || !token) {
             navigate('/');
             return;
@@ -41,7 +42,6 @@ export default function Ativos() {
         loadActives();
     }, [navigate]);
 
-    // Função para carregar os ativos da API
     const loadActives = async () => {
         try {
             setLoading(true);
@@ -49,8 +49,6 @@ export default function Ativos() {
             setActives(res || []);
         } catch (err) {
             console.error('Erro ao carregar ativos:', err);
-
-            // Se token expirou, faz logout e redireciona
             if (err?.response?.status === 401) {
                 servicoAutenticacao.sair();
                 navigate('/');
@@ -64,25 +62,31 @@ export default function Ativos() {
     const openModal = (item = null) => {
         if (item) {
             setEditing(item);
-            setForm({ name: item.name, type: item.type });
+            // ALTERAÇÃO: Mapeando propriedades em inglês e garantindo fallback
+            setForm({ 
+                name: item.name || '', 
+                type: item.type || '',
+                userId: item.userId || '' 
+            });
         } else {
             setEditing(null);
-            setForm({ name: '', type: '' });
+            setForm({ name: '', type: '', userId: '' });
         }
         setShowModal(true);
     };
 
-    // Fecha o modal
     const closeModal = () => {
         setShowModal(false);
         setEditing(null);
+        setForm({ name: '', type: '', userId: '' });
     };
 
-    // Submete o formulário de criação/edição
+    // Submete o formulário
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const payload = { ...form };
+            // ALTERAÇÃO: Payload já está em inglês baseado no state 'form'
+            const payload = { ...form, userId: userData.id };
 
             if (editing) {
                 await activesApi.update(editing.id, payload);
@@ -94,14 +98,10 @@ export default function Ativos() {
             loadActives();
         } catch (err) {
             console.error('Erro ao salvar ativo:', err);
-            alert(
-                'Erro ao salvar ativo: ' +
-                    (err.response?.data?.error || err.message),
-            );
+            setErro(err.response?.data?.error);
         }
     };
 
-    // Exclui um ativo
     const handleDelete = async (id) => {
         if (!window.confirm('Excluir este ativo?')) return;
 
@@ -112,28 +112,36 @@ export default function Ativos() {
             console.error('Erro ao excluir ativo:', err);
             alert(
                 'Erro ao excluir ativo: ' +
-                    (err.response?.data?.error || err.message),
+                (err.response?.data?.error || err.message),
             );
         }
     };
 
+    // Função auxiliar para gerar dados fake (certifique-se que generateActive retorna name/type em inglês também)
+    const handleAutoFill = () => {
+        const fake = generateActive();
+        // Garante que o fake data mapeie para o inglês se a função original retornar portugues
+        setForm({
+            name: fake.name || fake.nome || '',
+            type: fake.type || fake.tipo || '',
+            userId: ''
+        });
+    }
+
     return (
         <div className="dashboard-wrap">
             <div className="content">
-                {/* Cabeçalho da página */}
                 <header className="content-head">
                     <h2>Ativos</h2>
                     <div className="user-badge">👤 {userData.name}</div>
                 </header>
 
-                {/* Barra de ações */}
                 <div className="actions-bar">
                     <button className="btn-primary" onClick={() => openModal()}>
                         + Novo Ativo
                     </button>
                 </div>
 
-                {/* Tabela de ativos */}
                 {loading ? (
                     <div className="loading">Carregando ativos...</div>
                 ) : (
@@ -158,6 +166,7 @@ export default function Ativos() {
                                     actives.map((a) => (
                                         <tr key={a.id}>
                                             <td>{a.id}</td>
+                                            {/* ALTERAÇÃO: Renderizando propriedades em inglês */}
                                             <td>{a.name}</td>
                                             <td>{a.type}</td>
                                             <td>
@@ -172,7 +181,6 @@ export default function Ativos() {
                     </div>
                 )}
 
-                {/* Modal de criação/edição */}
                 {showModal && (
                     <div className="modal-overlay" onClick={closeModal}>
                         <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -180,27 +188,30 @@ export default function Ativos() {
                             <form onSubmit={handleSubmit}>
                                 <div className="form-group">
                                     <label>Nome</label>
+                                    {/* ALTERAÇÃO: Input ligado a form.name */}
                                     <input
-                                        value={form.name}
+                                        value={form.name || ''}
                                         onChange={(e) => setForm({ ...form, name: e.target.value })}
                                         required
                                     />
                                 </div>
                                 <div className="form-group">
                                     <label>Tipo</label>
+                                    {/* ALTERAÇÃO: Input ligado a form.type */}
                                     <input
-                                        value={form.type}
+                                        value={form.type || ''}
                                         onChange={(e) => setForm({ ...form, type: e.target.value })}
                                         required
                                     />
                                 </div>
 
-                                {/* Ações do modal */}
+                                <p className="error-message">{erro}</p>
+
                                 <div className="modal-actions">
                                     <button
                                         type="button"
                                         className="btn-secondary"
-                                        onClick={() => setForm(generateActive())}
+                                        onClick={handleAutoFill}
                                         style={{ marginRight: 8 }}
                                     >
                                         Auto-preencher

@@ -1,4 +1,3 @@
-// backend/controllers/investmentController.js
 import InvestmentService from '../services/investmentService.js';
 
 class InvestmentController {
@@ -56,7 +55,7 @@ class InvestmentController {
 
     async getAll(req, res) {
         try {
-            const userId = req.user?.userId;
+            const userId = req.user?.id;
             if (!userId) {
                 return res
                     .status(401)
@@ -71,7 +70,7 @@ class InvestmentController {
 
     async getTotalInvested(req, res) {
         try {
-            const userId = req.user?.userId;
+            const userId = req.user?.id;
             if (!userId) {
                 return res
                     .status(401)
@@ -88,7 +87,7 @@ class InvestmentController {
 
     async getGainLoss(req, res) {
         try {
-            const userId = req.user?.userId;
+            const userId = req.user?.id;
             if (!userId) {
                 return res
                     .status(401)
@@ -121,7 +120,7 @@ class InvestmentController {
     async create(req, res) {
         try {
             const { amount, activeId, date, kind } = req.body;
-            const userId = req.user?.userId;
+            const userId = req.user?.id;
             if (!userId) {
                 return res
                     .status(400)

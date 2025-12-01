@@ -3,9 +3,11 @@ import activeRepository from '../repositories/activeRepository.js';
 class ActiveService {
     async createActive(name, type, userId) {
         try {
-            if (!name || !type || !userId) {
-                throw new Error('Nome, tipo e userId são obrigatórios');
+            console.log('createActive Service - name:', name, 'type:', type, 'userId:', userId);
+            if (!name || !type) {
+                throw new Error('Nome e tipo são obrigatórios');
             }
+            // userId já é validado no controller
             const active = await activeRepository.create(name, type, userId);
             return active;
         } catch (error) {
@@ -16,9 +18,7 @@ class ActiveService {
 
     async getActives(userId) {
         try {
-            if (!userId) {
-                throw new Error('userId é obrigatório');
-            }
+            // userId já é validado no controller
             const actives = await activeRepository.findAll(userId);
             return actives;
         } catch (error) {
@@ -29,9 +29,10 @@ class ActiveService {
 
     async getActiveById(id, userId) {
         try {
-            if (!id || !userId) {
-                throw new Error('id e userId são obrigatórios');
+            if (!id) {
+                throw new Error('id é obrigatório');
             }
+            // userId já é validado no controller
             const active = await activeRepository.findById(id, userId);
             if (!active) {
                 throw new Error('Active não encontrado');
@@ -45,9 +46,10 @@ class ActiveService {
 
     async updateActive(id, name, type, userId) {
         try {
-            if (!id || !name || !type || !userId) {
-                throw new Error('id, nome, tipo e userId são obrigatórios');
+            if (!id || !name || !type) {
+                throw new Error('id, nome e tipo são obrigatórios');
             }
+            // userId já é validado no controller
             const active = await activeRepository.update(
                 id,
                 name,
@@ -63,9 +65,10 @@ class ActiveService {
 
     async deleteActive(id, userId) {
         try {
-            if (!id || !userId) {
-                throw new Error('id e userId são obrigatórios');
+            if (!id) {
+                throw new Error('id é obrigatório');
             }
+            // userId já é validado no controller
             await activeRepository.delete(id, userId);
         } catch (error) {
             console.error(error);

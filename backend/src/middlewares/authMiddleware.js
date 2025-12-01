@@ -16,7 +16,7 @@ export const authenticateToken = (req, res, next) => {
             return res.sendStatus(403);
         }
 
-        req.user = user;
+        req.user = { id: user.userId }; // Garante que o userId esteja disponível como req.user.id
         next();
     });
 };

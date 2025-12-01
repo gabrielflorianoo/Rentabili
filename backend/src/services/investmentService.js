@@ -1,4 +1,3 @@
-// backend/src/services/investmentService.js
 import investmentRepository from '../repositories/investmentRepository.js';
 
 class InvestmentService {

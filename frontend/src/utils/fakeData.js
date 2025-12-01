@@ -68,8 +68,8 @@ export function generateActive() {
     ];
     const types = ['Ação', 'FII', 'Renda Fixa', 'ETF'];
     return {
-        name: randomFrom(names),
-        type: randomFrom(types),
+        nome: randomFrom(names),
+        tipo: randomFrom(types),
     };
 }
 

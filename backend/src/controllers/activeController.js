@@ -1,12 +1,15 @@
-// backend/controllers/activeController.js
 import activeService from '../services/activeService.js';
 
 // Create a new active
 export async function createActive(req, res) {
     const { name, type } = req.body;
     const userId = req.user.id; // Assuming user ID is available from authentication middleware
+    console.log('createActive - userId:', userId); // Adicionado para depuração
 
     try {
+        if (!userId) {
+            return res.status(400).json({ error: 'userId é obrigatório' });
+        }
         const active = await activeService.createActive(name, type, userId);
         res.status(201).json(active);
     } catch (error) {
