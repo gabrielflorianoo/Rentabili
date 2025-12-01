@@ -15,7 +15,7 @@ export default function Sidebar({ aoSair = () => {}, paginaAtiva = '' }) {
 
             {/* Logo / marca da aplicação */}
             <div className="logo">
-                📈<strong>RENTABIL</strong>
+                📈<strong>RENTABILI</strong>
             </div>
 
             {/* Menu de navegação lateral */}
