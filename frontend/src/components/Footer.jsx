@@ -9,7 +9,7 @@ export default function Footer() {
         <footer className="footer">
 
             {/* Texto principal do rodapé com direitos autorais */}
-            <p>© 2025 Rentabil - Todos os direitos reservados</p>
+            <p>© 2025 Rentabili - Todos os direitos reservados</p>
 
             {/* Linha extra com crédito da equipe de desenvolvimento */}
             <p style={{ fontSize: '0.8rem', marginTop: '5px' }}>
