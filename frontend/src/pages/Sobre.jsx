@@ -22,9 +22,9 @@ export default function Sobre() {
         <div className="page-container">
             <Header />
             <main className="page-content">
-                <h1 className="page-title">Sobre o Rentabil</h1>
+                <h1 className="page-title">Sobre o Rentabili</h1>
                 <p className="page-text">
-                    O Rentabil é um sistema gerenciador de rentabilidade de
+                    O Rentabili é um sistema gerenciador de rentabilidade de
                     investimentos, desenvolvido para resolver a falta de
                     visibilidade e monitoramento ineficiente da rentabilidade de
                     investimentos por parte de investidores.
