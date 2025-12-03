@@ -4,7 +4,7 @@ import { authenticateToken } from '../middlewares/authMiddleware.js';
 import { cacheMiddleware } from '../middlewares/cacheMiddleware.js';
 
 const router = express.Router();
-const dashboardController = new DashboardController();
+const dashboardController = DashboardController();
 
 const DASHBOARD_CACHE_KEY = 'dashboard_data';
 const DASHBOARD_TTL = 60;
