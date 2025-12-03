@@ -5,6 +5,11 @@ function errorHandler(err, req, res, next) {
 
     let status = err.status || 500;
     let message = err.message || 'Internal Server Error';
+
+    if (err.message === 'Not Found' || err.status === 404) {
+        status = 404;
+        message = 'Not Found';
+    }
     let details = err.details;
 
     if (err.code === 'P2002') {

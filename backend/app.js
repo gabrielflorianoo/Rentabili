@@ -123,7 +123,6 @@ app.use('/investments', investmentsRouter);
 app.use('/transactions', transactionsRouter);
 app.use('/wallets', walletsRouter);
 app.use('/auth', authRouter);
-app.use('/dashboard', dashboardRouter);
 app.use('/actives', activesRouter);
 app.use('/historical-balances', historicalBalancesRouter);
 
