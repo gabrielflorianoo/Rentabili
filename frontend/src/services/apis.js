@@ -1,50 +1,50 @@
 import axios from 'axios';
 
-// Flag para alternar entre ambiente de produção e desenvolvimento
-const PRODUCTION = import.meta.env.PRODUCTION === true;
+const PRODUCTION = true;
+const BASE_URL = PRODUCTION ? 'https://backend-rentabili.vercel.app' : import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-// Define a URL base conforme o ambiente (produção ou local)
-const BASE_URL = PRODUCTION ? 'https://backend-rentabili.vercel.app' : 'http://localhost:3000' || import.meta.env.VITE_API_URL 
-// Cria uma instância do axios com baseURL definida e cabeçalhos padrão
+// Cria uma instância do axios com baseURL e headers padrão
 const apiClient = axios.create({
     baseURL: BASE_URL,
     headers: {
         'Content-Type': 'application/json',
     },
-    withCredentials: true, // Permite envio automático de cookies/sessões
-    });
+    withCredentials: true,
+});
 
 /**
- * Função genérica para tratar respostas de requisições Axios.
- * Envolve a chamada em um try/catch para capturar possíveis erros.
- * @param {Promise} responsePromise - Promessa retornada por uma chamada axios.
- * @returns {Promise<any>} Retorna os dados da resposta ou lança um erro.
+ * Função para tratar a resposta de uma requisição Axios.
+ * @param {Promise} responsePromise - A promessa retornada por uma chamada do axios.
+ * @returns {Promise<any>} O dado da resposta ou null em caso de erro.
  */
 const handleResponse = async (responsePromise) => {
     try {
         const response = await responsePromise;
-        return response.data; // Retorna apenas o "data", simplificando o consumo
+        return response.data;
     } catch (error) {
+        // Você pode adicionar tratamento de erro específico aqui (ex: redirecionar no 401)
         console.error('Erro na Requisição API:', error);
-        // Lança o erro novamente para que quem chamou possa decidir o que fazer
+        // Lança o erro novamente para que o código de chamada possa tratá-lo (opcional, mas recomendado)
         throw error;
     }
+};
 
-
-// Interceptor de requisição para adicionar o token JWT automaticamente
+// Interceptor para adicionar token quando presente
 apiClient.interceptors.request.use((config) => {
     try {
-        const token = localStorage.getItem('rentabil_token'); // Recupera token salvo
+        const token = localStorage.getItem('rentabil_token');
         if (token) {
             config.headers = config.headers || {};
-            config.headers.Authorization = `Bearer ${token}`; // Adiciona Authorization
+            config.headers.Authorization = `Bearer ${token}`;
         }
     } catch (e) {
-        // Caso localStorage não esteja disponível (ex: SSR)
+        // localStorage pode falhar em ambientes não-browser
     }
-    return config; // Retorna a config modificada
-    // --- Funções Auxiliares Genéricas ---
-// Todas as chamadas usam handleResponse para padronizar o retorno e erros
+    return config;
+});
+
+// --- Funções Auxiliares Genéricas ---
+// Cria uma função auxiliar para aplicar o handleResponse a todas as chamadas.
 
 const get = (url, config) => handleResponse(apiClient.get(url, config));
 const post = (url, data, config) =>
@@ -53,22 +53,22 @@ const put = (url, data, config) =>
     handleResponse(apiClient.put(url, data, config));
 const remove = (url, config) => handleResponse(apiClient.delete(url, config));
 
-// Auth API – Funções relacionadas à autenticação
+// Auth API
 export const authApi = {
     login: (email, password) => post('/auth/login', { email, password }),
     register: (payload) => post('/auth/register', payload),
 };
 
-// Users API – CRUD de usuários
+// Users API
 export const userApi = {
-    list: () => get('/users'), // Lista todos os usuários
-    getById: (id) => get(`/users/${id}`), // Busca por ID
-    create: (payload) => post('/users', payload), // Criação
-    update: (id, payload) => put(`/users/${id}`, payload), // Atualização
-    remove: (id) => remove(`/users/${id}`), // Remoção
+    list: () => get('/users'),
+    getById: (id) => get(`/users/${id}`),
+    create: (payload) => post('/users', payload),
+    update: (id, payload) => put(`/users/${id}`, payload),
+    remove: (id) => remove(`/users/${id}`),
 };
 
-// Transactions API – CRUD de transações financeiras
+// Transactions API
 export const transactionsApi = {
     list: () => get('/transactions'),
     getById: (id) => get(`/transactions/${id}`),
@@ -77,19 +77,19 @@ export const transactionsApi = {
     remove: (id) => remove(`/transactions/${id}`),
 };
 
-// Investments API – Operações financeiras e cálculos de investimentos
+// Investments API
 export const investmentsApi = {
     list: () => get('/investments'),
     getById: (id) => get(`/investments/${id}`),
     create: (payload) => post('/investments', payload),
     update: (id, payload) => put(`/investments/${id}`, payload),
     remove: (id) => remove(`/investments/${id}`),
-    getTotalInvested: () => get('/investments/total-invested'), // Soma total investida
-    getGainLoss: () => get('/investments/gain-loss'), // Ganhos e perdas
-    simulateInvestment: (payload) => post('/investments/simulate', payload), // Simulações
+    getTotalInvested: () => get('/investments/total-invested'),
+    getGainLoss: () => get('/investments/gain-loss'),
+    simulateInvestment: (payload) => post('/investments/simulate', payload),
 };
 
-// Wallets API – Para gerenciamento de carteiras
+// Wallets API
 export const walletsApi = {
     list: () => get('/wallets'),
     getById: (id) => get(`/wallets/${id}`),
@@ -98,12 +98,12 @@ export const walletsApi = {
     remove: (id) => remove(`/wallets/${id}`),
 };
 
-// Dashboard API – Dados consolidados do painel
+// Dashboard API
 export const dashboardApi = {
     getSummary: () => get('/dashboard/summary'),
 };
 
-// Actives API – Gerenciamento de ativos financeiros
+// Actives API
 export const activesApi = {
     list: () => get('/actives'),
     getById: (id) => get(`/actives/${id}`),
@@ -111,7 +111,8 @@ export const activesApi = {
     update: (id, payload) => put(`/actives/${id}`, payload),
     remove: (id) => remove(`/actives/${id}`),
 };
-// Historical Balances API – Histórico de valores dos ativos
+
+// Historical Balances API
 export const historicalBalancesApi = {
     listByActive: (activeId) => get(`/historical-balances/active/${activeId}`),
     getById: (id) => get(`/historical-balances/${id}`),
@@ -119,4 +120,5 @@ export const historicalBalancesApi = {
     update: (id, payload) => put(`/historical-balances/${id}`, payload),
     remove: (id) => remove(`/historical-balances/${id}`),
 };
+
 export default apiClient;
