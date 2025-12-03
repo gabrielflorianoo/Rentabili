@@ -25,17 +25,37 @@ const VersoCartao = ({ aoVirar }) => {
         }
     };
 
+    // Calcula se é maior de 18 
+    const validarIdade = (dataString) => {
+        if (!dataString) return false;
+        const partes = dataString.split('-');
+        const dataNasc = new Date(partes[0], partes[1] - 1, partes[2]);
+        const hoje = new Date();
+        
+        let idade = hoje.getFullYear() - dataNasc.getFullYear();
+        const m = hoje.getMonth() - dataNasc.getMonth();
+        
+        if (m < 0 || (m === 0 && hoje.getDate() < dataNasc.getDate())) {
+            idade--;
+        }
+        return idade >= 18;
+    };
+
     const validar = () => {
         const novosErros = {};
-        
-        // Validação de caractere especial (Regex)
         const regexEspecial = /[!@#$%^&*(),.?":{}|<>]/;
 
         if (!dadosForm.nome) novosErros.nome = 'Nome é obrigatório';
-        
         if (!dadosForm.email) novosErros.email = 'Email é obrigatório';
-        
-        // --- AQUI ESTÁ A CORREÇÃO DO BLOQUEIO ---
+
+        // --- VALIDAÇÃO DE IDADE ---
+        if (!dadosForm.nascimento) {
+            novosErros.nascimento = 'Data é obrigatória';
+        } else if (!validarIdade(dadosForm.nascimento)) {
+            novosErros.nascimento = 'É necessário ter +18 anos.';
+        }
+
+        // --- VALIDAÇÃO DE SENHA (Tamanho + Especial) ---
         if (!dadosForm.senha || dadosForm.senha.length < 6) {
             novosErros.senha = 'Senha deve ter ao menos 6 caracteres';
         } else if (!regexEspecial.test(dadosForm.senha)) {
@@ -44,7 +64,7 @@ const VersoCartao = ({ aoVirar }) => {
 
         if (dadosForm.senha !== dadosForm.confirmarSenha)
             novosErros.confirmarSenha = 'Senhas não conferem';
-            
+
         setErros(novosErros);
         return Object.keys(novosErros).length === 0;
     };
@@ -52,7 +72,7 @@ const VersoCartao = ({ aoVirar }) => {
     const lidarComCadastro = async (ev) => {
         ev.preventDefault();
         
-        // Agora a função validar() vai barrar se não tiver caractere especial
+        // Se a validação falhar (idade ou senha), para aqui
         if (!validar()) return;
 
         setCarregando(true);
@@ -76,10 +96,10 @@ const VersoCartao = ({ aoVirar }) => {
 
     const preencherAutomaticamente = () => {
         setDadosForm({
-            nome: 'Banco do Bradesco2',
-            email: 'email2@example.com',
-            nascimento: '0001-01-01',
-            senha: '123123@', // Já inclui o @ para passar no teste
+            nome: 'Usuário Teste',
+            email: 'teste@example.com',
+            nascimento: '2000-01-01', // Data válida (+18)
+            senha: '123123@',
             confirmarSenha: '123123@',
         });
         setErros({});
@@ -122,7 +142,7 @@ const VersoCartao = ({ aoVirar }) => {
                                 rotulo="Data de Nascimento"
                                 valor={dadosForm.nascimento}
                                 aoMudar={lidarComMudanca}
-                                erro={erros.nascimento}
+                                erro={erros.nascimento} // Agora exibe o erro de idade
                                 required
                             />
 
