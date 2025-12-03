@@ -13,7 +13,6 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 
-// Registrando componentes do gráfico
 ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -26,111 +25,93 @@ ChartJS.register(
 );
 
 export default function Simulador() {
-    // Estados do Formulário
-    const [tipoInvestimento, setTipoInvestimento] = useState("CDB"); // CDB, LCI, TESOURO
-    const [valorInicial, setValorInicial] = useState("");
-    const [aporteMensal, setAporteMensal] = useState(""); // Novo: Aporte mensal
-    const [taxaAnual, setTaxaAnual] = useState(""); // Novo: Taxa Anual (mais comum)
-    const [prazoMeses, setPrazoMeses] = useState("");
+    // --- ESTADOS DO CENÁRIO A ---
+    const [cenarioA, setCenarioA] = useState({
+        nome: "Cenário A (Ex: Poupança)",
+        tipo: "CDB", // Usando CDB como genérico tributável
+        taxa: 0.6, // % ao mês
+        inicial: 1000,
+        aporte: 100
+    });
 
-    // Estados de Resultado
-    const [resultados, setResultados] = useState(null);
-    const [dadosGrafico, setDadosGrafico] = useState(null);
+    // --- ESTADOS DO CENÁRIO B ---
+    const [cenarioB, setCenarioB] = useState({
+        nome: "Cenário B (Ex: CDB 120%)",
+        tipo: "CDB",
+        taxa: 1.1, // % ao mês
+        inicial: 1000,
+        aporte: 100
+    });
 
-    // --- REGRA DE NEGÓCIO: TABELA REGRESSIVA DE IR ---
-    const calcularAliquotaIR = (dias) => {
-        if (tipoInvestimento === "LCI") return 0; // LCI/LCA é isento
-        
+    const [prazo, setPrazo] = useState(24); // Meses
+    const [resultado, setResultado] = useState(null);
+
+    // Regra de Negócio: Tabela Regressiva IR
+    const calcularIR = (dias, tipo) => {
+        if (tipo === "LCI" || tipo === "LCA") return 0;
         if (dias <= 180) return 22.5;
         if (dias <= 360) return 20.0;
         if (dias <= 720) return 17.5;
         return 15.0;
     };
 
+    const calcularCenario = (params, meses) => {
+        let montante = Number(params.inicial);
+        let investido = Number(params.inicial);
+        const evolucao = [montante];
+        const taxaDecimal = Number(params.taxa) / 100;
+
+        for (let i = 1; i <= meses; i++) {
+            montante = (montante + Number(params.aporte)) * (1 + taxaDecimal);
+            investido += Number(params.aporte);
+            evolucao.push(montante);
+        }
+
+        // Desconto de IR no final
+        const lucroBruto = montante - investido;
+        const aliquota = calcularIR(meses * 30, params.tipo);
+        const imposto = lucroBruto * (aliquota / 100);
+        const liquido = montante - imposto;
+
+        return {
+            bruto: montante,
+            liquido: liquido,
+            investido: investido,
+            lucroLiquido: liquido - investido,
+            evolucao: evolucao
+        };
+    };
+
     const simular = () => {
-        if (!valorInicial || !taxaAnual || !prazoMeses) {
-            alert("Preencha todos os campos obrigatórios.");
-            return;
-        }
+        const resA = calcularCenario(cenarioA, prazo);
+        const resB = calcularCenario(cenarioB, prazo);
 
-        // Conversão de Taxa Anual para Mensal
-        const taxaMensal = (Math.pow(1 + (Number(taxaAnual) / 100), 1 / 12) - 1);
-        
-        let totalInvestido = Number(valorInicial);
-        let montanteBruto = Number(valorInicial);
-        const aporte = Number(aporteMensal) || 0;
-        
-        const labels = [];
-        const dataBruto = [];
-        const dataInvestido = [];
-        const dataLiquido = [];
+        const labels = Array.from({ length: Number(prazo) + 1 }, (_, i) => `Mês ${i}`);
 
-        // --- MOTOR DE CÁLCULO MÊS A MÊS ---
-        for (let i = 0; i <= Number(prazoMeses); i++) {
-            // Adiciona dados ao gráfico
-            labels.push(`Mês ${i}`);
-            dataInvestido.push(totalInvestido);
-            
-            // Calcula imposto proporcional ao tempo decorrido (em dias)
-            const diasCorridos = i * 30;
-            const aliquota = calcularAliquotaIR(diasCorridos);
-            
-            const rendimento = montanteBruto - totalInvestido;
-            const descontoIR = rendimento * (aliquota / 100);
-            const liquido = montanteBruto - descontoIR;
-
-            dataBruto.push(montanteBruto);
-            dataLiquido.push(liquido);
-
-            // Avança para o próximo mês (Juros Compostos + Aporte)
-            if (i < Number(prazoMeses)) {
-                montanteBruto = (montanteBruto + aporte) * (1 + taxaMensal);
-                totalInvestido += aporte;
+        setResultado({
+            a: resA,
+            b: resB,
+            diferenca: resB.liquido - resA.liquido,
+            grafico: {
+                labels,
+                datasets: [
+                    {
+                        label: cenarioA.nome,
+                        data: resA.evolucao,
+                        borderColor: '#d90429', // Vermelho/Laranja
+                        backgroundColor: 'rgba(217, 4, 41, 0.1)',
+                        tension: 0.4
+                    },
+                    {
+                        label: cenarioB.nome,
+                        data: resB.evolucao,
+                        borderColor: '#00a651', // Verde Rentabili
+                        backgroundColor: 'rgba(0, 166, 81, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }
+                ]
             }
-        }
-
-        // Consolida resultados finais
-        const valorFinalBruto = dataBruto[dataBruto.length - 1];
-        const valorFinalInvestido = dataInvestido[dataInvestido.length - 1];
-        const valorFinalLiquido = dataLiquido[dataLiquido.length - 1];
-        const lucroBruto = valorFinalBruto - valorFinalInvestido;
-        const impostoTotal = valorFinalBruto - valorFinalLiquido;
-
-        setResultados({
-            valorFinalBruto,
-            valorFinalLiquido,
-            valorFinalInvestido,
-            lucroBruto,
-            impostoTotal,
-            aliquotaFinal: calcularAliquotaIR(Number(prazoMeses) * 30)
-        });
-
-        setDadosGrafico({
-            labels,
-            datasets: [
-                {
-                    label: 'Patrimônio Bruto',
-                    data: dataBruto,
-                    borderColor: '#00a651',
-                    backgroundColor: 'rgba(0, 166, 81, 0.1)',
-                    fill: true,
-                    tension: 0.4
-                },
-                {
-                    label: 'Patrimônio Líquido (Pós Imposto)',
-                    data: dataLiquido,
-                    borderColor: '#0077b6',
-                    borderDash: [5, 5], // Linha pontilhada
-                    tension: 0.4
-                },
-                {
-                    label: 'Dinheiro Investido',
-                    data: dataInvestido,
-                    borderColor: '#666',
-                    pointRadius: 0,
-                    borderWidth: 1
-                }
-            ]
         });
     };
 
@@ -138,134 +119,112 @@ export default function Simulador() {
         <div className="dashboard-wrap">
             <div className="content">
                 <header className="content-head">
-                    <h2>Simulador Avançado</h2>
-                    <div className="user-badge">Modo Projeção</div>
+                    <h2>Comparador de Investimentos</h2>
+                    <div className="user-badge">Simulação Avançada</div>
                 </header>
 
                 <div className="simulador-container">
-                    {/* --- ÁREA DE INPUTS --- */}
-                    <div className="form-section">
-                        <h1 className="simuladorTitulo">Parâmetros da Simulação</h1>
+                    
+                    {/* --- ÁREA DE INPUTS LADO A LADO --- */}
+                    <div className="comparador-grid">
                         
-                        <div className="form-row">
+                        {/* CENÁRIO A */}
+                        <div className="cenario-card">
+                            <h3 style={{color: '#d90429'}}>Cenário A</h3>
                             <div className="form-group">
-                                <label>Tipo de Investimento</label>
-                                <select 
-                                    className="simuladorInput"
-                                    value={tipoInvestimento}
-                                    onChange={(e) => setTipoInvestimento(e.target.value)}
-                                >
-                                    <option value="CDB">CDB / RDB (Tributável)</option>
-                                    <option value="TESOURO">Tesouro Direto (Tributável)</option>
-                                    <option value="LCI">LCI / LCA (Isento de IR)</option>
+                                <label>Nome</label>
+                                <input className="simuladorInput" value={cenarioA.nome} onChange={e => setCenarioA({...cenarioA, nome: e.target.value})} />
+                            </div>
+                            <div className="form-group">
+                                <label>Taxa (% a.m.)</label>
+                                <input type="number" className="simuladorInput" value={cenarioA.taxa} onChange={e => setCenarioA({...cenarioA, taxa: e.target.value})} />
+                            </div>
+                            <div className="form-group">
+                                <label>Tipo (IR)</label>
+                                <select className="simuladorInput" value={cenarioA.tipo} onChange={e => setCenarioA({...cenarioA, tipo: e.target.value})}>
+                                    <option value="CDB">CDB (Tributável)</option>
+                                    <option value="LCI">LCI (Isento)</option>
                                 </select>
                             </div>
-                            
+                        </div>
+
+                        {/* PARÂMETROS COMUNS */}
+                        <div className="cenario-card centro">
+                            <h3>Parâmetros</h3>
                             <div className="form-group">
                                 <label>Valor Inicial (R$)</label>
-                                <input
-                                    type="number"
-                                    className="simuladorInput"
-                                    placeholder="Ex: 5000"
-                                    value={valorInicial}
-                                    onChange={(e) => setValorInicial(e.target.value)}
-                                />
+                                <input type="number" className="simuladorInput" value={cenarioA.inicial} onChange={e => {
+                                    setCenarioA({...cenarioA, inicial: e.target.value});
+                                    setCenarioB({...cenarioB, inicial: e.target.value});
+                                }} />
                             </div>
-
                             <div className="form-group">
                                 <label>Aporte Mensal (R$)</label>
-                                <input
-                                    type="number"
-                                    className="simuladorInput"
-                                    placeholder="Ex: 500 (Opcional)"
-                                    value={aporteMensal}
-                                    onChange={(e) => setAporteMensal(e.target.value)}
-                                />
+                                <input type="number" className="simuladorInput" value={cenarioA.aporte} onChange={e => {
+                                    setCenarioA({...cenarioA, aporte: e.target.value});
+                                    setCenarioB({...cenarioB, aporte: e.target.value});
+                                }} />
                             </div>
+                            <div className="form-group">
+                                <label>Tempo (Meses)</label>
+                                <input type="number" className="simuladorInput" value={prazo} onChange={e => setPrazo(e.target.value)} />
+                            </div>
+                            <button onClick={simular} className="simuladorButton" style={{marginTop: '20px'}}>
+                                COMPARAR AGORA
+                            </button>
                         </div>
 
-                        <div className="form-row">
+                        {/* CENÁRIO B */}
+                        <div className="cenario-card">
+                            <h3 style={{color: '#00a651'}}>Cenário B</h3>
                             <div className="form-group">
-                                <label>Rentabilidade Anual (%)</label>
-                                <input
-                                    type="number"
-                                    className="simuladorInput"
-                                    placeholder="Ex: 13.75"
-                                    value={taxaAnual}
-                                    onChange={(e) => setTaxaAnual(e.target.value)}
-                                />
+                                <label>Nome</label>
+                                <input className="simuladorInput" value={cenarioB.nome} onChange={e => setCenarioB({...cenarioB, nome: e.target.value})} />
                             </div>
-
                             <div className="form-group">
-                                <label>Prazo (Meses)</label>
-                                <input
-                                    type="number"
-                                    className="simuladorInput"
-                                    placeholder="Ex: 24"
-                                    value={prazoMeses}
-                                    onChange={(e) => setPrazoMeses(e.target.value)}
-                                />
+                                <label>Taxa (% a.m.)</label>
+                                <input type="number" className="simuladorInput" value={cenarioB.taxa} onChange={e => setCenarioB({...cenarioB, taxa: e.target.value})} />
+                            </div>
+                            <div className="form-group">
+                                <label>Tipo (IR)</label>
+                                <select className="simuladorInput" value={cenarioB.tipo} onChange={e => setCenarioB({...cenarioB, tipo: e.target.value})}>
+                                    <option value="CDB">CDB (Tributável)</option>
+                                    <option value="LCI">LCI (Isento)</option>
+                                </select>
                             </div>
                         </div>
-
-                        <button onClick={simular} className="simuladorButton">
-                            Calcular Projeção
-                        </button>
                     </div>
 
-                    {/* --- ÁREA DE RESULTADOS --- */}
-                    {resultados && (
-                        <>
-                            <section className="stats-grid">
-                                <div className="stat-card green">
-                                    <div className="stat-icon">💰</div>
-                                    <div className="stat-info">
-                                        <div className="stat-label">Valor Final Líquido</div>
-                                        <div className="stat-value">
-                                            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(resultados.valorFinalLiquido)}
-                                        </div>
-                                    </div>
+                    {/* --- RESULTADOS --- */}
+                    {resultado && (
+                        <div className="resultado-comparativo">
+                            
+                            <div className="placar">
+                                <div className="placar-item">
+                                    <span>Resultado A (Líquido)</span>
+                                    <strong style={{color: '#d90429'}}>
+                                        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(resultado.a.liquido)}
+                                    </strong>
                                 </div>
+                                <div className="vs">VS</div>
+                                <div className="placar-item">
+                                    <span>Resultado B (Líquido)</span>
+                                    <strong style={{color: '#00a651'}}>
+                                        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(resultado.b.liquido)}
+                                    </strong>
+                                </div>
+                            </div>
 
-                                <div className="stat-card blue">
-                                    <div className="stat-icon">📈</div>
-                                    <div className="stat-info">
-                                        <div className="stat-label">Total em Juros</div>
-                                        <div className="stat-value">
-                                            +{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(resultados.lucroBruto)}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="stat-card red">
-                                    <div className="stat-icon">🏛️</div>
-                                    <div className="stat-info">
-                                        <div className="stat-label">Imposto (IR {resultados.aliquotaFinal}%)</div>
-                                        <div className="stat-value">
-                                            -{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(resultados.impostoTotal)}
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
+                            <div className="vencedor-banner">
+                                {resultado.diferenca > 0 
+                                    ? `🏆 O Cenário B rende R$ ${resultado.diferenca.toFixed(2)} a mais!` 
+                                    : `🏆 O Cenário A rende R$ ${Math.abs(resultado.diferenca).toFixed(2)} a mais!`}
+                            </div>
 
                             <div className="chartWrapper">
-                                <Line 
-                                    data={dadosGrafico} 
-                                    options={{
-                                        responsive: true,
-                                        plugins: {
-                                            legend: { position: 'top' },
-                                            tooltip: { mode: 'index', intersect: false }
-                                        },
-                                        interaction: {
-                                            mode: 'nearest',
-                                            axis: 'x',
-                                            intersect: false
-                                        }
-                                    }}
-                                />
+                                <Line data={resultado.grafico} />
                             </div>
-                        </>
+                        </div>
                     )}
                 </div>
             </div>
