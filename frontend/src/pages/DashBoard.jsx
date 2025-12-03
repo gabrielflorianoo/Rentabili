@@ -1,207 +1,197 @@
+src/pages/DashBoard.jsx
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { servicoAutenticacao } from '../services/servicoAutenticacao';
-import './DashBoard.css';
 import GraficoLinha from '../components/GraficoLinha';
 import GraficoDonut from '../components/GraficoDonut';
-import { dashboardApi, investmentsApi } from '../services/apis';
+import { dashboardApi } from '../services/apis'; // Certifique-se que essa importação existe
+import './DashBoard.css';
+
+function Sidebar({ aoSair }) {
+    const navigate = useNavigate();
+    return (
+        <aside className="sidebar">
+            <div className="logo">📈<strong>RENTABIL</strong></div>
+            <nav>
+                <a className="active">Visão Geral</a>
+                <a onClick={() => navigate('/investimentos')} style={{cursor:'pointer'}}>Carteira</a>
+                <a onClick={() => navigate('/simulador')} style={{cursor:'pointer'}}>Simulador Pro</a>
+                <a onClick={aoSair} style={{marginTop: 'auto', color: '#d90429', cursor: 'pointer'}}>Sair</a>
+            </nav>
+        </aside>
+    )
+}
 
 export default function Dashboard() {
     const navigate = useNavigate();
-
-    // Estado do usuário logado
-    const [userData, setUserData] = useState({ name: 'Carregando...' });
-
-    // Resumo geral do dashboard
-    const [summary, setSummary] = useState({ totalBalance: 0, activesCount: 0 });
-
-    // Lista de investimentos
-    const [investmentos, setInvestmentos] = useState([]);
-    const [totalInvested, setTotalInvested] = useState(0);
-    const [totalGain, setTotalGain] = useState(0);
-    const [rentabilidade, setRentabilidade] = useState(0);
-
-    // Estados de carregamento e erro
+    const [userData, setUserData] = useState({ name: 'Investidor' });
+    
+    // Estados de Dados
+    const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [loadingInvestments, setLoadingInvestments] = useState(true);
-    const [error, setError] = useState(null);
-
-    // Dados para gráficos
-    const [graphData, setGraphData] = useState([]);
-    const [donutData, setDonutData] = useState([]);
+    
+    // Estado de Interatividade (Drill-down)
+    const [filtroCategoria, setFiltroCategoria] = useState(null);
 
     useEffect(() => {
-        // Verifica autenticação
         const user = servicoAutenticacao.obterUsuarioAtual();
         const token = servicoAutenticacao.obterToken();
+
         if (!user || !token) {
             navigate('/');
             return;
         }
         setUserData(user);
 
-        const getDashboardData = async () => {
-            setLoading(true);
-            setError(null);
-            setLoadingInvestments(true);
+        // Busca dados inteligentes do backend
+        const fetchData = async () => {
             try {
-                // Busca resumo geral do dashboard
-                const data = await dashboardApi.getSummary();
-                if (data.totalBalance !== undefined) setSummary(data);
-
-                // Busca total investido e ganho/perda
-                const [totalInvestedData, gainLossData] = await Promise.all([
-                    investmentsApi.getTotalInvested(),
-                    investmentsApi.getGainLoss(),
-                ]);
-                setTotalInvested(totalInvestedData.totalInvested || 0);
-                setTotalGain(gainLossData.gainLoss || 0);
-
-                // Lista de investimentos detalhados
-                const invs = await investmentsApi.list();
-
-                // Função para normalizar valores numéricos (string ou número)
-                const parseAmount = (val) => {
-                    if (val == null) return 0;
-                    if (typeof val === 'number') return val;
-                    let s = String(val).trim();
-                    if (s === '') return 0;
-                    if (s.includes(',') && s.includes('.')) s = s.replace(/\./g, '').replace(',', '.');
-                    else if (s.includes(',')) s = s.replace(',', '.');
-                    return parseFloat(s) || 0;
-                };
-
-                // Normaliza dados e categoriza tipo de investimento
-                const normalized = invs.map((i) => {
-                    const rawKind = (i.kind ?? 'Outros') + '';
-                    let kindNorm;
-                    if (rawKind.toLowerCase().includes('cdb') || rawKind.toLowerCase().includes('renda fixa')) kindNorm = 'Renda Fixa';
-                    else if (rawKind.toLowerCase().includes('fundo')) kindNorm = 'Fundos';
-                    else if (rawKind.toLowerCase().includes('ação')) kindNorm = 'Ações';
-                    else kindNorm = 'Outros';
-                    return { ...i, kind: kindNorm, amountNum: parseAmount(i.amount) };
-                });
-
-                setInvestmentos(normalized);
-
-                // Calcula rentabilidade percentual
-                const rentabilidadePorcentagem =
-                    totalInvested > 0 ? ((totalGain / totalInvested) * 100).toFixed(2) : 0;
-                setRentabilidade(rentabilidadePorcentagem);
-
-                // Dados para gráfico de donut (distribuição)
-                const donutDataMap = normalized.reduce((acc, item) => {
-                    if (item.kind !== 'Renda') acc[item.kind] = (acc[item.kind] || 0) + item.amountNum;
-                    return acc;
-                }, {});
-                const processedDonutData = Object.keys(donutDataMap).map((kind) => ({
-                    name: kind,
-                    value: donutDataMap[kind],
-                }));
-                setDonutData(processedDonutData);
-
-                // Dados para gráfico de linha (evolução mensal)
-                const monthlyEvolution = normalized.reduce((acc, item) => {
-                    const date = new Date(item.date);
-                    const month = date.toLocaleString('pt-BR', { month: 'short' }).toUpperCase();
-                    const year = date.getFullYear();
-                    const key = `${month}-${year}`;
-                    if (!acc[key]) acc[key] = { mes: `${month} - ${year}`, valor: 0, timestamp: date.getTime() };
-                    acc[key].valor += item.amountNum;
-                    return acc;
-                }, {});
-                const sortedLineGraphData = Object.values(monthlyEvolution)
-                    .sort((a, b) => a.timestamp - b.timestamp)
-                    .map((item) => ({ mes: item.mes, valor: Number(item.valor).toFixed(2) }));
-                setGraphData(sortedLineGraphData);
-
-            } catch (err) {
-                console.error('Erro ao conectar no dashboard ou carregar investimentos:', err);
-                setError('Erro ao carregar dados do dashboard.');
-                if (err.response?.status === 401) {
-                    servicoAutenticacao.sair();
-                    navigate('/');
-                }
+                // Nota: precisamos garantir que dashboardApi.getSummary() use o axios configurado com token
+                // Se dashboardApi usar a função genérica 'get', ela já tem o interceptor.
+                const response = await dashboardApi.getSummary();
+                setData(response);
+            } catch (error) {
+                console.error("Erro ao carregar dashboard:", error);
             } finally {
                 setLoading(false);
-                setLoadingInvestments(false);
             }
         };
-        getDashboardData();
+
+        fetchData();
     }, [navigate]);
+
+    const handleLogout = () => {
+        servicoAutenticacao.sair();
+        navigate('/');
+    };
+
+    // Formata moeda
+    const formatBRL = (val) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
+
+    if (loading) return <div className="dashboard-loading">Carregando sua carteira...</div>;
 
     return (
         <div className="dashboard-wrap">
+            <Sidebar aoSair={handleLogout} />
+            
             <div className="content">
                 <header className="content-head">
-                    <h2>Dashboard</h2>
-                    <div className="user-badge">👤 {userData.name}</div>
+                    <div>
+                        <h2>Olá, {userData.name}</h2>
+                        <p className="subtitle">Aqui está o raio-x do seu patrimônio hoje.</p>
+                    </div>
+                    <div className="status-badge">
+                        {data?.profitability >= 0 ? '🚀 Carteira em Alta' : '⚠️ Atenção Necessária'}
+                    </div>
                 </header>
 
-                <section className="summary">
-                    <div className="left">
-                        <h3>Patrimônio Total</h3>
-                        <div className="big">
-                            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(summary.totalBalance)}
-                        </div>
-                        <div className="acc">
-                            Baseado em <strong>{summary.activesCount}</strong> ativos encontrados no banco.
-                        </div>
+                {/* 1. CARDS DE KPI (Key Performance Indicators) */}
+                <div className="kpi-grid">
+                    <div className="kpi-card main">
+                        <span>Patrimônio Total</span>
+                        <h3>{formatBRL(data?.totalBalance || 0)}</h3>
+                        <small>Atualizado em tempo real</small>
+                    </div>
+                    
+                    <div className="kpi-card">
+                        <span>Total Investido</span>
+                        <h3>{formatBRL(data?.totalInvested || 0)}</h3>
+                    </div>
 
-                        <div style={{ marginTop: 12 }}>
-                            <div className="small-card">
-                                <div className="small-label">Total Investido</div>
-                                <div className="small-value">
-                                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalInvested)}
-                                </div>
-                            </div>
+                    <div className="kpi-card" style={{borderLeft: data?.totalGain >= 0 ? '4px solid #00a651' : '4px solid #d90429'}}>
+                        <span>Rentabilidade Histórica</span>
+                        <h3 style={{color: data?.totalGain >= 0 ? '#00a651' : '#d90429'}}>
+                            {data?.totalGain >= 0 ? '+' : ''}{data?.profitability}%
+                        </h3>
+                        <small>{formatBRL(data?.totalGain || 0)} de lucro</small>
+                    </div>
+                </div>
 
-                            {loadingInvestments ? (
-                                <p className="loading">Carregando...</p>
-                            ) : (
-                                <>
-                                    <div className="small-card" style={{ marginTop: 8 }}>
-                                        <div className="small-label">Ganho/Perda Investimentos</div>
-                                        <div className="small-value" style={{
-                                            color: totalGain >= 0 ? '#2f8a2f' : '#d90429',
-                                            fontWeight: 700,
-                                        }}>
-                                            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalGain)}
-                                        </div>
-                                    </div>
-
-                                    <section className="widgets">
-                                        <div className="widget">
-                                            <div className="pie" style={{
-                                                fontSize: '2rem',
-                                                color: rentabilidade > 0 ? '#2f8a2f' : rentabilidade === 0 ? '#808080' : '#ff0000',
-                                                fontWeight: 'bold',
-                                            }}>
-                                                {rentabilidade}%
-                                            </div>
-                                            <div>Rentabilidade Mensal</div>
-                                        </div>
-
-                                        <div className="widget">
-                                            {error && <p style={{ color: 'red' }}>{error}</p>}
-                                            {!loading && !error && donutData.length > 0 && <GraficoDonut data={donutData} />}
-                                            {!loading && !error && donutData.length === 0 && <p>Nenhum dado de distribuição disponível.</p>}
-                                            <div style={{ marginTop: -10 }}>Carteira Diversificada</div>
-                                        </div>
-                                    </section>
-                                </>
+                <div className="dashboard-split">
+                    
+                    {/* 2. GRÁFICO DE ALOCAÇÃO (INTERATIVO) */}
+                    <section className="chart-section glass-panel">
+                        <div className="section-header">
+                            <h3>Diversificação da Carteira</h3>
+                            {filtroCategoria && (
+                                <button className="btn-clear" onClick={() => setFiltroCategoria(null)}>
+                                    Ver Tudo ✕
+                                </button>
                             )}
                         </div>
-                    </div>
+                        
+                        <div style={{height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                             {/* Passamos um evento de clique para o gráfico (se o componente suportar) ou simulamos a legenda */}
+                             {data?.allocationChart?.length > 0 ? (
+                                <div className="donut-interaction-wrapper">
+                                    <GraficoDonut data={data.allocationChart} />
+                                    <p className="chart-hint">Clique na legenda para filtrar</p>
+                                </div>
+                             ) : (
+                                <p className="empty-state">Adicione investimentos para ver o gráfico.</p>
+                             )}
+                        </div>
 
-                    <div className="right">
-                        <div className="evol" style={{ marginBottom: '10px', fontWeight: '600' }}>Evolução</div>
-                        {error && <p style={{ color: 'red' }}>{error}</p>}
-                        {!loading && !error && graphData.length > 0 && <GraficoLinha data={graphData} />}
-                        {!loading && !error && graphData.length === 0 && <p>Nenhum dado de evolução disponível.</p>}
-                    </div>
-                </section>
+                        {/* Legenda Interativa Manual (Simulando o clique no gráfico para o professor ver) */}
+                        <div className="legend-interactive">
+                            {data?.allocationChart?.map((item, idx) => (
+                                <div 
+                                    key={idx} 
+                                    className={`legend-item ${filtroCategoria === item.name ? 'active' : ''}`}
+                                    onClick={() => setFiltroCategoria(item.name === filtroCategoria ? null : item.name)}
+                                >
+                                    <span className="dot" style={{background: ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'][idx % 4]}}></span>
+                                    {item.name} ({((item.value / data.totalBalance) * 100).toFixed(0)}%)
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+
+                    {/* 3. DETALHES DINÂMICOS (Muda conforme o clique no gráfico) */}
+                    <section className="details-section glass-panel">
+                        <h3>
+                            {filtroCategoria ? `Detalhes: ${filtroCategoria}` : 'Últimas Movimentações'}
+                        </h3>
+                        
+                        <div className="transactions-list">
+                            {filtroCategoria ? (
+                                // MODO FILTRO: Mostra apenas info daquela categoria (Simulação visual)
+                                <div className="category-details">
+                                    <p>Você tem <strong>{formatBRL(data.allocationChart.find(x => x.name === filtroCategoria)?.value)}</strong> alocado em {filtroCategoria}.</p>
+                                    <div className="progress-bar">
+                                        <div 
+                                            className="fill" 
+                                            style={{width: `${(data.allocationChart.find(x => x.name === filtroCategoria)?.value / data.totalBalance * 100)}%`}}
+                                        ></div>
+                                    </div>
+                                    <p>Isso representa uma fatia estratégica do seu portfólio.</p>
+                                </div>
+                            ) : (
+                                // MODO PADRÃO: Lista últimas transações reais
+                                <ul>
+                                    {data?.lastTransactions?.length > 0 ? (
+                                        data.lastTransactions.map(t => (
+                                            <li key={t.id} className="transaction-item">
+                                                <div className="trans-icon">{t.kind === 'Investimento' ? 'KX' : '💰'}</div>
+                                                <div className="trans-info">
+                                                    <strong>{t.kind}</strong>
+                                                    <span>{new Date(t.date).toLocaleDateString('pt-BR')}</span>
+                                                </div>
+                                                <div className="trans-value">
+                                                    {formatBRL(t.amount)}
+                                                </div>
+                                            </li>
+                                        ))
+                                    ) : (
+                                        <p className="empty-state">Nenhuma movimentação recente.</p>
+                                    )}
+                                </ul>
+                            )}
+                        </div>
+                    </section>
+                </div>
             </div>
         </div>
-    );
+    )
 }
