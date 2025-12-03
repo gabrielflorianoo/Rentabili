@@ -25,8 +25,8 @@ const FrenteCartao = ({ aoVirar }) => {
     const preencherAutomaticamente = () => {
         setDadosForm({
             ...dadosForm,
-            email: 'investidor@exemplo.com',
-            senha: 'investidor123',
+            email: 'email@example.com',
+            senha: '123123@',
             codigo: '',
             novaSenha: '',
         });
