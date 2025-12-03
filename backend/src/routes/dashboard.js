@@ -1,10 +1,10 @@
 import express from 'express';
-import DashboardController from '../controllers/dashboardController.js';
+import { DashboardController } from '../controllers/dashboardController.js';
 import { authenticateToken } from '../middlewares/authMiddleware.js';
 import { cacheMiddleware } from '../middlewares/cacheMiddleware.js';
 
 const router = express.Router();
-const dashboardController = DashboardController();
+const dashboardController = new DashboardController();
 
 const DASHBOARD_CACHE_KEY = 'dashboard_data';
 const DASHBOARD_TTL = 60;
