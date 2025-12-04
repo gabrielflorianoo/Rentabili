@@ -3,9 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import { servicoAutenticacao } from '../services/servicoAutenticacao';
 import { dashboardApi } from '../services/apis';
 import Sidebar from '../components/Sidebar'; 
+import {
+    useTopPerformers,
+    usePortfolioEvolution,
+    useAllocation,
+} from '../hooks/usePerformanceHooks';
+import {
+    EvolutionLineChart,
+    AllocationPieChart,
+    TopPerformersWidget,
+    PerformanceBarChart,
+} from '../components/PerformanceCharts';
 import './DashBoard.css';
 
-// --- IMPORTAÇÃO DAS BIBLIOTECAS GRÁFICAS (Era isso que faltava) ---
+// --- IMPORTAÇÃO DAS BIBLIOTECAS GRÁFICAS ---
 import {
   Chart as ChartJS,
   ArcElement,
@@ -41,6 +52,11 @@ export default function Dashboard() {
     
     // Estado para Interatividade (Filtro ao clicar no gráfico)
     const [selectedCategory, setSelectedCategory] = useState(null);
+
+    // Custom hooks para performance
+    const { topPerformers, loading: topLoading } = useTopPerformers(5);
+    const { evolution, loading: evolutionLoading } = usePortfolioEvolution(12);
+    const { allocation, loading: allocationLoading } = useAllocation();
 
     useEffect(() => {
         const user = servicoAutenticacao.obterUsuarioAtual();
@@ -209,7 +225,35 @@ export default function Dashboard() {
                     </section>
                 </div>
 
-                {/* 4. ÚLTIMAS MOVIMENTAÇÕES */}
+                {/* 4. GRÁFICOS DE PERFORMANCE */}
+                <section className="performance-section glass-panel">
+                    <h3>📊 Análise de Performance</h3>
+                    <div className="performance-grid">
+                        <div className="chart-wrapper">
+                            <EvolutionLineChart
+                                data={evolution}
+                                title="Evolução Patrimonial (12 meses)"
+                            />
+                        </div>
+                        <div className="chart-wrapper">
+                            <AllocationPieChart
+                                data={allocation}
+                                title="Distribuição de Ativos"
+                            />
+                        </div>
+                    </div>
+                </section>
+
+                {/* 5. TOP PERFORMERS */}
+                <section className="top-performers-section">
+                    <TopPerformersWidget
+                        topPerformers={topPerformers}
+                        loading={topLoading}
+                        error={null}
+                    />
+                </section>
+
+                {/* 6. ÚLTIMAS MOVIMENTAÇÕES */}
                 <section className="transactions-section">
                     <h3>Últimas Movimentações</h3>
                     <div className="transactions-list-horizontal">

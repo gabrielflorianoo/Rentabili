@@ -457,3 +457,68 @@
         height: 40px;
     }
 }
+
+/* Performance Section */
+.performance-section {
+    margin: 40px 0;
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.dark .performance-section {
+    background: #1f2937;
+}
+
+.performance-section h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dark .performance-section h3 {
+    color: #f3f4f6;
+}
+
+.performance-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 30px;
+    margin-top: 20px;
+}
+
+@media (max-width: 1024px) {
+    .performance-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.chart-wrapper {
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.dark .chart-wrapper {
+    background: #2d3748;
+}
+
+/* Top Performers Section */
+.top-performers-section {
+    margin: 40px 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;
+}
+
+@media (max-width: 768px) {
+    .top-performers-section {
+        grid-template-columns: 1fr;
+    }
+}

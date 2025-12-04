@@ -16,6 +16,8 @@ import Relatorios from './pages/Relatorios';
 import Ativos from './pages/Ativos';
 import Transacoes from './pages/Transacoes';
 import Simulador from './pages/Simulador';
+import Historico from './pages/Historico';
+import AnaliseDados from './pages/AnaliseDados';
 
 // --- IMPORTAÇÃO DE COMPONENTES DE LAYOUT E ROTA ---
 import RotaProtegida from './components/ProtectRout'; // Mantido
@@ -25,6 +27,7 @@ import './styles/estilo.css';
 import './styles/improvements.css';
 import './styles/sidebar.css';
 import './styles/pages.css';
+import './styles/performance.css';
 
 const handleLogout = () => {
     if (window.confirm("Tem certeza que deseja sair?")) {
@@ -60,7 +63,8 @@ export default function App() {
                     <Route path="/relatorios" element={<Relatorios />} />
                     <Route path="/actives" element={<Ativos />} />
                     <Route path="/simulador" element={<Simulador />} />
-
+                    <Route path="/historico" element={<Historico />} />
+                    <Route path="/analise" element={<AnaliseDados />} />
                 </Route>
 
                 {/* Rota 404 de fallback */}

@@ -30,6 +30,7 @@ import authRouter from './src/routes/auth.js';
 import dashboardRouter from './src/routes/dashboard.js';
 import activesRouter from './src/routes/actives.js';
 import historicalBalancesRouter from './src/routes/historicalBalances.js';
+import performanceRouter from './src/routes/performance.js';
 
 import logger from './src/logger.js';
 
@@ -126,6 +127,7 @@ app.use('/auth', authRouter);
 app.use('/actives', activesRouter);
 app.use('/historical-balances', historicalBalancesRouter);
 app.use('/dashboard', dashboardRouter);
+app.use('/performance', performanceRouter);
 
 app.use(errorHandler);
 

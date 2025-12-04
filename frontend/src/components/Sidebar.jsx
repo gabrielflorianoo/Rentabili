@@ -52,6 +52,18 @@ export default function Sidebar({ aoSair = () => {}, paginaAtiva = '' }) {
                     Relatórios
                 </a>
                 <a
+                    onClick={() => navigate('/historico')}
+                    className={paginaAtiva === 'historico' ? 'active' : ''}
+                >
+                    📊 Histórico
+                </a>
+                <a
+                    onClick={() => navigate('/analise')}
+                    className={paginaAtiva === 'analise' ? 'active' : ''}
+                >
+                    📈 Análise
+                </a>
+                <a
                     onClick={() => navigate('/simulador')}
                     className={paginaAtiva === 'simulador' ? 'active' : ''}
                 >

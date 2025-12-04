@@ -120,4 +120,30 @@ export const historicalBalancesApi = {
     remove: (id) => remove(`/historical-balances/${id}`),
 };
 
+// Performance API
+export const performanceApi = {
+    getGainLoss: (activeId, startDate, endDate) => 
+        get(`/performance/active/${activeId}/gain-loss`, {
+            params: { startDate, endDate }
+        }),
+    getPerformanceByPeriod: (activeId) => 
+        get(`/performance/active/${activeId}/periods`),
+    getAllPerformance: (startDate, endDate) =>
+        get('/performance/all', {
+            params: { startDate, endDate }
+        }),
+    getTopPerformers: (limit) =>
+        get('/performance/top-performers', {
+            params: { limit }
+        }),
+    getPortfolioEvolution: (months) =>
+        get('/performance/evolution', {
+            params: { months }
+        }),
+    getAllocation: () =>
+        get('/performance/allocation'),
+    getLastBalanceDates: () =>
+        get('/performance/last-dates'),
+};
+
 export default apiClient;
