@@ -31,10 +31,10 @@ const VersoCartao = ({ aoVirar }) => {
         const partes = dataString.split('-');
         const dataNasc = new Date(partes[0], partes[1] - 1, partes[2]);
         const hoje = new Date();
-        
+
         let idade = hoje.getFullYear() - dataNasc.getFullYear();
         const m = hoje.getMonth() - dataNasc.getMonth();
-        
+
         if (m < 0 || (m === 0 && hoje.getDate() < dataNasc.getDate())) {
             idade--;
         }
@@ -71,7 +71,7 @@ const VersoCartao = ({ aoVirar }) => {
 
     const lidarComCadastro = async (ev) => {
         ev.preventDefault();
-        
+
         // Se a validação falhar (idade ou senha), para aqui
         if (!validar()) return;
 
@@ -106,13 +106,15 @@ const VersoCartao = ({ aoVirar }) => {
     };
 
     return (
+        // Uso de styles.cardBack e styles.cardFace (transformação)
         <div className={`${styles.cardFace} ${styles.cardBack}`}>
-            <div className={styles.formArea}>
+            {/* CORRIGIDO: Esta é a área branca do formulário. Usa formArea (flex/center/padding) */}
+            <div className={`${styles.formArea}`}>
                 {!sucesso ? (
                     <div className={`${styles.formContent} ${styles.fadeInUp}`}>
-                        <div className={styles.formHeader}>
-                            <h2 className={styles.formTitle}>Crie sua conta</h2>
-                            <p className={styles.formSubtitle}>Junte-se à inovação</p>
+                        <div className={`${styles.formHeader}`}>
+                            <h2 className={`${styles.formTitle}`}>Crie sua conta</h2>
+                            <p className={`${styles.formSubtitle}`}>Junte-se à inovação</p>
                         </div>
 
                         <form onSubmit={lidarComCadastro}>
@@ -142,7 +144,7 @@ const VersoCartao = ({ aoVirar }) => {
                                 rotulo="Data de Nascimento"
                                 valor={dadosForm.nascimento}
                                 aoMudar={lidarComMudanca}
-                                erro={erros.nascimento} // Agora exibe o erro de idade
+                                erro={erros.nascimento}
                                 required
                             />
 
@@ -156,7 +158,7 @@ const VersoCartao = ({ aoVirar }) => {
                                 required
                             />
 
-                            <span className={styles.dicaCampo}>
+                            <span className={`${styles.dicaCampo}`}>
                                 Mínimo de 6 caracteres e 1 caractere especial
                                 (@, #, $, etc).
                             </span>
@@ -172,18 +174,19 @@ const VersoCartao = ({ aoVirar }) => {
                             />
 
                             {erros.geral && (
-                                <div className={styles.errorMessage}>
+                                <div className={`${styles.errorMessage}`}>
                                     {erros.geral}
                                 </div>
                             )}
 
                             <button
                                 type="submit"
-                                className={styles.holoButton}
+                                className={`${styles.holoButton}`}
                             >
                                 {carregando ? 'Enviando...' : 'Criar Conta'}
                             </button>
 
+                            {/* CORRIGIDO: Classes combinadas devem ser passadas separadamente */}
                             <button
                                 type="button"
                                 className={`${styles.holoButton} ${styles.secondaryButton}`}
@@ -194,31 +197,27 @@ const VersoCartao = ({ aoVirar }) => {
                         </form>
                     </div>
                 ) : (
-                    <div
-                        className={`${styles.formContent} ${styles.fadeInUp}`}
-                        style={{ textAlign: 'center' }}
-                    >
-                        <div className={styles.formHeader}>
-                            <h2 className={styles.formTitle}>Conta Criada!</h2>
-                            <p className={styles.formSubtitle}>
+                    <div className={`${styles.formContent} ${styles.fadeInUp}`} style={{ textAlign: 'center' }}>
+                        <div className={`${styles.formHeader}`}>
+                            <h2 className={`${styles.formTitle}`}>Conta Criada!</h2>
+                            <p className={`${styles.formSubtitle}`}>
                                 Seja bem-vindo ao Rentabili Investidor.
                             </p>
                         </div>
 
-                        <button className={styles.holoButton} onClick={irParaLogin}>
+                        <button className={`${styles.holoButton}`} onClick={irParaLogin}>
                             Fazer Login Agora
                         </button>
                     </div>
                 )}
             </div>
-
             <div className={`${styles.cardSection} ${styles.welcomeSection}`}>
                 <div className={`${styles.welcomeContent} ${styles.fadeInUp}`}>
-                    <img src={imgLogo} alt="Logo" className={styles.logoImgBack} />
-                    <h1 className={styles.welcomeTitle}>Controle seu investimento</h1>
+                    <img src={imgLogo} alt="Logo" className={`${styles.logoImgBack}`} />
+                    <h1 className={`${styles.welcomeTitle}`}>Controle seu investimento</h1>
                 </div>
 
-                <button className={styles.flipButton} onClick={aoVirar}>
+                <button className={`${styles.flipButton}`} onClick={aoVirar}>
                     ← Voltar
                 </button>
             </div>

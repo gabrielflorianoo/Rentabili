@@ -106,7 +106,7 @@ const FrenteCartao = ({ aoVirar }) => {
                         Bem-vindo ao futuro dos investimentos
                     </p>
                 </div>
-                <button className="flip-button" onClick={aoVirar}>
+                <button className="flip-button action" onClick={aoVirar}>
                     Criar Conta →
                 </button>
             </div>
@@ -152,7 +152,6 @@ const FrenteCartao = ({ aoVirar }) => {
                                 type="button"
                                 className="holo-button secondary-button"
                                 onClick={preencherAutomaticamente}
-                                style={{ marginTop: '10px', background: 'transparent', color: '#00a651', border: '1px solid #00a651' }}
                             >
                                 Preencher Automaticamente
                             </button>
