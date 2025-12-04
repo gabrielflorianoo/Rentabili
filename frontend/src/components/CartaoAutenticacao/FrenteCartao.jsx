@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import InputFlutuante from '../InputFlutuante';
 import { servicoAutenticacao } from '../../services/servicoAutenticacao';
 import imgLogo from '../../assets/logo.jpeg';
+import styles from './FrenteCartao.module.css';
 
 const FrenteCartao = ({ aoVirar }) => {
     const navigate = useNavigate();
@@ -85,39 +86,39 @@ const FrenteCartao = ({ aoVirar }) => {
     };
 
     return (
-        <div className="card-face card-front">
+        <div className={`${styles.cardFace} ${styles.cardFront}`}>
             {/* Lado Esquerdo: Boas Vindas */}
-            <div className="card-section welcome-section">
-                <div className="welcome-content fade-in-up">
+            <div className={`${styles.cardSection} ${styles.welcomeSection}`}>
+                <div className={`${styles.welcomeContent} ${styles.fadeInUp}`}>
                     
                     {/* --- ATALHO NA LOGO ADICIONADO AQUI --- */}
                     <div 
-                        className="logo-container" 
+                        className={styles.logoContainer} 
                         onClick={() => navigate('/')} 
                         style={{ cursor: 'pointer' }}
                         title="Voltar para a Página Inicial"
                     >
-                        <img src={imgLogo} alt="Logo" className="logo-img" />
+                        <img src={imgLogo} alt="Logo" className={styles.logoImg} />
                     </div>
                     {/* -------------------------------------- */}
 
-                    <h1 className="welcome-title">Rentabili Investidor</h1>
-                    <p className="welcome-subtitle">
+                    <h1 className={styles.welcomeTitle}>Rentabili Investidor</h1>
+                    <p className={styles.welcomeSubtitle}>
                         Bem-vindo ao futuro dos investimentos
                     </p>
                 </div>
-                <button className="flip-button action" onClick={aoVirar}>
+                <button className={`${styles.flipButton}`} onClick={aoVirar}>
                     Criar Conta →
                 </button>
             </div>
 
             {/* Lado Direito: Formulários */}
-            <div className="card-section form-section">
+            <div className={`${styles.cardSection} ${styles.formSection}`}>
                 {visualizacao === 'login' && (
-                    <div className="form-content fade-in-up">
-                        <div className="form-header">
-                            <h2 className="form-title">Acesse sua conta</h2>
-                            <p className="form-subtitle">
+                    <div className={`${styles.formContent} ${styles.fadeInUp}`}>
+                        <div className={styles.formHeader}>
+                            <h2 className={styles.formTitle}>Acesse sua conta</h2>
+                            <p className={styles.formSubtitle}>
                                 Entre com suas credenciais
                             </p>
                         </div>
@@ -142,7 +143,7 @@ const FrenteCartao = ({ aoVirar }) => {
                             />
                             <button
                                 type="submit"
-                                className="holo-button"
+                                className={styles.holoButton}
                                 disabled={carregando}
                             >
                                 {carregando ? 'Entrando...' : 'Entrar na Conta'}
@@ -150,7 +151,7 @@ const FrenteCartao = ({ aoVirar }) => {
 
                             <button
                                 type="button"
-                                className="holo-button secondary-button"
+                                className={`${styles.holoButton} ${styles.secondaryButton}`}
                                 onClick={preencherAutomaticamente}
                             >
                                 Preencher Automaticamente
@@ -158,7 +159,7 @@ const FrenteCartao = ({ aoVirar }) => {
                         </form>
                         <a
                             href="#"
-                            className="form-link"
+                            className={styles.formLink}
                             onClick={(e) => {
                                 e.preventDefault();
                                 setVisualizacao('recuperar');
@@ -171,10 +172,10 @@ const FrenteCartao = ({ aoVirar }) => {
 
                 {/* TELA DE RECUPERAÇÃO */}
                 {visualizacao === 'recuperar' && (
-                    <div className="form-content fade-in-up">
-                        <div className="form-header">
-                            <h2 className="form-title">Recuperar Senha</h2>
-                            <p className="form-subtitle">
+                    <div className={`${styles.formContent} ${styles.fadeInUp}`}>
+                        <div className={styles.formHeader}>
+                            <h2 className={styles.formTitle}>Recuperar Senha</h2>
+                            <p className={styles.formSubtitle}>
                                 Insira seu e-mail para receber o código
                             </p>
                         </div>
@@ -188,13 +189,13 @@ const FrenteCartao = ({ aoVirar }) => {
                                 erro={erros.email}
                                 required
                             />
-                            <button type="submit" className="holo-button">
+                            <button type="submit" className={styles.holoButton}>
                                 Enviar Código
                             </button>
                         </form>
                         <a
                             href="#"
-                            className="form-link"
+                            className={styles.formLink}
                             onClick={(e) => {
                                 e.preventDefault();
                                 setVisualizacao('login');
@@ -207,10 +208,10 @@ const FrenteCartao = ({ aoVirar }) => {
 
                 {/* TELA DE VALIDAÇÃO */}
                 {visualizacao === 'validar' && (
-                    <div className="form-content fade-in-up">
-                        <div className="form-header">
-                            <h2 className="form-title">Redefinir</h2>
-                            <p className="form-subtitle">
+                    <div className={`${styles.formContent} ${styles.fadeInUp}`}>
+                        <div className={styles.formHeader}>
+                            <h2 className={styles.formTitle}>Redefinir</h2>
+                            <p className={styles.formSubtitle}>
                                 Código enviado para seu e-mail
                             </p>
                         </div>
@@ -233,13 +234,13 @@ const FrenteCartao = ({ aoVirar }) => {
                                 erro={erros.novaSenha}
                                 required
                             />
-                            <button type="submit" className="holo-button">
+                            <button type="submit" className={styles.holoButton}>
                                 Salvar Nova Senha
                             </button>
                         </form>
                         <a
                             href="#"
-                            className="form-link"
+                            className={styles.formLink}
                             onClick={(e) => {
                                 e.preventDefault();
                                 setVisualizacao('login');
