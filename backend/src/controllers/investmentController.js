@@ -55,7 +55,7 @@ class InvestmentController {
 
     async getAll(req, res) {
         try {
-            const userId = req.user?.id;
+            const userId = req.userId;
             if (!userId) {
                 return res
                     .status(401)
@@ -70,7 +70,7 @@ class InvestmentController {
 
     async getTotalInvested(req, res) {
         try {
-            const userId = req.user?.id;
+            const userId = req.userId;
             if (!userId) {
                 return res
                     .status(401)
@@ -87,7 +87,7 @@ class InvestmentController {
 
     async getGainLoss(req, res) {
         try {
-            const userId = req.user?.id;
+            const userId = req.userId;
             if (!userId) {
                 return res
                     .status(401)
@@ -120,7 +120,7 @@ class InvestmentController {
     async create(req, res) {
         try {
             const { amount, activeId, date, kind } = req.body;
-            const userId = req.user?.id;
+            const userId = req.userId;
             if (!userId) {
                 return res
                     .status(400)
@@ -143,7 +143,7 @@ class InvestmentController {
         try {
             const id = Number(req.params.id);
             const { amount, activeId, date, kind } = req.body;
-            const userId = req.user?.userId;
+            const userId = req.userId;
             if (!userId) {
                 return res
                     .status(400)
@@ -166,7 +166,8 @@ class InvestmentController {
     async remove(req, res) {
         try {
             const id = Number(req.params.id);
-            await InvestmentService.remove(id);
+            const userId = req.userId;
+            await InvestmentService.remove(id, userId);
             res.status(204).send();
         } catch (error) {
             res.status(500).json({ error: error.message });

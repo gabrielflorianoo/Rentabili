@@ -18,6 +18,7 @@ router.get(
 
 router.get(
     '/dashboard',
+    authenticateToken,
     cacheMiddleware(DASHBOARD_CACHE_KEY, DASHBOARD_TTL),
     dashboardController.getDashboard,
 );

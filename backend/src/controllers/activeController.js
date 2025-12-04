@@ -3,8 +3,7 @@ import activeService from '../services/activeService.js';
 // Create a new active
 export async function createActive(req, res) {
     const { name, type } = req.body;
-    const userId = req.user.id; // Assuming user ID is available from authentication middleware
-    console.log('createActive - userId:', userId); // Adicionado para depuração
+    const userId = req.userId;
 
     try {
         if (!userId) {
@@ -19,7 +18,7 @@ export async function createActive(req, res) {
 
 // Get all actives for a user
 export async function getActives(req, res) {
-    const userId = req.user.id;
+    const userId = req.userId;
 
     try {
         const actives = await activeService.getActives(userId);
@@ -32,7 +31,7 @@ export async function getActives(req, res) {
 // Get a single active by ID
 export async function getActiveById(req, res) {
     const { id } = req.params;
-    const userId = req.user.id;
+    const userId = req.userId;
 
     try {
         const active = await activeService.getActiveById(id, userId);
@@ -47,7 +46,7 @@ export async function getActiveById(req, res) {
 export async function updateActive(req, res) {
     const { id } = req.params;
     const { name, type } = req.body;
-    const userId = req.user.id;
+    const userId = req.userId;
 
     try {
         const active = await activeService.updateActive(id, name, type, userId);
@@ -60,7 +59,7 @@ export async function updateActive(req, res) {
 // Delete an active
 export async function deleteActive(req, res) {
     const { id } = req.params;
-    const userId = req.user.id;
+    const userId = req.userId;
 
     try {
         await activeService.deleteActive(id, userId);

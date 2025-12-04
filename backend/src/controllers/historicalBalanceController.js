@@ -4,7 +4,7 @@ import historicalBalanceService from '../services/historicalBalanceService.js';
 // Create a new historical balance for an active
 export async function createHistoricalBalance(req, res) {
     const { date, value, activeId } = req.body;
-    const userId = req.user.id; // Assuming user ID is available from authentication middleware
+    const userId = req.userId;
 
     try {
         const historicalBalance =
@@ -23,7 +23,7 @@ export async function createHistoricalBalance(req, res) {
 // Get all historical balances for a specific active
 export async function getHistoricalBalancesByActive(req, res) {
     const { activeId } = req.params;
-    const userId = req.user.id;
+    const userId = req.userId;
 
     try {
         const historicalBalances =
@@ -40,7 +40,7 @@ export async function getHistoricalBalancesByActive(req, res) {
 // Get a single historical balance by ID
 export async function getHistoricalBalanceById(req, res) {
     const { id } = req.params;
-    const userId = req.user.id;
+    const userId = req.userId;
 
     try {
         const historicalBalance =
@@ -55,7 +55,7 @@ export async function getHistoricalBalanceById(req, res) {
 export async function updateHistoricalBalance(req, res) {
     const { id } = req.params;
     const { date, value } = req.body;
-    const userId = req.user.id;
+    const userId = req.userId;
 
     try {
         const historicalBalance =
@@ -74,7 +74,7 @@ export async function updateHistoricalBalance(req, res) {
 // Delete a historical balance
 export async function deleteHistoricalBalance(req, res) {
     const { id } = req.params;
-    const userId = req.user.id;
+    const userId = req.userId;
 
     try {
         await historicalBalanceService.deleteHistoricalBalance(id, userId);

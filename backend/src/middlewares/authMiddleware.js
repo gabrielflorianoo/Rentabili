@@ -16,7 +16,8 @@ export const authenticateToken = (req, res, next) => {
             return res.sendStatus(403);
         }
 
-        req.user = { id: user.userId }; // Garante que o userId esteja disponível como req.user.id
+        req.userId = user.userId; // Disponibiliza o userId para os controllers
+        req.user = { userId: user.userId, id: user.userId }; // Garante compatibilidade com cacheMiddleware
         next();
     });
 };

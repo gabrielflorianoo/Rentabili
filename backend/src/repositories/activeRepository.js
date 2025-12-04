@@ -37,20 +37,27 @@ class ActiveRepository {
 
     async findById(id, userId) {
         try {
-            const active = await prisma.active.findUnique({
+            const active = await prisma.active.findFirst({
                 where: {
                     id: parseInt(id),
                     userId,
                 },
                 include: {
-                    balances: true,
+                    balances: {
+                        orderBy: { date: 'desc' },
+                    },
                     investments: true,
                 },
             });
+            
+            if (!active) {
+                throw new Error('Ativo não encontrado');
+            }
+            
             return active;
         } catch (error) {
             console.error(error);
-            throw new Error('Erro ao buscar active por ID no banco de dados');
+            throw new Error(error.message || 'Erro ao buscar active por ID no banco de dados');
         }
     }
 

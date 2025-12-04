@@ -1,5 +1,3 @@
-import prisma from '../../prisma/client.js';
-
 import dashboardService from '../services/dashboardService.js';
 
 class DashboardController {

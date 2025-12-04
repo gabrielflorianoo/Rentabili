@@ -4,9 +4,16 @@ import Sidebar from '../components/Sidebar';
 
 const SidebarLayout = ({ aoSair }) => {
     return (
-        <section className="app-container">
+        <section style={{ display: 'flex', minHeight: '100vh' }}>
             <Sidebar aoSair={aoSair} />
-            <Outlet />
+            <main style={{ 
+                flex: 1, 
+                marginLeft: '280px',
+                width: 'calc(100% - 280px)',
+                overflow: 'auto'
+            }}>
+                <Outlet />
+            </main>
         </section>
     );
 }

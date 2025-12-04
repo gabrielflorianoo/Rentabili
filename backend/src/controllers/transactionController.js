@@ -37,7 +37,7 @@ class TransactionController {
 
     async getAll(req, res) {
         try {
-            const userId = req.user?.id;
+            const userId = req.userId;
             if (!userId) {
                 return res
                     .status(401)
@@ -66,8 +66,8 @@ class TransactionController {
 
     async create(req, res) {
         try {
-            const { amount, type, description, date, userId, walletId } =
-                req.body;
+            const { amount, type, description, date, walletId } = req.body;
+            const userId = req.userId;
             const newTransaction = await transactionService.create(
                 amount,
                 type,
@@ -85,8 +85,8 @@ class TransactionController {
     async update(req, res) {
         try {
             const id = Number(req.params.id);
-            const { amount, type, description, date, userId, walletId } =
-                req.body;
+            const { amount, type, description, date, walletId } = req.body;
+            const userId = req.userId;
             const updatedTransaction = await transactionService.update(
                 id,
                 amount,

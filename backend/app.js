@@ -125,6 +125,7 @@ app.use('/wallets', walletsRouter);
 app.use('/auth', authRouter);
 app.use('/actives', activesRouter);
 app.use('/historical-balances', historicalBalancesRouter);
+app.use('/dashboard', dashboardRouter);
 
 app.use(errorHandler);
 

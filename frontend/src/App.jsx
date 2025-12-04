@@ -22,6 +22,9 @@ import RotaProtegida from './components/ProtectRout'; // Mantido
 import Sidebar from './components/Sidebar'; // Ainda precisamos dele aqui se não usarmos o LayoutComponent
 import SidebarLayout from './layouts/SidebarLayout'; // Adicione a importação do Layout
 import './styles/estilo.css';
+import './styles/improvements.css';
+import './styles/sidebar.css';
+import './styles/pages.css';
 
 const handleLogout = () => {
     if (window.confirm("Tem certeza que deseja sair?")) {
