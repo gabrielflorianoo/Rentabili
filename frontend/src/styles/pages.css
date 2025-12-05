@@ -341,7 +341,26 @@ hr {
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
 }
 
-.modal-overlay, [class*="overlay"] {
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(3px);
+    z-index: 1999;
+    padding: 20px;
+}
+
+.dark .modal-overlay {
+    background: rgba(0, 0, 0, 0.7);
+}
+
+[class*="overlay"]:not(.modal-overlay) {
     position: fixed;
     top: 0;
     left: 0;
@@ -349,11 +368,6 @@ hr {
     bottom: 0;
     background: rgba(0, 0, 0, 0.5);
     z-index: 1999;
-}
-
-.dark .modal-overlay,
-.dark [class*="overlay"] {
-    background: rgba(0, 0, 0, 0.7);
 }
 
 /* =========================================

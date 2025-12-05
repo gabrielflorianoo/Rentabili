@@ -4,6 +4,7 @@ import { activesApi } from '../services/apis';
 import { generateActive } from '../utils/fakeData';
 import { servicoAutenticacao } from '../services/servicoAutenticacao';
 import './Ativos.css';
+import Modal from '../components/Modal';
 
 export default function Ativos() {
     const navigate = useNavigate();
@@ -181,52 +182,27 @@ export default function Ativos() {
                     </div>
                 )}
 
-                {showModal && (
-                    <div className="modal-overlay" onClick={closeModal}>
-                        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                            <h3>{editing ? 'Editar Ativo' : 'Novo Ativo'}</h3>
-                            <form onSubmit={handleSubmit}>
-                                <div className="form-group">
-                                    <label>Nome</label>
-                                    {/* ALTERAÇÃO: Input ligado a form.name */}
-                                    <input
-                                        value={form.name || ''}
-                                        onChange={(e) => setForm({ ...form, name: e.target.value })}
-                                        required
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Tipo</label>
-                                    {/* ALTERAÇÃO: Input ligado a form.type */}
-                                    <input
-                                        value={form.type || ''}
-                                        onChange={(e) => setForm({ ...form, type: e.target.value })}
-                                        required
-                                    />
-                                </div>
-
-                                <p className="error-message">{erro}</p>
-
-                                <div className="modal-actions">
-                                    <button
-                                        type="button"
-                                        className="btn-secondary"
-                                        onClick={handleAutoFill}
-                                        style={{ marginRight: 8 }}
-                                    >
-                                        Auto-preencher
-                                    </button>
-                                    <button type="button" className="btn-cancel" onClick={closeModal}>
-                                        Cancelar
-                                    </button>
-                                    <button type="submit" className="btn-save">
-                                        Salvar
-                                    </button>
-                                </div>
-                            </form>
+                <Modal open={showModal} onClose={closeModal}>
+                    <h3>{editing ? 'Editar Ativo' : 'Novo Ativo'}</h3>
+                    <form onSubmit={handleSubmit}>
+                        <div className="form-group">
+                            <label>Nome</label>
+                            <input value={form.name || ''} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
                         </div>
-                    </div>
-                )}
+                        <div className="form-group">
+                            <label>Tipo</label>
+                            <input value={form.type || ''} onChange={(e) => setForm({ ...form, type: e.target.value })} required />
+                        </div>
+
+                        <p className="error-message">{erro}</p>
+
+                        <div className="modal-actions">
+                            <button type="button" className="btn-secondary" onClick={handleAutoFill} style={{ marginRight: 8 }}>Auto-preencher</button>
+                            <button type="button" className="btn-cancel" onClick={closeModal}>Cancelar</button>
+                            <button type="submit" className="btn-save">Salvar</button>
+                        </div>
+                    </form>
+                </Modal>
             </div>
         </div>
     );

@@ -4,6 +4,7 @@ import { investmentsApi, activesApi } from '../services/apis';
 import { generateInvestment } from '../utils/fakeData';
 import { servicoAutenticacao } from '../services/servicoAutenticacao';
 import './Investimentos.css';
+import Modal from '../components/Modal';
 
 export default function Investimentos() {
     const navigate = useNavigate();
@@ -14,12 +15,18 @@ export default function Investimentos() {
     const [filterActiveType, setFilterActiveType] = useState('Todos');
     const [carregando, setCarregando] = useState(true);
     const [mostrarModal, setMostrarModal] = useState(false);
+    const [mostrarModalSimulacao, setMostrarModalSimulacao] = useState(false);
     const [investimentoEditando, setInvestimentoEditando] = useState(null);
     const [autoPreencherErro, setAutoPreencherErro] = useState("");
     const [formData, setFormData] = useState({
         activeId: '',
         amount: '',
         date: new Date().toISOString().split('T')[0],
+    });
+    const [dataTarget, setDataTarget] = useState(() => {
+        const hoje = new Date();
+        hoje.setMonth(hoje.getMonth() + 1);
+        return hoje.toISOString().split('T')[0];
     });
 
     useEffect(() => {
@@ -204,6 +211,93 @@ export default function Investimentos() {
         }
     };
 
+    const handleSimulacaoCompleta = async () => {
+        try {
+            const token = servicoAutenticacao.obterToken();
+            if (!token) {
+                alert('Sessão expirada. Faça login novamente.');
+                servicoAutenticacao.sair();
+                navigate('/');
+                return;
+            }
+
+            const targetDate = new Date(dataTarget);
+            const hoje = new Date();
+            const maxDate = new Date(hoje);
+            maxDate.setMonth(maxDate.getMonth() + 12);
+
+            if (targetDate > maxDate) {
+                alert('Data alvo não pode ser mais de 12 meses no futuro.');
+                return;
+            }
+
+            if (targetDate <= hoje) {
+                alert('Data alvo deve ser no futuro.');
+                return;
+            }
+
+            // Filtrar apenas investimentos (não rendas)
+            const investimentosBase = investimentos.filter(inv => inv.kind !== 'Renda');
+
+            let simulacoesCriadas = 0;
+
+            for (const inv of investimentosBase) {
+                const invDate = new Date(inv.date);
+                let currentDate = new Date(invDate);
+                currentDate.setMonth(currentDate.getMonth() + 1); // Começar do próximo mês
+
+                let currentAmount = parseFloat(inv.amount);
+
+                while (currentDate <= targetDate) {
+                    // Verificar se já existe renda para este ativo nesta data
+                    const existeRenda = investimentos.some(r => 
+                        r.kind === 'Renda' && 
+                        r.activeId === inv.activeId && 
+                        new Date(r.date).toISOString().split('T')[0] === currentDate.toISOString().split('T')[0]
+                    );
+
+                    if (!existeRenda) {
+                        // variação aleatória entre -5% e +12%
+                        const min = -0.05;
+                        const max = 0.12;
+                        const pct = Math.random() * (max - min) + min;
+
+                        currentAmount = parseFloat((currentAmount * (1 + pct)).toFixed(2));
+
+                        const payload = {
+                            activeId: inv.activeId,
+                            amount: currentAmount.toFixed(2),
+                            date: new Date(currentDate).toISOString(),
+                            kind: 'Renda',
+                        };
+
+                        await investmentsApi.create(payload);
+                        simulacoesCriadas++;
+                    }
+
+                    // Avançar para o próximo mês
+                    currentDate.setMonth(currentDate.getMonth() + 1);
+                }
+            }
+
+            alert(`Simulação completa realizada! ${simulacoesCriadas} rendas simuladas.`);
+            setMostrarModalSimulacao(false);
+            carregarInvestimentos();
+        } catch (err) {
+            console.error('Erro na simulação completa:', err);
+            if (err.response?.status === 403) {
+                alert('Ação não autorizada. Faça login novamente.');
+                servicoAutenticacao.sair();
+                navigate('/');
+                return;
+            }
+            alert(
+                'Erro na simulação completa: ' +
+                (err.response?.data?.error || err.message),
+            );
+        }
+    };
+
     // Helper maps
     const activeById = React.useMemo(() => {
         const map = new Map();
@@ -233,6 +327,12 @@ export default function Investimentos() {
                         onClick={() => abrirModal()}
                     >
                         + Novo Investimento
+                    </button>
+                    <button
+                        className="btn-secondary"
+                        onClick={() => setMostrarModalSimulacao(true)}
+                    >
+                        🔄 Simulação Completa
                     </button>
                 </div>
 
@@ -506,103 +606,74 @@ export default function Investimentos() {
                 )}
 
                 {/* Modal */}
-                {mostrarModal && (
-                    <div className="modal-overlay" onClick={fecharModal}>
-                        <div
-                            className="modal-content"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <h3>
-                                {investimentoEditando
-                                    ? 'Editar Investimento'
-                                    : 'Novo Investimento'}
-                            </h3>
-                            <form onSubmit={handleSubmit}>
-                                <div className="form-group">
-                                    <label>ID do Ativo</label>
-                                    <input
-                                        type="number"
-                                        value={formData.activeId}
-                                        onChange={(e) =>
-                                            setFormData({
-                                                ...formData,
-                                                activeId: e.target.value,
-                                            })
-                                        }
-                                        required
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Valor</label>
-                                    <input
-                                        type="number"
-                                        step="0.01"
-                                        value={formData.amount}
-                                        onChange={(e) =>
-                                            setFormData({
-                                                ...formData,
-                                                amount: e.target.value,
-                                            })
-                                        }
-                                        required
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Tipo</label>
-                                    <select
-                                        value={formData.kind}
-                                        onChange={(e) =>
-                                            setFormData({
-                                                ...formData,
-                                                kind: e.target.value,
-                                            })
-                                        }
-                                    >
-                                        <option value="Investimento">
-                                            Investimento
-                                        </option>
-                                        <option value="Renda">Renda</option>
-                                    </select>
-                                </div>
-                                <div className="form-group">
-                                    <label>Data</label>
-                                    <input
-                                        type="date"
-                                        value={formData.date}
-                                        onChange={(e) =>
-                                            setFormData({
-                                                ...formData,
-                                                date: e.target.value,
-                                            })
-                                        }
-                                        required
-                                    />
-                                </div>
-                                <p className="error-message">{autoPreencherErro}</p>
-                                <div className="modal-actions">
-                                    <button
-                                        type="button"
-                                        className="btn-secondary"
-                                        onClick={handleAutoPreencher}
-                                        style={{ marginRight: 8 }}
-                                    >
-                                        Auto-preencher
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className="btn-cancel"
-                                        onClick={fecharModal}
-                                    >
-                                        Cancelar
-                                    </button>
-                                    <button type="submit" className="btn-save">
-                                        Salvar
-                                    </button>
-                                </div>
-                            </form>
+                <Modal open={mostrarModal} onClose={fecharModal}>
+                    <h3>
+                        {investimentoEditando ? 'Editar Investimento' : 'Novo Investimento'}
+                    </h3>
+                    <form onSubmit={handleSubmit}>
+                        <div className="form-group">
+                            <label>ID do Ativo</label>
+                            <input
+                                type="number"
+                                value={formData.activeId}
+                                onChange={(e) => setFormData({ ...formData, activeId: e.target.value })}
+                                required
+                            />
                         </div>
+                        <div className="form-group">
+                            <label>Valor</label>
+                            <input
+                                type="number"
+                                step="0.01"
+                                value={formData.amount}
+                                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                                required
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label>Tipo</label>
+                            <select value={formData.kind} onChange={(e) => setFormData({ ...formData, kind: e.target.value })}>
+                                <option value="Investimento">Investimento</option>
+                                <option value="Renda">Renda</option>
+                            </select>
+                        </div>
+                        <div className="form-group">
+                            <label>Data</label>
+                            <input type="date" value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} required />
+                        </div>
+                        <p className="error-message">{autoPreencherErro}</p>
+                        <div className="modal-actions">
+                            <button type="button" className="btn-secondary" onClick={handleAutoPreencher} style={{ marginRight: 8 }}>Auto-preencher</button>
+                            <button type="button" className="btn-cancel" onClick={fecharModal}>Cancelar</button>
+                            <button type="submit" className="btn-save">Salvar</button>
+                        </div>
+                    </form>
+                </Modal>
+
+                {/* Modal Simulação Completa */}
+                <Modal open={mostrarModalSimulacao} onClose={() => setMostrarModalSimulacao(false)}>
+                    <h3>Simulação Completa</h3>
+                    <p>Simule o mercado para todos os investimentos até a data alvo.</p>
+                    <div className="form-group">
+                        <label>Data Alvo (máx. 12 meses à frente)</label>
+                        <input
+                            type="date"
+                            value={dataTarget}
+                            onChange={(e) => setDataTarget(e.target.value)}
+                            min={new Date().toISOString().split('T')[0]}
+                            max={() => {
+                                const maxDate = new Date();
+                                maxDate.setMonth(maxDate.getMonth() + 12);
+                                return maxDate.toISOString().split('T')[0];
+                            }}
+                            required
+                        />
                     </div>
-                )}
+                    <div className="modal-actions">
+                        <button type="button" className="btn-cancel" onClick={() => setMostrarModalSimulacao(false)}>Cancelar</button>
+                        <button type="button" className="btn-save" onClick={handleSimulacaoCompleta}>Executar Simulação</button>
+                    </div>
+                </Modal>
             </div>
         </div>
     );
