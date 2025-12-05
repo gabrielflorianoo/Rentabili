@@ -91,9 +91,9 @@ export default function Dashboard() {
 
     // Prepara dados para o Gráfico de Rosca (Doughnut)
     const doughnutData = {
-        labels: data?.allocationChart?.map(i => i.name) || [],
+        labels: allocation?.map(i => i.type) || [],
         datasets: [{
-            data: data?.allocationChart?.map(i => i.value) || [],
+            data: allocation?.map(i => i.value) || [],
             backgroundColor: ['#00a651', '#0077b6', '#9b5de5', '#f15bb5', '#fee440', '#ff9f43'],
             borderWidth: 0,
         }]
@@ -115,10 +115,10 @@ export default function Dashboard() {
 
     // Prepara dados para o Gráfico de Linha (Line)
     const lineData = {
-        labels: data?.historyChart?.map(h => h.month) || [],
+        labels: evolution?.map(e => e.month) || [],
         datasets: [{
             label: 'Evolução Patrimonial',
-            data: data?.historyChart?.map(h => h.amount) || [],
+            data: evolution?.map(e => e.value) || [],
             fill: true,
             backgroundColor: 'rgba(0, 166, 81, 0.1)',
             borderColor: '#00a651',
@@ -128,6 +128,18 @@ export default function Dashboard() {
     };
 
     if (loading) return <div className="loading">Carregando inteligência financeira...</div>;
+    
+    // Se não tem dados após carregar, mostrar estado vazio
+    if (!data) {
+        return (
+            <div className="dashboard-wrap">
+                <Sidebar aoSair={handleLogout} paginaAtiva="dashboard" />
+                <div className="content">
+                    <div className="loading">Erro ao carregar dados. Tente recarregar a página.</div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="dashboard-wrap">
@@ -139,8 +151,8 @@ export default function Dashboard() {
                         <h2>Olá, {userData.name}</h2>
                         <p className="subtitle">Visão geral da sua estratégia de investimentos.</p>
                     </div>
-                    <div className={`status-badge ${data?.totalGain >= 0 ? 'profit' : 'loss'}`}>
-                        {data?.totalGain >= 0 ? '🚀 Carteira Rentável' : '📉 Atenção Necessária'}
+                    <div className={`status-badge ${(data?.totalGain || 0) >= 0 ? 'profit' : 'loss'}`}>
+                        {(data?.totalGain || 0) >= 0 ? '🚀 Carteira Rentável' : '📉 Atenção Necessária'}
                     </div>
                 </header>
 
@@ -150,7 +162,7 @@ export default function Dashboard() {
                         <div className="kpi-icon">💰</div>
                         <div>
                             <span>Patrimônio Total</span>
-                            <h3>{formatBRL(data?.totalBalance)}</h3>
+                            <h3>{formatBRL(data?.totalBalance || data?.summary?.totalBalance || 0)}</h3>
                         </div>
                     </div>
                     
@@ -158,7 +170,7 @@ export default function Dashboard() {
                         <div className="kpi-icon">📥</div>
                         <div>
                             <span>Total Aportado</span>
-                            <h3>{formatBRL(data?.totalInvested)}</h3>
+                            <h3>{formatBRL(data?.totalInvested || 0)}</h3>
                         </div>
                     </div>
 
@@ -166,10 +178,10 @@ export default function Dashboard() {
                         <div className="kpi-icon">📈</div>
                         <div>
                             <span>Rentabilidade</span>
-                            <h3 style={{color: data?.totalGain >= 0 ? '#00a651' : '#d90429'}}>
-                                {data?.totalGain >= 0 ? '+' : ''}{data?.profitability}%
+                            <h3 style={{color: (data?.totalGain || 0) >= 0 ? '#00a651' : '#d90429'}}>
+                                {(data?.totalGain || 0) >= 0 ? '+' : ''}{data?.profitability || 0}%
                             </h3>
-                            <small>{formatBRL(data?.totalGain)} de lucro real</small>
+                            <small>{formatBRL(data?.totalGain || 0)} de lucro real</small>
                         </div>
                     </div>
                 </div>
@@ -185,7 +197,7 @@ export default function Dashboard() {
                             }
                         </div>
                         <div className="chart-container-donut">
-                            {data?.allocationChart?.length > 0 ? (
+                            {allocation && allocation.length > 0 ? (
                                 <div style={{ width: '100%', height: '100%' }}>
                                     <Doughnut data={doughnutData} options={doughnutOptions} />
                                 </div>
@@ -205,13 +217,23 @@ export default function Dashboard() {
                                 <div className="detail-box">
                                     <span>Valor em {selectedCategory}</span>
                                     <strong>
-                                        {formatBRL(data.allocationChart.find(c => c.name === selectedCategory)?.value)}
+                                        {(() => {
+                                            const item = allocation?.find(a => a.type === selectedCategory);
+                                            if (!item) return 'R$ 0,00';
+                                            return formatBRL(item.value);
+                                        })()}
                                     </strong>
                                 </div>
                                 <div className="progress-bar">
                                     <div 
                                         className="fill" 
-                                        style={{width: `${(data.allocationChart.find(x => x.name === selectedCategory)?.value / data.totalBalance * 100)}%`}}
+                                        style={{
+                                            width: `${(() => {
+                                                const item = allocation?.find(a => a.type === selectedCategory);
+                                                if (!item) return '0%';
+                                                return item.percentage;
+                                            })()}%`
+                                        }}
                                     ></div>
                                 </div>
                                 <p>Isso representa uma parte estratégica do seu portfólio.</p>
@@ -230,27 +252,45 @@ export default function Dashboard() {
                     <h3>📊 Análise de Performance</h3>
                     <div className="performance-grid">
                         <div className="chart-wrapper">
-                            <EvolutionLineChart
-                                data={evolution}
-                                title="Evolução Patrimonial (12 meses)"
-                            />
+                            {evolutionLoading ? (
+                                <div className="flex items-center justify-center h-80 bg-gray-50 rounded-lg">
+                                    <p className="text-gray-400">Carregando evolução...</p>
+                                </div>
+                            ) : (
+                                <EvolutionLineChart
+                                    data={evolution}
+                                    title="Evolução Patrimonial (12 meses)"
+                                />
+                            )}
                         </div>
                         <div className="chart-wrapper">
-                            <AllocationPieChart
-                                data={allocation}
-                                title="Distribuição de Ativos"
-                            />
+                            {allocationLoading ? (
+                                <div className="flex items-center justify-center h-80 bg-gray-50 rounded-lg">
+                                    <p className="text-gray-400">Carregando alocação...</p>
+                                </div>
+                            ) : (
+                                <AllocationPieChart
+                                    data={allocation}
+                                    title="Distribuição de Ativos"
+                                />
+                            )}
                         </div>
                     </div>
                 </section>
 
                 {/* 5. TOP PERFORMERS */}
                 <section className="top-performers-section">
-                    <TopPerformersWidget
-                        topPerformers={topPerformers}
-                        loading={topLoading}
-                        error={null}
-                    />
+                    {topLoading ? (
+                        <div className="bg-white rounded-lg shadow p-6">
+                            <p className="text-center text-gray-400">Carregando performers...</p>
+                        </div>
+                    ) : (
+                        <TopPerformersWidget
+                            topPerformers={topPerformers}
+                            loading={topLoading}
+                            error={null}
+                        />
+                    )}
                 </section>
 
                 {/* 6. ÚLTIMAS MOVIMENTAÇÕES */}
@@ -260,11 +300,11 @@ export default function Dashboard() {
                         {data?.recentTransactions?.length > 0 ? (
                             data.recentTransactions.map(t => (
                                 <div key={t.id} className="trans-card-mini">
-                                    <span className={`trans-type ${t.kind === 'Investimento' ? 'in' : 'profit'}`}>
-                                        {t.kind === 'Investimento' ? 'Aporte' : 'Rendimento'}
+                                    <span className={`trans-type ${(t.kind || t.type) === 'Investimento' || (t.kind || t.type) === 'income' ? 'in' : 'profit'}`}>
+                                        {(t.kind === 'Investimento' || t.type === 'income') ? 'Aporte' : 'Rendimento'}
                                     </span>
                                     <strong>{formatBRL(t.amount)}</strong>
-                                    <small>{new Date(t.date).toLocaleDateString('pt-BR')}</small>
+                                    <small>{t.date ? new Date(t.date).toLocaleDateString('pt-BR') : 'N/A'}</small>
                                 </div>
                             ))
                         ) : (

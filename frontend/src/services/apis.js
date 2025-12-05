@@ -99,7 +99,7 @@ export const walletsApi = {
 
 // Dashboard API
 export const dashboardApi = {
-    getSummary: () => get('/dashboard/summary'),
+    getSummary: () => get('/dashboard/dashboard'),
 };
 
 // Actives API

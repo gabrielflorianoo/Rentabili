@@ -72,26 +72,33 @@ export const AllocationPieChart = ({ data, title = "Alocação de Ativos" }) => 
         );
     }
 
+    // Normalizar dados para garantir que têm as propriedades esperadas
+    const normalizedData = data.map(item => ({
+        type: item.type || item.name,
+        percentage: item.percentage || 0,
+        value: item.value || 0
+    }));
+
     return (
         <div className="w-full h-80 bg-white rounded-lg shadow p-4">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">{title}</h3>
             <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                     <Pie
-                        data={data}
+                        data={normalizedData}
                         cx="50%"
                         cy="50%"
                         labelLine={false}
-                        label={({ type, percentage }) => `${type}: ${percentage}%`}
+                        label={({ type, percentage }) => `${type}: ${percentage.toFixed(1)}%`}
                         outerRadius={80}
                         fill="#8884d8"
-                        dataKey="percentage"
+                        dataKey="value"
                     >
-                        {data.map((entry, index) => (
+                        {normalizedData.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                     </Pie>
-                    <Tooltip formatter={(value) => `${value.toFixed(2)}%`} />
+                    <Tooltip formatter={(value) => `R$ ${value.toFixed(2)}`} />
                 </PieChart>
             </ResponsiveContainer>
         </div>

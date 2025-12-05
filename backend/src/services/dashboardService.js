@@ -52,6 +52,10 @@ class DashboardService {
                         walletsTotal: 5000.00,
                         investmentsCount: 3,
                     },
+                    totalBalance: 25000.00,
+                    totalInvested: 20000.00,
+                    totalGain: 5000.00,
+                    profitability: 25.00,
                     allocationChart: [
                         {
                             name: 'Ações',
@@ -69,6 +73,14 @@ class DashboardService {
                             name: 'Criptomoedas',
                             value: 10,
                         },
+                    ],
+                    historyChart: [
+                        { month: 'Jan', amount: 18000 },
+                        { month: 'Fev', amount: 19500 },
+                        { month: 'Mar', amount: 21000 },
+                        { month: 'Abr', amount: 22500 },
+                        { month: 'Mai', amount: 24000 },
+                        { month: 'Jun', amount: 25000 },
                     ],
                     evolutionChart: [
                         { month: 'Jan', value: 18000 },
@@ -146,6 +158,7 @@ class DashboardService {
                             type: 'income',
                             description: 'Depósito',
                             date: new Date(),
+                            kind: 'Investimento',
                         },
                         {
                             id: 2,
@@ -153,6 +166,7 @@ class DashboardService {
                             type: 'expense',
                             description: 'Taxa de investimento',
                             date: new Date(),
+                            kind: 'Rendimento',
                         },
                         {
                             id: 3,
@@ -160,6 +174,7 @@ class DashboardService {
                             type: 'income',
                             description: 'Dividendos',
                             date: new Date(),
+                            kind: 'Rendimento',
                         },
                     ],
                 };
@@ -195,6 +210,11 @@ class DashboardService {
                 value: Math.round(totalBalance * (0.8 + (i * 0.04))),
             }));
 
+            // Calcular métricas de rentabilidade
+            const totalInvested = investments.reduce((sum, inv) => sum + Number(inv.amount || 0), 0);
+            const totalGain = totalBalance - totalInvested;
+            const profitability = totalInvested > 0 ? ((totalGain / totalInvested) * 100).toFixed(2) : 0;
+
             return {
                 summary: {
                     totalBalance,
@@ -202,7 +222,12 @@ class DashboardService {
                     walletsTotal,
                     investmentsCount: investments.length,
                 },
+                totalBalance,
+                totalInvested,
+                totalGain,
+                profitability,
                 allocationChart,
+                historyChart: evolutionChart,
                 evolutionChart,
                 actives,
                 wallets,
