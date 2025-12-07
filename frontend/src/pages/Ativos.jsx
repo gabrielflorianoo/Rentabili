@@ -183,25 +183,43 @@ export default function Ativos() {
                 )}
 
                 <Modal open={showModal} onClose={closeModal}>
-                    <h3>{editing ? 'Editar Ativo' : 'Novo Ativo'}</h3>
-                    <form onSubmit={handleSubmit}>
-                        <div className="form-group">
-                            <label>Nome</label>
-                            <input value={form.name || ''} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
-                        </div>
-                        <div className="form-group">
-                            <label>Tipo</label>
-                            <input value={form.type || ''} onChange={(e) => setForm({ ...form, type: e.target.value })} required />
-                        </div>
-
-                        <p className="error-message">{erro}</p>
-
-                        <div className="modal-actions">
-                            <button type="button" className="btn-secondary" onClick={handleAutoFill} style={{ marginRight: 8 }}>Auto-preencher</button>
-                            <button type="button" className="btn-cancel" onClick={closeModal}>Cancelar</button>
-                            <button type="submit" className="btn-save">Salvar</button>
-                        </div>
-                    </form>
+                    <div className="modal-header">
+                        <h3>{editing ? '✏️ Editar Ativo' : '➕ Novo Ativo'}</h3>
+                        <p>{editing ? 'Atualize as informações do ativo' : 'Adicione um novo ativo ao seu portfólio'}</p>
+                    </div>
+                    <div className="modal-body">
+                        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                            <div className="form-group">
+                                <label htmlFor="name">Nome do Ativo</label>
+                                <input 
+                                    id="name"
+                                    placeholder="Ex: Ação PETR4"
+                                    value={form.name || ''} 
+                                    onChange={(e) => setForm({ ...form, name: e.target.value })} 
+                                    required 
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="type">Tipo</label>
+                                <input 
+                                    id="type"
+                                    placeholder="Ex: Ação, Fundo, ETF"
+                                    value={form.type || ''} 
+                                    onChange={(e) => setForm({ ...form, type: e.target.value })} 
+                                    required 
+                                />
+                            </div>
+                            {erro && <p className="error-message">{erro}</p>}
+                        </form>
+                    </div>
+                    <div className="modal-actions">
+                        <button type="button" className="btn-secondary" onClick={handleAutoFill}>Auto-preencher</button>
+                        <button type="button" className="btn-cancel" onClick={closeModal}>Cancelar</button>
+                        <button type="button" className="btn-save" onClick={() => {
+                            const form = document.querySelector('.modal-content form');
+                            if (form) form.dispatchEvent(new Event('submit', { bubbles: true }));
+                        }}>Salvar</button>
+                    </div>
                 </Modal>
             </div>
         </div>

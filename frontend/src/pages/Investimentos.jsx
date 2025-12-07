@@ -18,6 +18,7 @@ export default function Investimentos() {
     const [mostrarModalSimulacao, setMostrarModalSimulacao] = useState(false);
     const [investimentoEditando, setInvestimentoEditando] = useState(null);
     const [autoPreencherErro, setAutoPreencherErro] = useState("");
+    const [simulandoCompleto, setSimulandoCompleto] = useState(false);
     const [formData, setFormData] = useState({
         activeId: '',
         amount: '',
@@ -213,6 +214,7 @@ export default function Investimentos() {
 
     const handleSimulacaoCompleta = async () => {
         try {
+            setSimulandoCompleto(true);
             const token = servicoAutenticacao.obterToken();
             if (!token) {
                 alert('Sessão expirada. Faça login novamente.');
@@ -228,11 +230,13 @@ export default function Investimentos() {
 
             if (targetDate > maxDate) {
                 alert('Data alvo não pode ser mais de 12 meses no futuro.');
+                setSimulandoCompleto(false);
                 return;
             }
 
             if (targetDate <= hoje) {
                 alert('Data alvo deve ser no futuro.');
+                setSimulandoCompleto(false);
                 return;
             }
 
@@ -282,19 +286,22 @@ export default function Investimentos() {
 
             alert(`Simulação completa realizada! ${simulacoesCriadas} rendas simuladas.`);
             setMostrarModalSimulacao(false);
-            carregarInvestimentos();
+            await carregarInvestimentos();
+            setSimulandoCompleto(false);
         } catch (err) {
             console.error('Erro na simulação completa:', err);
             if (err.response?.status === 403) {
                 alert('Ação não autorizada. Faça login novamente.');
                 servicoAutenticacao.sair();
                 navigate('/');
+                setSimulandoCompleto(false);
                 return;
             }
             alert(
                 'Erro na simulação completa: ' +
                 (err.response?.data?.error || err.message),
             );
+            setSimulandoCompleto(false);
         }
     };
 
@@ -605,74 +612,113 @@ export default function Investimentos() {
                     </div>
                 )}
 
-                {/* Modal */}
+                {/* Modal Novo/Editar Investimento */}
                 <Modal open={mostrarModal} onClose={fecharModal}>
-                    <h3>
-                        {investimentoEditando ? 'Editar Investimento' : 'Novo Investimento'}
-                    </h3>
-                    <form onSubmit={handleSubmit}>
-                        <div className="form-group">
-                            <label>ID do Ativo</label>
-                            <input
-                                type="number"
-                                value={formData.activeId}
-                                onChange={(e) => setFormData({ ...formData, activeId: e.target.value })}
-                                required
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label>Valor</label>
-                            <input
-                                type="number"
-                                step="0.01"
-                                value={formData.amount}
-                                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                                required
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label>Tipo</label>
-                            <select value={formData.kind} onChange={(e) => setFormData({ ...formData, kind: e.target.value })}>
-                                <option value="Investimento">Investimento</option>
-                                <option value="Renda">Renda</option>
-                            </select>
-                        </div>
-                        <div className="form-group">
-                            <label>Data</label>
-                            <input type="date" value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} required />
-                        </div>
-                        <p className="error-message">{autoPreencherErro}</p>
-                        <div className="modal-actions">
-                            <button type="button" className="btn-secondary" onClick={handleAutoPreencher} style={{ marginRight: 8 }}>Auto-preencher</button>
-                            <button type="button" className="btn-cancel" onClick={fecharModal}>Cancelar</button>
-                            <button type="submit" className="btn-save">Salvar</button>
-                        </div>
-                    </form>
+                    <div className="modal-header">
+                        <h3>{investimentoEditando ? '✏️ Editar Investimento' : '➕ Novo Investimento'}</h3>
+                        <p>{investimentoEditando ? 'Atualize os dados do investimento' : 'Adicione um novo investimento ao portfólio'}</p>
+                    </div>
+                    <div className="modal-body">
+                        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                            <div className="form-group">
+                                <label htmlFor="activeId">ID do Ativo</label>
+                                <input
+                                    id="activeId"
+                                    type="number"
+                                    placeholder="Ex: 1"
+                                    value={formData.activeId}
+                                    onChange={(e) => setFormData({ ...formData, activeId: e.target.value })}
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="amount">Valor (R$)</label>
+                                <input
+                                    id="amount"
+                                    type="number"
+                                    step="0.01"
+                                    placeholder="Ex: 1000.00"
+                                    value={formData.amount}
+                                    onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="kind">Tipo</label>
+                                <select 
+                                    id="kind"
+                                    value={formData.kind} 
+                                    onChange={(e) => setFormData({ ...formData, kind: e.target.value })}
+                                >
+                                    <option value="Investimento">Investimento</option>
+                                    <option value="Renda">Renda</option>
+                                </select>
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="date">Data</label>
+                                <input 
+                                    id="date"
+                                    type="date" 
+                                    value={formData.date} 
+                                    onChange={(e) => setFormData({ ...formData, date: e.target.value })} 
+                                    required 
+                                />
+                            </div>
+                            {autoPreencherErro && <p className="error-message">{autoPreencherErro}</p>}
+                        </form>
+                    </div>
+                    <div className="modal-actions">
+                        <button type="button" className="btn-secondary" onClick={handleAutoPreencher}>Auto-preencher</button>
+                        <button type="button" className="btn-cancel" onClick={fecharModal}>Cancelar</button>
+                        <button type="button" className="btn-save" onClick={() => {
+                            const form = document.querySelector('.modal-content form');
+                            if (form) form.dispatchEvent(new Event('submit', { bubbles: true }));
+                        }}>Salvar</button>
+                    </div>
                 </Modal>
 
                 {/* Modal Simulação Completa */}
-                <Modal open={mostrarModalSimulacao} onClose={() => setMostrarModalSimulacao(false)}>
-                    <h3>Simulação Completa</h3>
-                    <p>Simule o mercado para todos os investimentos até a data alvo.</p>
-                    <div className="form-group">
-                        <label>Data Alvo (máx. 12 meses à frente)</label>
-                        <input
-                            type="date"
-                            value={dataTarget}
-                            onChange={(e) => setDataTarget(e.target.value)}
-                            min={new Date().toISOString().split('T')[0]}
-                            max={() => {
-                                const maxDate = new Date();
-                                maxDate.setMonth(maxDate.getMonth() + 12);
-                                return maxDate.toISOString().split('T')[0];
-                            }}
-                            required
-                        />
+                <Modal open={mostrarModalSimulacao} onClose={() => !simulandoCompleto && setMostrarModalSimulacao(false)}>
+                    <div className="modal-header">
+                        <h3>🎯 Simulação Completa</h3>
+                        <p>Simule o mercado para todos os seus investimentos</p>
                     </div>
-                    <div className="modal-actions">
-                        <button type="button" className="btn-cancel" onClick={() => setMostrarModalSimulacao(false)}>Cancelar</button>
-                        <button type="button" className="btn-save" onClick={handleSimulacaoCompleta}>Executar Simulação</button>
+                    <div className="modal-body">
+                        {simulandoCompleto ? (
+                            <div className="modal-loading">
+                                <div className="spinner" />
+                                <p className="modal-loading-text">Simulando investimentos...</p>
+                                <p className="modal-loading-subtext">Por favor, aguarde enquanto processamos sua simulação.</p>
+                            </div>
+                        ) : (
+                            <>
+                                <p>Defina uma data alvo (máximo 12 meses no futuro) e deixe nossa IA simular o comportamento do mercado para todos os seus investimentos.</p>
+                                <div className="form-group">
+                                    <label htmlFor="dataTarget">Data Alvo</label>
+                                    <input
+                                        id="dataTarget"
+                                        type="date"
+                                        value={dataTarget}
+                                        onChange={(e) => setDataTarget(e.target.value)}
+                                        min={new Date().toISOString().split('T')[0]}
+                                        max={(() => {
+                                            const maxDate = new Date();
+                                            maxDate.setMonth(maxDate.getMonth() + 12);
+                                            return maxDate.toISOString().split('T')[0];
+                                        })()}
+                                        required
+                                    />
+                                    <small style={{ color: '#999', marginTop: '4px', display: 'block' }}>Máximo 12 meses a partir de hoje</small>
+                                </div>
+                            </>
+                        )}
                     </div>
+                    {!simulandoCompleto && (
+                        <div className="modal-actions">
+                            <button type="button" className="btn-cancel" onClick={() => setMostrarModalSimulacao(false)}>Cancelar</button>
+                            <button type="button" className="btn-save" onClick={handleSimulacaoCompleta}>Executar Simulação</button>
+                        </div>
+                    )}
                 </Modal>
             </div>
         </div>
