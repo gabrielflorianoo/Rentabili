@@ -40,12 +40,12 @@ class DashboardRepository {
                         orderBy: { date: 'desc' }, 
                         take: 1 
                     },
-                    investments: true,
                 },
             });
 
             return actives.map((a) => {
-                // Se tem saldo histórico, usar isso
+                // SEMPRE usar o saldo histórico mais recente se existir
+                // Os balances históricos devem ser a fonte da verdade para o patrimônio atual
                 if (a.balances && a.balances.length > 0) {
                     return {
                         id: a.id,
@@ -55,20 +55,13 @@ class DashboardRepository {
                     };
                 }
                 
-                // Senão, calcular baseado nos investimentos
-                const totalInvested = (a.investments || [])
-                    .filter(inv => inv.kind !== 'Renda')
-                    .reduce((sum, inv) => sum + Number(inv.amount || 0), 0);
-                
-                const totalRenda = (a.investments || [])
-                    .filter(inv => inv.kind === 'Renda')
-                    .reduce((sum, inv) => sum + Number(inv.amount || 0), 0);
-                
+                // Se não houver balance histórico, retornar 0
+                // (o sistema deve manter balances atualizados)
                 return {
                     id: a.id,
                     name: a.name,
                     type: a.type,
-                    latestBalance: totalInvested + totalRenda,
+                    latestBalance: 0,
                 };
             });
         } catch (error) {

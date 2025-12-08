@@ -192,62 +192,71 @@ class DashboardService {
                     dashboardRepository.findBalanceHistory(userId, 6),
                 ]);
 
-            // Calcular saldo de cada ativo a partir dos investimentos
+            // Calcular saldo de cada ativo a partir dos investimentos e saldos históricos
             const activesMap = new Map();
             
+            // Primeiro, processar todos os investimentos para saber quais ativos existem
             investments.forEach((inv) => {
                 if (!activesMap.has(inv.activeId)) {
                     activesMap.set(inv.activeId, {
                         id: inv.activeId,
                         name: inv.active.name,
                         type: inv.active.type,
-                        totalBalance: 0,
-                        totalInvested: 0,
+                        totalAportado: 0, // Apenas aportes reais (sem rendas)
+                        currentBalance: 0, // Saldo atual do ativo
                     });
                 }
                 
                 const active = activesMap.get(inv.activeId);
                 const amount = Number(inv.amount || 0);
                 
-                // Adicionar ao saldo total (investimentos + rendas)
-                active.totalBalance += amount;
-                
-                // Se não é renda, adicionar ao investido
+                // Somar apenas investimentos que NÃO são rendas para calcular total aportado
                 if (inv.kind !== 'Renda') {
-                    active.totalInvested += amount;
+                    active.totalAportado += amount;
                 }
             });
 
-            // Converter map em array e formatar
-            const actives = Array.from(activesMap.values()).map((a) => ({
-                id: a.id,
-                name: a.name,
-                type: a.type,
-                latestBalance: a.totalBalance,
-            }));
+            // Buscar saldo mais recente de cada ativo usando balances históricos
+            const activesWithBalances = await dashboardRepository.findActivesWithLatestBalances(userId);
+            
+            // Atualizar saldos atuais baseado nos balances históricos
+            activesWithBalances.forEach((activeData) => {
+                if (activesMap.has(activeData.id)) {
+                    const active = activesMap.get(activeData.id);
+                    active.currentBalance = activeData.latestBalance || 0;
+                }
+            });
 
             // Calcular totais
-            const totalActives = actives.reduce((s, a) => s + a.latestBalance, 0);
-            const walletsTotal = wallets.reduce((s, w) => s + Number(w.balance || 0), 0);
-            const totalBalance = totalActives + walletsTotal;
-
-            // Total investido (sem rendas)
-            const totalInvested = Array.from(activesMap.values()).reduce(
-                (sum, a) => sum + a.totalInvested,
-                0,
-            );
-
-            // Total ganho em rendas (apenas do tipo 'Renda')
-            const totalRenda = investments
-                .filter((inv) => inv.kind === 'Renda')
-                .reduce((sum, inv) => sum + Number(inv.amount || 0), 0);
-
-            // Ganho total = patrimônio - investimento inicial
-            const totalGain = totalBalance - totalInvested;
+            let totalAportado = 0; // Total investido SEM rendas
+            let totalPatrimonio = 0; // Patrimônio atual total
             
-            // Rentabilidade = (rendas / investimento) × 100
-            const profitability = totalInvested > 0 
-                ? parseFloat(((totalRenda / totalInvested) * 100).toFixed(2))
+            const actives = Array.from(activesMap.values()).map((a) => {
+                totalAportado += a.totalAportado;
+                totalPatrimonio += a.currentBalance;
+                
+                return {
+                    id: a.id,
+                    name: a.name,
+                    type: a.type,
+                    latestBalance: a.currentBalance,
+                    totalAportado: a.totalAportado,
+                };
+            });
+
+            // Somar carteiras ao patrimônio total
+            const walletsTotal = wallets.reduce((s, w) => s + Number(w.balance || 0), 0);
+            const totalBalance = totalPatrimonio + walletsTotal;
+
+            // Total investido = apenas aportes (sem rendas)
+            const totalInvested = totalAportado;
+            
+            // Ganho total = patrimônio atual - total aportado
+            const totalGain = totalPatrimonio - totalAportado;
+            
+            // Rentabilidade = ((patrimônio atual - total aportado) / total aportado) × 100
+            const profitability = totalAportado > 0 
+                ? parseFloat(((totalGain / totalAportado) * 100).toFixed(2))
                 : 0;
 
             // Criar gráfico de alocação
@@ -286,7 +295,7 @@ class DashboardService {
                 },
                 totalBalance,
                 totalInvested,
-                totalGain: totalRenda,
+                totalGain,
                 profitability,
                 allocationChart,
                 historyChart: evolutionChart,
