@@ -27,19 +27,55 @@ const OPCOES_INVESTIMENTO = {
 
 const CORES = ['#00a651', '#d90429', '#0077b6', '#9b5de5', '#f15bb5', '#fee440'];
 
+// Estado inicial para permitir o reset fácil do formulário
+const ESTADO_INICIAL = {
+    nome: '',
+    aporteInicial: 1000,
+    aporteMensal: 200,
+    taxaAnual: 10.65, 
+    tipoIR: 'REGRESSIVO',
+    prazoMeses: 24
+};
+
+// Configurações do gráfico (para formatar o eixo Y e tooltip em R$)
+const chartOptions = {
+    responsive: true,
+    plugins: {
+        legend: { position: 'top' },
+        tooltip: {
+            callbacks: {
+                label: function(context) {
+                    let label = context.dataset.label || '';
+                    if (label) {
+                        label += ': ';
+                    }
+                    if (context.parsed.y !== null) {
+                        label += new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(context.parsed.y);
+                    }
+                    return label;
+                }
+            }
+        },
+    },
+    scales: {
+        y: {
+            ticks: {
+                // Formata o eixo Y para moeda brasileira
+                callback: function(value, index, ticks) {
+                    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+                }
+            }
+        }
+    }
+};
+
+
 export default function Simulador() {
     // Estado da lista de cenários
     const [cenarios, setCenarios] = useState([]);
     
-    // Estado do formulário de adição
-    const [novoCenario, setNovoCenario] = useState({
-        nome: '',
-        aporteInicial: 1000,
-        aporteMensal: 200,
-        taxaAnual: 10.65, // Começa com CDI padrão
-        tipoIR: 'REGRESSIVO',
-        prazoMeses: 24
-    });
+    // Estado do formulário de adição (usa ESTADO_INICIAL)
+    const [novoCenario, setNovoCenario] = useState(ESTADO_INICIAL);
 
     const [graficoData, setGraficoData] = useState(null);
 
@@ -60,23 +96,32 @@ export default function Simulador() {
             alert("Dê um nome para este cenário (Ex: Minha Aposentadoria)");
             return;
         }
-
-        const taxaMensal = Math.pow(1 + (Number(novoCenario.taxaAnual) / 100), 1 / 12) - 1;
-        let montante = Number(novoCenario.aporteInicial);
-        let totalInvestido = Number(novoCenario.aporteInicial);
+        
+        // Conversão de taxa anual para mensal equivalente
+        const taxaAnualDecimal = Number(novoCenario.taxaAnual) / 100;
+        const taxaMensal = Math.pow(1 + taxaAnualDecimal, 1 / 12) - 1;
+        
+        // Garante que os inputs sejam tratados como números
+        const aporteInicial = Number(novoCenario.aporteInicial);
+        const aporteMensal = Number(novoCenario.aporteMensal);
+        const prazoMeses = Number(novoCenario.prazoMeses);
+        
+        let montante = aporteInicial;
+        let totalInvestido = aporteInicial;
         const evolucao = [montante];
 
         // Cálculo mês a mês (juros aplicados ANTES do novo aporte)
-        for (let i = 1; i <= Number(novoCenario.prazoMeses); i++) {
-            montante = montante * (1 + taxaMensal) + Number(novoCenario.aporteMensal);
-            totalInvestido += Number(novoCenario.aporteMensal);
+        for (let i = 1; i <= prazoMeses; i++) {
+            montante = montante * (1 + taxaMensal) + aporteMensal;
+            totalInvestido += aporteMensal;
             evolucao.push(montante);
         }
 
-        // Cálculo Final (Impostos)
+        // Cálculo Final (Impostos) - Prazo aproximado em dias
         const lucroBruto = montante - totalInvestido;
-        const aliquota = calcularIR(Number(novoCenario.prazoMeses) * 30, novoCenario.tipoIR);
-        const imposto = lucroBruto * (aliquota / 100);
+        const diasTotais = prazoMeses * 30; // Simplificação para IR
+        const aliquota = calcularIR(diasTotais, novoCenario.tipoIR);
+        const imposto = lucroBruto > 0 ? lucroBruto * (aliquota / 100) : 0;
         const liquido = montante - imposto;
 
         const cenarioCalculado = {
@@ -95,8 +140,8 @@ export default function Simulador() {
         setCenarios(novaLista);
         atualizarGrafico(novaLista);
         
-        // Limpa nome para o próximo
-        setNovoCenario({...novoCenario, nome: ''});
+        // Resetar o formulário após adicionar o cenário (Melhoria UX)
+        setNovoCenario(ESTADO_INICIAL);
     };
 
     const removerCenario = (id) => {
@@ -111,18 +156,28 @@ export default function Simulador() {
             return;
         }
 
-        // Pega o maior prazo para definir o eixo X
+        // Pega o maior prazo para definir o eixo X do gráfico
         const maiorPrazo = Math.max(...lista.map(c => Number(c.prazoMeses)));
         const labels = Array.from({ length: maiorPrazo + 1 }, (_, i) => `Mês ${i}`);
 
-        const datasets = lista.map((c, index) => ({
-            label: c.nome,
-            data: c.resultado.evolucao,
-            borderColor: CORES[index % CORES.length],
-            backgroundColor: 'transparent',
-            tension: 0.3,
-            pointRadius: 2
-        }));
+        const datasets = lista.map((c, index) => {
+            const dataComPadding = [...c.resultado.evolucao];
+            
+            // Adiciona 'null' para preencher os dados de cenários mais curtos
+            // Isso garante que a linha termine no mês correto no gráfico
+            while (dataComPadding.length <= maiorPrazo) { 
+                dataComPadding.push(null);
+            }
+
+            return {
+                label: c.nome,
+                data: dataComPadding,
+                borderColor: CORES[index % CORES.length],
+                backgroundColor: 'transparent',
+                tension: 0.3,
+                pointRadius: 2
+            }
+        });
 
         setGraficoData({ labels, datasets });
     };
@@ -135,6 +190,15 @@ export default function Simulador() {
             taxaAnual: preset.taxa,
             tipoIR: preset.tipoIR
         });
+    };
+    
+    // Função unificada para manipular inputs
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setNovoCenario(prev => ({
+            ...prev,
+            [name]: value
+        }));
     };
 
     return (
@@ -170,8 +234,9 @@ export default function Simulador() {
                                 <input 
                                     className="simuladorInput" 
                                     placeholder="Ex: CDB do Banco X"
+                                    name="nome"
                                     value={novoCenario.nome} 
-                                    onChange={e => setNovoCenario({...novoCenario, nome: e.target.value})} 
+                                    onChange={handleInputChange} 
                                 />
                             </div>
                             <div className="form-group">
@@ -179,16 +244,18 @@ export default function Simulador() {
                                 <input 
                                     type="number" 
                                     className="simuladorInput" 
+                                    name="taxaAnual"
                                     value={novoCenario.taxaAnual} 
-                                    onChange={e => setNovoCenario({...novoCenario, taxaAnual: e.target.value})} 
+                                    onChange={handleInputChange} 
                                 />
                             </div>
                             <div className="form-group">
                                 <label>Tipo de Imposto</label>
                                 <select 
                                     className="simuladorInput" 
+                                    name="tipoIR"
                                     value={novoCenario.tipoIR} 
-                                    onChange={e => setNovoCenario({...novoCenario, tipoIR: e.target.value})}
+                                    onChange={handleInputChange}
                                 >
                                     <option value="REGRESSIVO">Regressivo (CDB/Tesouro)</option>
                                     <option value="ISENTO">Isento (LCI/LCA/Poupança)</option>
@@ -200,15 +267,33 @@ export default function Simulador() {
                         <div className="form-row">
                             <div className="form-group">
                                 <label>Aporte Inicial (R$)</label>
-                                <input type="number" className="simuladorInput" value={novoCenario.aporteInicial} onChange={e => setNovoCenario({...novoCenario, aporteInicial: e.target.value})} />
+                                <input 
+                                    type="number" 
+                                    className="simuladorInput" 
+                                    name="aporteInicial"
+                                    value={novoCenario.aporteInicial} 
+                                    onChange={handleInputChange} 
+                                />
                             </div>
                             <div className="form-group">
                                 <label>Aporte Mensal (R$)</label>
-                                <input type="number" className="simuladorInput" value={novoCenario.aporteMensal} onChange={e => setNovoCenario({...novoCenario, aporteMensal: e.target.value})} />
+                                <input 
+                                    type="number" 
+                                    className="simuladorInput" 
+                                    name="aporteMensal"
+                                    value={novoCenario.aporteMensal} 
+                                    onChange={handleInputChange} 
+                                />
                             </div>
                             <div className="form-group">
                                 <label>Prazo (Meses)</label>
-                                <input type="number" className="simuladorInput" value={novoCenario.prazoMeses} onChange={e => setNovoCenario({...novoCenario, prazoMeses: e.target.value})} />
+                                <input 
+                                    type="number" 
+                                    className="simuladorInput" 
+                                    name="prazoMeses"
+                                    value={novoCenario.prazoMeses} 
+                                    onChange={handleInputChange} 
+                                />
                             </div>
                         </div>
 
@@ -263,7 +348,7 @@ export default function Simulador() {
                             {/* --- 3. GRÁFICO COMPARATIVO --- */}
                             <div className="chartWrapper">
                                 <h3 style={{textAlign: 'center', marginBottom: '15px'}}>Curva de Evolução Patrimonial</h3>
-                                {graficoData && <Line data={graficoData} />}
+                                {graficoData && <Line data={graficoData} options={chartOptions} />}
                             </div>
                         </>
                     )}
