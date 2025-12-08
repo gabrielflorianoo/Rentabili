@@ -70,7 +70,7 @@ export default function Dashboard() {
 
         const fetchData = async () => {
             try {
-                const response = await dashboardApi.getSummary();
+                const response = await dashboardApi.getDashboard();
                 setData(response);
             } catch (error) {
                 console.error("Erro no dashboard:", error);
@@ -89,11 +89,14 @@ export default function Dashboard() {
 
     const formatBRL = (val) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val || 0);
 
+    // Usar allocation do dashboard data ou do hook
+    const allocationData = data?.allocationChart || allocation || [];
+
     // Prepara dados para o Gráfico de Rosca (Doughnut)
     const doughnutData = {
-        labels: allocation?.map(i => i.type) || [],
+        labels: allocationData?.map(i => i.name || i.type) || [],
         datasets: [{
-            data: allocation?.map(i => i.value) || [],
+            data: allocationData?.map(i => i.value || i.percentage) || [],
             backgroundColor: ['#00a651', '#0077b6', '#9b5de5', '#f15bb5', '#fee440', '#ff9f43'],
             borderWidth: 0,
         }]
@@ -197,7 +200,7 @@ export default function Dashboard() {
                             }
                         </div>
                         <div className="chart-container-donut">
-                            {allocation && allocation.length > 0 ? (
+                            {allocationData && allocationData.length > 0 ? (
                                 <div style={{ width: '100%', height: '100%' }}>
                                     <Doughnut data={doughnutData} options={doughnutOptions} />
                                 </div>
@@ -218,7 +221,7 @@ export default function Dashboard() {
                                     <span>Valor em {selectedCategory}</span>
                                     <strong>
                                         {(() => {
-                                            const item = allocation?.find(a => a.type === selectedCategory);
+                                            const item = allocationData?.find(a => a.type === selectedCategory || a.name === selectedCategory);
                                             if (!item) return 'R$ 0,00';
                                             return formatBRL(item.value);
                                         })()}
@@ -229,9 +232,9 @@ export default function Dashboard() {
                                         className="fill" 
                                         style={{
                                             width: `${(() => {
-                                                const item = allocation?.find(a => a.type === selectedCategory);
+                                                const item = allocationData?.find(a => a.type === selectedCategory || a.name === selectedCategory);
                                                 if (!item) return '0%';
-                                                return item.percentage;
+                                                return item.percentage || ((item.value / allocationData.reduce((sum, a) => sum + a.value, 0)) * 100);
                                             })()}%`
                                         }}
                                     ></div>
@@ -252,7 +255,12 @@ export default function Dashboard() {
                     <h3>📊 Análise de Performance</h3>
                     <div className="performance-grid">
                         <div className="chart-wrapper">
-                            {evolutionLoading ? (
+                            {data?.evolutionChart && data.evolutionChart.length > 0 ? (
+                                <EvolutionLineChart
+                                    data={data.evolutionChart}
+                                    title="Evolução Patrimonial (12 meses)"
+                                />
+                            ) : evolutionLoading ? (
                                 <div className="flex items-center justify-center h-80 bg-gray-50 rounded-lg">
                                     <p className="text-gray-400">Carregando evolução...</p>
                                 </div>
@@ -264,7 +272,12 @@ export default function Dashboard() {
                             )}
                         </div>
                         <div className="chart-wrapper">
-                            {allocationLoading ? (
+                            {data?.allocationChart && data.allocationChart.length > 0 ? (
+                                <AllocationPieChart
+                                    data={data.allocationChart}
+                                    title="Distribuição de Ativos"
+                                />
+                            ) : allocationLoading ? (
                                 <div className="flex items-center justify-center h-80 bg-gray-50 rounded-lg">
                                     <p className="text-gray-400">Carregando alocação...</p>
                                 </div>
@@ -280,7 +293,13 @@ export default function Dashboard() {
 
                 {/* 5. TOP PERFORMERS */}
                 <section className="top-performers-section">
-                    {topLoading ? (
+                    {data?.actives && data.actives.length > 0 ? (
+                        <TopPerformersWidget
+                            topPerformers={data.actives.slice(0, 5)}
+                            loading={false}
+                            error={null}
+                        />
+                    ) : topLoading ? (
                         <div className="bg-white rounded-lg shadow p-6">
                             <p className="text-center text-gray-400">Carregando performers...</p>
                         </div>
@@ -297,7 +316,7 @@ export default function Dashboard() {
                 <section className="transactions-section">
                     <h3>Últimas Movimentações</h3>
                     <div className="transactions-list-horizontal">
-                        {data?.recentTransactions?.length > 0 ? (
+                        {data?.recentTransactions && data.recentTransactions.length > 0 ? (
                             data.recentTransactions.map(t => (
                                 <div key={t.id} className="trans-card-mini">
                                     <span className={`trans-type ${(t.kind || t.type) === 'Investimento' || (t.kind || t.type) === 'income' ? 'in' : 'profit'}`}>
