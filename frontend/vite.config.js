@@ -7,7 +7,7 @@ export default defineConfig({
         'import.meta.env.VITE_API_URL2': JSON.stringify(
             'https://symmetrical-guide-v7q4g66jw54f6qpq-3000.app.github.dev/',
         ),
-        'import.meta.env.PRODUCTION': JSON.stringify(false),
+        'import.meta.env.PRODUCTION': JSON.stringify(true),
         'import.meta.env.VITE_USE_DB': JSON.stringify(false),
     },
 });
