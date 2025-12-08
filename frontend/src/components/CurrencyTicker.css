@@ -19,6 +19,16 @@
     padding-left: 100%; /* Começa fora da tela */
 }
 
+/* --- NOVO: Pausa ao passar o mouse --- */
+.ticker-container:hover .ticker-content {
+    animation-play-state: paused;
+}
+
+/* --- NOVO: Pausa quando o modal abre (classe controlada pelo React) --- */
+.ticker-content.paused {
+    animation-play-state: paused !important;
+}
+
 .ticker-item {
     display: inline-block;
     padding: 0 30px;
