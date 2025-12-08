@@ -33,6 +33,25 @@ class InvestmentService {
         }
     }
 
+    async getDifferentActivesCount(userId) {
+        try {
+            if (!userId) {
+                throw new Error('Usuário não autenticado');
+            }
+            const investments = await investmentRepository.findAll(userId);
+            // Contar apenas os ativos que têm investimentos (não rendas)
+            const uniqueActives = new Set(
+                investments
+                    .filter((it) => it.kind !== 'Renda')
+                    .map((it) => it.activeId)
+            );
+            return uniqueActives.size;
+        } catch (error) {
+            console.error('Erro ao buscar número de ativos diferentes:', error);
+            throw new Error(error.message);
+        }
+    }
+
     parseAmount(val) {
         if (val === null || val === undefined) return 0;
         if (typeof val === 'number') return val;

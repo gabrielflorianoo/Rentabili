@@ -32,6 +32,7 @@ class InvestmentController {
         this.remove = this.remove.bind(this);
         this.getTotalInvested = this.getTotalInvested.bind(this);
         this.getGainLoss = this.getGainLoss.bind(this);
+        this.getDifferentActivesCount = this.getDifferentActivesCount.bind(this);
     }
 
     // Helper to parse amount, handling different formats
@@ -97,6 +98,23 @@ class InvestmentController {
             res.json({ gainLoss });
         } catch (error) {
             console.error('Erro ao buscar ganho/perda:', error);
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    async getDifferentActivesCount(req, res) {
+        try {
+            const userId = req.userId;
+            if (!userId) {
+                return res
+                    .status(401)
+                    .json({ error: 'Usuário não autenticado' });
+            }
+            const count =
+                await InvestmentService.getDifferentActivesCount(userId);
+            res.json({ count });
+        } catch (error) {
+            console.error('Erro ao buscar número de ativos diferentes:', error);
             res.status(500).json({ error: error.message });
         }
     }

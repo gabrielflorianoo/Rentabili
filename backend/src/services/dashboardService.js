@@ -1,4 +1,5 @@
 import dashboardRepository from '../repositories/dashboardRepository.js';
+import investmentService from './investmentService.js';
 
 class DashboardService {
     async getSummary(userId) {
@@ -27,9 +28,12 @@ class DashboardService {
                 }
             });
 
+            // Obter número de ativos diferentes com investimentos
+            const activesCount = await investmentService.getDifferentActivesCount(userId);
+
             return {
                 totalBalance,
-                activesCount: actives.length,
+                activesCount,
             };
         } catch (error) {
             console.error('DashboardService - getSummary:', error);
@@ -210,17 +214,21 @@ class DashboardService {
                 value: Math.round(totalBalance * (0.8 + (i * 0.04))),
             }));
 
-            // Calcular métricas de rentabilidade
-            const totalInvested = investments.reduce((sum, inv) => sum + Number(inv.amount || 0), 0);
+            // Contar apenas investimentos (não rendas)
+            const investmentsOnly = investments.filter((inv) => inv.kind !== 'Renda');
+            const totalInvested = investmentsOnly.reduce((sum, inv) => sum + Number(inv.amount || 0), 0);
             const totalGain = totalBalance - totalInvested;
             const profitability = totalInvested > 0 ? ((totalGain / totalInvested) * 100).toFixed(2) : 0;
+            
+            // Obter número de ativos diferentes com investimentos
+            const activesCountWithInvestments = await investmentService.getDifferentActivesCount(userId);
 
             return {
                 summary: {
                     totalBalance,
-                    activesCount: actives.length,
+                    activesCount: activesCountWithInvestments,
                     walletsTotal,
-                    investmentsCount: investments.length,
+                    investmentsCount: investmentsOnly.length,
                 },
                 totalBalance,
                 totalInvested,
@@ -231,7 +239,7 @@ class DashboardService {
                 evolutionChart,
                 actives,
                 wallets,
-                investments,
+                investments: investmentsOnly,
                 recentTransactions: transactions,
             };
         } catch (error) {

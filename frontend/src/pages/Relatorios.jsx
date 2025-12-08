@@ -81,10 +81,13 @@ export default function Relatorios() {
             .filter((t) => t.type === 'expense')
             .reduce((acc, t) => acc + parseFloat(t.amount), 0);
 
-        const totalInvestido = investimentos.reduce(
-            (acc, inv) => acc + parseFloat(inv.amount),
-            0,
-        );
+        // Filtrar apenas investimentos (kind !== 'Renda')
+        const totalInvestido = investimentos
+            .filter((inv) => inv.kind !== 'Renda')
+            .reduce(
+                (acc, inv) => acc + parseFloat(inv.amount),
+                0,
+            );
 
         const saldoLiquido = totalReceitas - totalDespesas;
 
@@ -254,7 +257,7 @@ export default function Relatorios() {
                             <div className="investments-summary">
                                 <div className="summary-item">
                                     <span className="summary-label">Total de Investimentos:</span>
-                                    <span className="summary-value">{investimentos.length}</span>
+                                    <span className="summary-value">{investimentos.filter(inv => inv.kind !== 'Renda').length}</span>
                                 </div>
                                 <div className="summary-item">
                                     <span className="summary-label">Valor Total Investido:</span>
