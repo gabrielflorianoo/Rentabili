@@ -305,6 +305,53 @@ export default function Investimentos() {
         }
     };
 
+    const handleApagarTodasAsRendas = async () => {
+        // Verificar se o usuário tem email autorizado
+        if (userData.email !== 'email@example.com') {
+            alert('Você não tem permissão para executar esta ação.');
+            return;
+        }
+
+        const rendas = investimentos.filter(inv => inv.kind === 'Renda');
+        
+        if (rendas.length === 0) {
+            alert('Não há rendas para apagar.');
+            return;
+        }
+
+        const confirmacao = window.confirm(
+            `Tem certeza que deseja apagar todas as ${rendas.length} rendas? Esta ação não pode ser desfeita.`
+        );
+
+        if (!confirmacao) return;
+
+        try {
+            let apagaramComSucesso = 0;
+            let erros = 0;
+
+            for (const renda of rendas) {
+                try {
+                    await investmentsApi.remove(renda.id);
+                    apagaramComSucesso++;
+                } catch (err) {
+                    console.error(`Erro ao apagar renda ${renda.id}:`, err);
+                    erros++;
+                }
+            }
+
+            if (erros === 0) {
+                alert(`✅ ${apagaramComSucesso} rendas apagadas com sucesso!`);
+            } else {
+                alert(`⚠️ ${apagaramComSucesso} rendas apagadas, mas ${erros} falharam.`);
+            }
+
+            await carregarInvestimentos();
+        } catch (err) {
+            console.error('Erro ao apagar rendas:', err);
+            alert('Erro ao apagar rendas: ' + (err.response?.data?.error || err.message));
+        }
+    };
+
     // Helper maps
     const activeById = React.useMemo(() => {
         const map = new Map();
@@ -341,6 +388,15 @@ export default function Investimentos() {
                     >
                         🔄 Simulação Completa
                     </button>
+                    {userData.email === 'email@example.com' && (
+                        <button
+                            className="btn-danger"
+                            onClick={handleApagarTodasAsRendas}
+                            title="Apagar todas as rendas de uma vez"
+                        >
+                            🗑️ Apagar Todas as Rendas
+                        </button>
+                    )}
                 </div>
 
                 <div className="filters-row">
