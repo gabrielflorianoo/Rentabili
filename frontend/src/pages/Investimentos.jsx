@@ -621,15 +621,20 @@ export default function Investimentos() {
                     <div className="modal-body">
                         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                             <div className="form-group">
-                                <label htmlFor="activeId">ID do Ativo</label>
-                                <input
+                                <label htmlFor="activeId">Ativo</label>
+                                <select
                                     id="activeId"
-                                    type="number"
-                                    placeholder="Ex: 1"
                                     value={formData.activeId}
                                     onChange={(e) => setFormData({ ...formData, activeId: e.target.value })}
                                     required
-                                />
+                                >
+                                    <option value="">Selecione um ativo...</option>
+                                    {actives.map((active) => (
+                                        <option key={active.id} value={active.id}>
+                                            {active.name} ({active.type})
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                             <div className="form-group">
                                 <label htmlFor="amount">Valor (R$)</label>
