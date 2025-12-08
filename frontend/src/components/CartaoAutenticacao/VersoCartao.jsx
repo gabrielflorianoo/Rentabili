@@ -5,8 +5,13 @@ import imgLogo from '../../assets/logo.jpeg';
 import styles from './VersoCartao.module.css';
 
 const VersoCartao = ({ aoVirar }) => {
+    // Indica se o cadastro foi concluído com sucesso
     const [sucesso, setSucesso] = useState(false);
+
+    // Indica se o formulário está enviando dados
     const [carregando, setCarregando] = useState(false);
+
+    // Armazena os valores dos campos digitados
     const [dadosForm, setDadosForm] = useState({
         nome: '',
         email: '',
@@ -14,75 +19,76 @@ const VersoCartao = ({ aoVirar }) => {
         senha: '',
         confirmarSenha: '',
     });
+
+    // Armazena erros de validação para exibir ao usuário
     const [erros, setErros] = useState({});
 
+    /**
+     * Atualiza os campos do formulário.
+     * Suporta dois formatos:
+     * - Evento padrão do input
+     * - Chamadas manuais como (id, valor)
+     */
     const lidarComMudanca = (eOrId, maybeValue) => {
         if (eOrId && eOrId.target) {
+            // Caso seja evento de input
             const { id, value } = eOrId.target;
             setDadosForm((prev) => ({ ...prev, [id]: value }));
         } else if (typeof eOrId === 'string') {
+            // Caso seja chamado manualmente (id, valor)
             setDadosForm((prev) => ({ ...prev, [eOrId]: maybeValue }));
         }
     };
 
-    // Calcula se é maior de 18 
-    const validarIdade = (dataString) => {
-        if (!dataString) return false;
-        const partes = dataString.split('-');
-        const dataNasc = new Date(partes[0], partes[1] - 1, partes[2]);
-        const hoje = new Date();
-
-        let idade = hoje.getFullYear() - dataNasc.getFullYear();
-        const m = hoje.getMonth() - dataNasc.getMonth();
-
-        if (m < 0 || (m === 0 && hoje.getDate() < dataNasc.getDate())) {
-            idade--;
-        }
-        return idade >= 18;
-    };
-
+    /**
+     * Verifica se todos os campos estão preenchidos corretamente.
+     * Retorna true/false e atualiza o estado de erros.
+     */
     const validar = () => {
         const novosErros = {};
-        const regexEspecial = /[!@#$%^&*(),.?":{}|<>]/;
 
         if (!dadosForm.nome) novosErros.nome = 'Nome é obrigatório';
         if (!dadosForm.email) novosErros.email = 'Email é obrigatório';
 
-        // --- VALIDAÇÃO DE IDADE ---
-        if (!dadosForm.nascimento) {
-            novosErros.nascimento = 'Data é obrigatória';
-        } else if (!validarIdade(dadosForm.nascimento)) {
-            novosErros.nascimento = 'É necessário ter +18 anos.';
-        }
-
-        // --- VALIDAÇÃO DE SENHA (Tamanho + Especial) ---
-        if (!dadosForm.senha || dadosForm.senha.length < 6) {
+        if (!dadosForm.senha || dadosForm.senha.length < 6)
             novosErros.senha = 'Senha deve ter ao menos 6 caracteres';
-        } else if (!regexEspecial.test(dadosForm.senha)) {
-            novosErros.senha = 'A senha precisa de 1 caractere especial (@, #, $, etc).';
-        }
 
         if (dadosForm.senha !== dadosForm.confirmarSenha)
             novosErros.confirmarSenha = 'Senhas não conferem';
 
         setErros(novosErros);
+
+        // Retorna true se não houver erros
         return Object.keys(novosErros).length === 0;
     };
 
+    /**
+     * Envio do formulário de cadastro.
+     * Chama o serviço de autenticação e trata sucesso/erro.
+     */
     const lidarComCadastro = async (ev) => {
         ev.preventDefault();
 
-        // Se a validação falhar (idade ou senha), para aqui
+        // Se a validação falhar, não envia o formulário
         if (!validar()) return;
 
         setCarregando(true);
+
         try {
+            // Envia dados ao backend via serviço de autenticação
             const resposta = await servicoAutenticacao.cadastrar(dadosForm);
+
             console.log(resposta);
 
-            if (resposta.sucesso) setSucesso(true);
-            else setErros({ geral: resposta.erro });
+            if (resposta.sucesso) {
+                // Mostra tela de sucesso
+                setSucesso(true);
+            } else {
+                // Exibe erro retornado pelo backend
+                setErros({ geral: resposta.erro });
+            }
         } catch (err) {
+            // Tratamento de erros inesperados
             setErros({ geral: 'Erro ao criar conta' });
             console.error(err);
         } finally {
@@ -90,31 +96,40 @@ const VersoCartao = ({ aoVirar }) => {
         }
     };
 
+    /**
+     * Após concluir o cadastro, usuário pode voltar ao login.
+     * Este método apenas chama a função de virar o cartão.
+     */
     const irParaLogin = () => {
         if (aoVirar) aoVirar();
     };
 
+    /**
+     * Preenche automaticamente os campos
+     * — ótimo para testes e demonstrações.
+     */
     const preencherAutomaticamente = () => {
         setDadosForm({
-            nome: 'Usuário Teste',
-            email: 'teste@example.com',
-            nascimento: '2000-01-01', // Data válida (+18)
+            nome: 'Banco do Bradesco2',
+            email: 'email2@example.com',
+            nascimento: '0001-01-01',
             senha: '123123@',
             confirmarSenha: '123123@',
         });
+
         setErros({});
     };
 
     return (
-        // Uso de styles.cardBack e styles.cardFace (transformação)
         <div className={`${styles.cardFace} ${styles.cardBack}`}>
-            {/* CORRIGIDO: Esta é a área branca do formulário. Usa formArea (flex/center/padding) */}
-            <div className={`${styles.formArea}`}>
+            <div className={styles.formArea}>
+
+                {/* Se o cadastro ainda não foi concluído, exibe o formulário */}
                 {!sucesso ? (
                     <div className={`${styles.formContent} ${styles.fadeInUp}`}>
-                        <div className={`${styles.formHeader}`}>
-                            <h2 className={`${styles.formTitle}`}>Crie sua conta</h2>
-                            <p className={`${styles.formSubtitle}`}>Junte-se à inovação</p>
+                        <div className={styles.formHeader}>
+                            <h2 className={styles.formTitle}>Crie sua conta</h2>
+                            <p className={styles.formSubtitle}>Junte-se à inovação</p>
                         </div>
 
                         <form onSubmit={lidarComCadastro}>
@@ -158,9 +173,8 @@ const VersoCartao = ({ aoVirar }) => {
                                 required
                             />
 
-                            <span className={`${styles.dicaCampo}`}>
-                                Mínimo de 6 caracteres e 1 caractere especial
-                                (@, #, $, etc).
+                            <span className={styles.dicaCampo}>
+                                Mínimo de 6 caracteres e 1 caractere especial (@, #, $, etc).
                             </span>
 
                             <InputFlutuante
@@ -173,20 +187,18 @@ const VersoCartao = ({ aoVirar }) => {
                                 required
                             />
 
+                            {/* Exibe erro geral retornado do servidor */}
                             {erros.geral && (
-                                <div className={`${styles.errorMessage}`}>
+                                <div className={styles.errorMessage}>
                                     {erros.geral}
                                 </div>
                             )}
 
-                            <button
-                                type="submit"
-                                className={`${styles.holoButton}`}
-                            >
+                            <button type="submit" className={styles.holoButton}>
                                 {carregando ? 'Enviando...' : 'Criar Conta'}
                             </button>
 
-                            {/* CORRIGIDO: Classes combinadas devem ser passadas separadamente */}
+                            {/* Botão para preencher dados automaticamente */}
                             <button
                                 type="button"
                                 className={`${styles.holoButton} ${styles.secondaryButton}`}
@@ -197,27 +209,34 @@ const VersoCartao = ({ aoVirar }) => {
                         </form>
                     </div>
                 ) : (
-                    <div className={`${styles.formContent} ${styles.fadeInUp}`} style={{ textAlign: 'center' }}>
-                        <div className={`${styles.formHeader}`}>
-                            <h2 className={`${styles.formTitle}`}>Conta Criada!</h2>
-                            <p className={`${styles.formSubtitle}`}>
+                    // Tela exibida após cadastro bem-sucedido
+                    <div
+                        className={`${styles.formContent} ${styles.fadeInUp}`}
+                        style={{ textAlign: 'center' }}
+                    >
+                        <div className={styles.formHeader}>
+                            <h2 className={styles.formTitle}>Conta Criada!</h2>
+                            <p className={styles.formSubtitle}>
                                 Seja bem-vindo ao Rentabili Investidor.
                             </p>
                         </div>
 
-                        <button className={`${styles.holoButton}`} onClick={irParaLogin}>
+                        <button className={styles.holoButton} onClick={irParaLogin}>
                             Fazer Login Agora
                         </button>
                     </div>
                 )}
             </div>
+
+            {/* Lado direito com branding e botão de voltar */}
             <div className={`${styles.cardSection} ${styles.welcomeSection}`}>
                 <div className={`${styles.welcomeContent} ${styles.fadeInUp}`}>
-                    <img src={imgLogo} alt="Logo" className={`${styles.logoImgBack}`} />
-                    <h1 className={`${styles.welcomeTitle}`}>Controle seu investimento</h1>
+                    <img src={imgLogo} alt="Logo" className={styles.logoImgBack} />
+                    <h1 className={styles.welcomeTitle}>Controle seu investimento</h1>
                 </div>
 
-                <button className={`${styles.flipButton}`} onClick={aoVirar}>
+                {/* Botão que vira o cartão (volta ao login) */}
+                <button className={styles.flipButton} onClick={aoVirar}>
                     ← Voltar
                 </button>
             </div>

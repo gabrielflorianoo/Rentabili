@@ -7,15 +7,12 @@ export default defineConfig({
         'import.meta.env.VITE_API_URL1': JSON.stringify(
             'https://symmetrical-guide-v7q4g66jw54f6qpq-3000.app.github.dev/',
         ),
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
+
         'import.meta.env.PRODUCTION': JSON.stringify(false),
         'import.meta.env.VITE_USE_DB': JSON.stringify(false),
-=======
+
         'import.meta.env.PRODUCTION': false,
->>>>>>> Stashed changes
-=======
-        'import.meta.env.PRODUCTION': false,
->>>>>>> Stashed changes
+
+
     },
 });
