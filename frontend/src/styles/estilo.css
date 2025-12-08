@@ -1,21 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 /* ==========================================================================
-   1. CONFIGURAÇÕES GERAIS
+   1. GLOBAIS E RESET
    ========================================================================== */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-html, body {
-    width: 100%;
-    height: 100%;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Poppins', sans-serif;
+    font-family: 'Poppins', sans-serif;
     min-height: 100vh;
     color: #1f2937;
     background: linear-gradient(135deg, #f8fafb 0%, #f3f4f6 100%);
@@ -32,19 +24,17 @@ body.dark {
 :root {
     --forest: #0b5c23;
     --emerald: #00c56f;
+    --mint-glow: #c8ffd7;
+    --cloud: #fdfdfd;
     --card-shadow: rgba(5, 100, 40, 0.25);
 }
 
 /* ==========================================================================
-   2. HEADER (Mantido)
+   2. HEADER E NAVEGAÇÃO
    ========================================================================== */
 .header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 50px;
-  background: #fff;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 15px 50px; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
   position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; height: 65px;
 }
 .header-right { display: flex; align-items: center; gap: 15px; }
@@ -58,99 +48,74 @@ body.dark {
 .btn-acesso:hover { background: #0a5c2b; }
 
 /* ==========================================================================
-   3. CORREÇÃO DEFINITIVA DO LOGIN (Frente e Verso)
+   3. CORREÇÃO DO LOGIN (Cartão 3D e Layout)
    ========================================================================== */
 
 .main-container {
     position: relative; z-index: 10; width: 100%; min-height: 100vh;
-    display: flex; align-items: center; justify-content: center; padding: clamp(24px, 4vw, 48px);
+    display: flex; align-items: center; justify-content: center; padding: 20px;
 }
 
-/* CONTAINER PAI: Transparente para não criar fundo branco atrás */
+/* O container pai NÃO deve ter fundo nem sombra para evitar duplicação */
 .innovative-card {
     width: min(1000px, 100%);
     height: 600px;
     position: relative;
     perspective: 1000px;
-    background: transparent !important; /* IMPORTANTE */
-    box-shadow: none !important;        /* IMPORTANTE */
-    border: none !important;            /* IMPORTANTE */
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    transition: transform 1s;
+    transform-style: preserve-3d;
 }
 
-.innovative-card.flipped .card-wrapper {
-    transform: rotateY(180deg);
-}
+.innovative-card.flipped { transform: rotateY(180deg); }
 
 .card-wrapper {
-    width: 100%;
-    height: 100%;
-    position: relative;
+    width: 100%; height: 100%; position: relative;
     transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     transform-style: preserve-3d;
 }
 
-/* FACES DO CARTÃO: Aqui fica o fundo branco e a sombra */
+/* A FACE do cartão recebe o estilo visual */
 .card-face {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    border-radius: 26px;
-    overflow: hidden;
-    display: flex;
-    background: #fff; /* Fundo base */
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    position: absolute; width: 100%; height: 100%;
+    -webkit-backface-visibility: hidden; backface-visibility: hidden;
+    border-radius: 26px; overflow: hidden; display: flex;
+    background: #fff;
     border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); /* Sombra corrigida */
 }
 
-.card-front {
-    z-index: 2;
-    transform: rotateY(0deg);
-}
+.card-front { z-index: 2; transform: rotateY(0deg); }
+.card-back { transform: rotateY(180deg); z-index: 1; background: #fff; }
 
-.card-back {
-    transform: rotateY(180deg);
-    z-index: 1;
-}
-
-/* SEÇÕES INTERNAS (Esquerda/Direita) */
+/* Layout Interno */
 .card-section {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: clamp(30px, 4vw, 48px);
-    gap: 18px;
-    min-width: 0;
+    flex: 1; display: flex; flex-direction: column;
+    justify-content: center; padding: 30px; min-width: 0;
 }
 
-/* LADO VERDE (Boas Vindas) - Usado na Frente (Esq) e no Verso (Dir) */
+/* LADO VERDE (Funciona na frente e no verso) */
 .welcome-section {
     flex: 1;
     background: linear-gradient(160deg, #077b23 0%, #00a651 95%) !important;
     color: #fff !important;
-    align-items: center;
-    text-align: center;
+    align-items: center; text-align: center;
 }
 
-/* LADO BRANCO (Formulário) - Usado na Frente (Dir) e no Verso (Esq) */
+/* LADO BRANCO */
 .form-section {
     flex: 1.2;
     background: #ffffff !important;
     color: #1f2937;
+    align-items: center;
 }
 
-/* Estilos de Texto e Logo */
-.welcome-content {
-    display: flex; flex-direction: column; align-items: center; gap: 14px; margin-bottom: 30px;
-}
-.welcome-title {
-    font-size: clamp(2rem, 3vw, 2.5rem); font-weight: 700; color: #fff; margin-bottom: 5px;
-}
-.welcome-subtitle {
-    font-size: 1rem; color: rgba(255, 255, 255, 0.9); max-width: 300px; margin: 0 auto;
-}
+/* Conteúdo */
+.welcome-content { display: flex; flex-direction: column; align-items: center; gap: 15px; margin-bottom: 30px; }
+.welcome-title { font-size: 2.2rem; font-weight: 700; color: #fff; }
+.welcome-subtitle { font-size: 1rem; opacity: 0.9; }
 
 .logo-container {
     background: white; padding: 10px; border-radius: 14px;
@@ -159,58 +124,53 @@ body.dark {
 }
 .logo-container:hover { transform: scale(1.05); }
 .logo-img { width: 80px; height: auto; display: block; }
-.logo-img-back { width: 68px; height: 68px; object-fit: cover; border-radius: 16px; }
 
-/* Formulários */
-.form-content { width: 100%; max-width: 400px; margin: 0 auto; }
-.form-header { text-align: center; margin-bottom: 25px; }
-.form-title { font-size: 1.8rem; color: #1a3d1a; font-weight: 700; }
-.form-subtitle { color: #666; font-size: 0.95rem; }
+/* Formulário */
+.form-content { width: 100%; max-width: 380px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px; }
+.form-header { text-align: center; margin-bottom: 20px; }
+.form-title { font-size: 1.8rem; font-weight: 700; color: #0f7c3a; margin-bottom: 5px; }
+.form-subtitle { font-size: 0.95rem; color: #666; }
 
 /* Inputs */
-.floating-input-group { position: relative; margin-bottom: 20px; }
+.floating-input-group { position: relative; margin-bottom: 15px; width: 100%; }
 .floating-input {
-    width: 100%; padding: 14px 15px; border: 1px solid #e0e0e0; border-radius: 10px;
-    background: #f9f9f9; font-size: 0.95rem; transition: all 0.2s; outline: none;
+    width: 100%; padding: 14px; border: 1px solid #e0e0e0; border-radius: 10px;
+    background: #f9f9f9; font-size: 0.95rem; outline: none; transition: 0.2s;
 }
-.floating-input:focus {
-    background: #fff; border-color: #009739; box-shadow: 0 0 0 3px rgba(0, 151, 57, 0.1);
-}
-.floating-label {
-    position: absolute; left: 15px; top: 14px; color: #888; pointer-events: none; transition: 0.2s;
-}
+.floating-input:focus { background: #fff; border-color: #009739; box-shadow: 0 0 0 3px rgba(0, 151, 57, 0.1); }
+.floating-label { position: absolute; left: 14px; top: 14px; color: #888; pointer-events: none; transition: 0.2s; }
 .floating-input:focus ~ .floating-label,
 .floating-input:not(:placeholder-shown) ~ .floating-label,
 .floating-input[type='date'] ~ .floating-label {
     top: -10px; left: 10px; font-size: 0.75rem; color: #00a651; background: #fff; padding: 0 5px; font-weight: 600;
 }
+.error-message { color: #d90429; font-size: 0.8rem; margin-top: 4px; display: block; }
+.dica-campo { display: block; font-size: 0.75rem; color: #6b8e6b; margin-top: -10px; margin-bottom: 15px; }
 
 /* Botões */
 .holo-button {
     width: 100%; padding: 14px; background: linear-gradient(90deg, #00a651, #00cc44);
-    color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s; margin-top: 10px; box-shadow: 0 4px 15px rgba(0, 166, 81, 0.3);
+    color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 600;
+    cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px rgba(0, 166, 81, 0.3); margin-top: 10px;
 }
 .holo-button:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0, 166, 81, 0.4); }
 .holo-button.secondary-button {
-    background: #fff; color: var(--forest); border: 2px solid rgba(15, 124, 58, 0.12); box-shadow: none; margin-top: 15px;
+    background: #fff; color: #00a651; border: 2px solid #00a651; box-shadow: none; margin-top: 15px;
 }
-.holo-button.secondary-button:hover { border-color: #00a651; color: #00a651; background: #f0fdf4; }
+.holo-button.secondary-button:hover { background: #f0fdf4; }
 
 .flip-button {
-    margin-top: 20px; padding: 12px 32px; border-radius: 50px; cursor: pointer; font-weight: 600; transition: all 0.3s;
-    font-size: 0.85rem; letter-spacing: 1px; text-transform: uppercase;
+    margin-top: 20px; padding: 12px 30px; border-radius: 50px; cursor: pointer; font-weight: 600;
     border: 2px solid rgba(255, 255, 255, 0.6); color: #fff; background: rgba(255,255,255,0.1);
+    text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; transition: 0.3s;
 }
-.flip-button:hover { background: white; color: #009739; border-color: white; }
+.flip-button:hover { background: white; color: #009739; }
 
-.form-link { display: block; text-align: center; margin-top: 15px; color: #666; text-decoration: none; font-size: 0.9rem; }
+.form-link { display: block; text-align: center; margin-top: 15px; color: #666; font-size: 0.9rem; text-decoration: none; }
 .form-link:hover { color: #00a651; text-decoration: underline; }
-.error-message { color: #d90429; font-size: 0.8rem; margin-top: 5px; display: block; }
-.dica-campo { display: block; font-size: 0.75rem; color: #6b8e6b; margin-top: -15px; margin-bottom: 15px; }
 
 /* ==========================================================================
-   4. OUTROS ESTILOS (Mantidos)
+   4. OUTROS ESTILOS GERAIS (Botões, Rodapé, etc.)
    ========================================================================== */
 .btn-primary { background: #2f8a2f; color: #fff; padding: 8px 12px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; }
 .btn-secondary { background: #fff; color: #1a3d1a; padding: 8px 12px; border-radius: 6px; border: 1px solid #cddfcf; cursor: pointer; font-weight: 600; }
@@ -226,20 +186,25 @@ body.dark {
 
 .loading { margin-top: 20px; font-size: 1.1rem; font-weight: 600; color: #0f7c3a; display: flex; align-items: center; gap: 10px; animation: fadeIn 0.6s ease forwards; }
 .loading::before { content: ""; width: 14px; height: 14px; border-radius: 50%; background: linear-gradient(90deg, #00a651, #00cc44); animation: pulse 0.9s infinite ease-in-out; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes pulse { 0% { transform: scale(0.8); opacity: 0.5; } 50% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(0.8); opacity: 0.5; } }
 .fade-in-up { animation: fadeInUp 1.2s ease forwards; }
 
-/* FIX PARA PÁGINAS SEM SIDEBAR */
+/* ==========================================================================
+   5. FIX PARA PÁGINAS PÚBLICAS (Sobre, Planos, Resumo)
+   ========================================================================== */
 .page-content.sem-sidebar {
-    margin-left: 0 !important; width: 90% !important; max-width: 1200px;
-    margin: 0 auto !important; padding-top: 100px; padding-bottom: 40px;
+    margin-left: 0 !important;   /* Remove espaço da sidebar */
+    width: 90% !important;       /* Largura segura */
+    max-width: 1200px;           /* Limite para telas grandes */
+    margin: 0 auto !important;   /* Centraliza */
+    padding-top: 100px;          /* Espaço do header */
+    padding-bottom: 40px;
     display: flex; flex-direction: column; align-items: center;
 }
 .sem-sidebar .page-text, .sem-sidebar .page-list { max-width: 800px; width: 100%; }
 .sem-sidebar .page-title, .sem-sidebar .section-title { text-align: center; width: 100%; }
 
-/* Tabelas e Planos */
+/* Estilos de Tabelas e Cards */
 .texto-verde { color: #0f7c3a; }
 .dark .texto-verde { color: #4ade80; }
 .tabela-sobre { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
@@ -248,6 +213,7 @@ body.dark {
 .dark .tabela-sobre { background: #161616 !important; color: white !important; }
 .dark .tabela-cell { border-color: #3a3a3a !important; }
 .dark .tabela-head { background: #15803d !important; }
+
 .titulo-centralizado { text-align: center; }
 .planos-container { display: flex; gap: 30px; flex-wrap: wrap; margin-top: 40px; }
 .card-plano { background: rgb(194, 192, 192); padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); flex: 1; min-width: 300px; display: flex; flex-direction: column; align-items: center; }
@@ -264,7 +230,7 @@ body.dark {
 .page-list li { margin-bottom: 10px; font-size: 1.05rem; }
 
 /* ==========================================================================
-   5. RESPONSIVIDADE (Mobile - FIX DE DUPLICAÇÃO)
+   6. RESPONSIVIDADE (Mobile - FIX DE DUPLICAÇÃO)
    ========================================================================== */
 @media (max-width: 850px) {
     .header { flex-direction: column; height: auto; padding: 20px; }
@@ -272,7 +238,6 @@ body.dark {
 
     .main-container { padding: 15px; height: auto; min-height: 100vh; align-items: flex-start; }
     
-    /* Remove 3D no mobile para evitar bugs visuais */
     .innovative-card { height: auto; min-height: auto; transform: none !important; transition: none; }
     
     .card-face { 
@@ -285,8 +250,7 @@ body.dark {
     .innovative-card.flipped .card-front { display: none; }
 
     .card-section { padding: 30px 20px; width: 100%; }
-    
-    /* Joga a seção verde para o topo no mobile */
+    /* No mobile, o verde vai para o topo */
     .welcome-section { order: -1; border-radius: 20px 20px 0 0; padding: 40px 20px; }
     .form-section { border-radius: 0 0 20px 20px; }
 }
