@@ -16,12 +16,13 @@ export default function Sobre() {
         padding: '12px',
         textAlign: 'left',
     };
-    const tdStyle = { border: '1px solid #ddddddff', padding: '12px' };
+    const tdStyle = { border: '1px solid #dddddd', padding: '12px' };
 
     return (
         <div className="page-container">
             <Header />
-            <main className="page-content">
+            {/* ADICIONADO: classe 'sem-sidebar' para corrigir o layout */}
+            <main className="page-content sem-sidebar">
                 <h1 className="page-title">Sobre o Rentabili</h1>
                 <p className="page-text">
                     O Rentabili é um sistema gerenciador de rentabilidade de
@@ -41,9 +42,7 @@ export default function Sobre() {
                     <tbody>
                         <tr>
                             <td style={tdStyle}>Robson Luis de Carvalho</td>
-                            <td style={tdStyle}>
-                                Frontend + Integração Frontend-Backend
-                            </td>
+                            <td style={tdStyle}>Frontend + Integração</td>
                         </tr>
                         <tr>
                             <td style={tdStyle}>Matheus Marinho Rodrigues</td>
@@ -67,17 +66,8 @@ export default function Sobre() {
                 <h2 className="section-title">Links do Projeto</h2>
                 <ul className="page-list">
                     <li>
-                        <a
-                            href="https://github.com/gabrielflorianoo/Rentabili"
-                            target="_blank"
-                            style={{ color: '#0f7c3a' }}
-                        >
+                        <a href="https://github.com/gabrielflorianoo/Rentabili" target="_blank" className="texto-verde">
                             GitHub do Projeto
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" style={{ color: '#0f7c3a' }}>
-                            Documentação no Google Drive
                         </a>
                     </li>
                 </ul>
