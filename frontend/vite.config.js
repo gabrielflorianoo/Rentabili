@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
     plugins: [react()],
     define: {
-        'import.meta.env.VITE_API_URL': JSON.stringify(
+        'import.meta.env.VITE_API_URL1': JSON.stringify(
             'https://symmetrical-guide-v7q4g66jw54f6qpq-3000.app.github.dev/',
         ),
 
@@ -12,12 +12,7 @@ export default defineConfig({
         'import.meta.env.PRODUCTION': JSON.stringify(false),
         'import.meta.env.VITE_USE_DB': JSON.stringify(false),
 
-        'import.meta.env.PRODUCTION': false,
-
-
-
-        'import.meta.env.VITE_USE_DB': false,
-        'import.meta.env.PRODUCTION': false,
+  
 
     },
 });
