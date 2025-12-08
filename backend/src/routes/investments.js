@@ -10,6 +10,11 @@ router.get(
     authenticateToken,
     investmentController.getTotalInvested,
 );
+router.get(
+    '/different-actives-count',
+    authenticateToken,
+    investmentController.getDifferentActivesCount,
+);
 router.get('/gain-loss', authenticateToken, investmentController.getGainLoss);
 router.post(
     '/simulate',
