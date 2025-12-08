@@ -20,94 +20,70 @@ body.dark {
     color: #f3f4f6;
 }
 
-/* =========================================
-   2. HEADER (Mantido)
-   ========================================= */
-.header {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 15px 50px; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; height: 65px;
-}
-.header-right { display: flex; align-items: center; gap: 15px; }
-.brand { display: flex; align-items: center; gap: 10px; }
-.logo-icon { width: 40px; height: 40px; background: #0f7c3a; border-radius: 6px; display: flex; justify-content: center; align-items: center; color: white; }
-.logo-text { font-weight: bold; font-size: 20px; color:#177517; }
-.menu { display: flex; gap: 30px; }
-.menu a { text-decoration: none; color: #555; font-weight: 500; transition: 0.2s; cursor: pointer; }
-.menu a:hover { color: #0f7c3a; }
-.btn-acesso { background: #0f7c3a; color: #fff; padding: 10px 24px; border-radius: 6px; font-size: 14px; text-decoration: none; font-weight: 600; border: none; cursor: pointer; }
-.btn-acesso:hover { background: #0a5c2b; }
 
-/* =========================================
-   3. CORREÇÃO VISUAL DEFINITIVA (Login)
-   ========================================= */
-
+/* Container que segura o cartão no centro da tela */
 .main-container {
-    position: relative; z-index: 10; width: 100%; min-height: 100vh;
-    display: flex; align-items: center; justify-content: center; padding: 20px;
+    position: relative; 
+    z-index: 10; 
+    width: 100%; 
+    min-height: 100vh;
+    display: grid;            
+    place-items: center;     
+    padding: 20px;
 }
 
-/* O PAI (Innovative Card):
-   - Totalmente transparente.
-   - Sem borda.
-   - Sem sombra.
-   - Apenas segura o espaço 3D.
-*/
+/* O PAI (Espaço 3D Invisível) */
 .innovative-card {
-    width: 1000px;
+    width: 1100px;            
     max-width: 95%;
-    height: 680px; /* Altura fixa para evitar scroll interno */
+    height: 720px;          
     position: relative;
     perspective: 1000px;
     background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    outline: none !important;
-    
-    margin: 0 auto;
-    transition: transform 1s;
-    transform-style: preserve-3d;
+    border: none !important;            
+    box-shadow: none !important;       
 }
 
-.innovative-card.flipped { transform: rotateY(180deg); }
+/* A classe flipped rotaciona o WRAPPER interno */
+.innovative-card.flipped .card-wrapper {
+    transform: rotateY(180deg);
+}
 
+/* O WRAPPER (Segura as faces juntas) */
 .card-wrapper {
-    width: 100%; height: 100%; position: relative;
+    width: 100%; 
+    height: 100%; 
+    position: relative;
     transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     transform-style: preserve-3d;
 }
 
+/* AS FACES*/
 .card-face {
-    position: absolute; width: 100%; height: 100%;
-    -webkit-backface-visibility: hidden; backface-visibility: hidden;
-    
-    /* Arredondamento e Corte */
-    border-radius: 26px; 
+    position: absolute; 
+    width: 100%; 
+    height: 100%;
+    -webkit-backface-visibility: hidden; 
+    backface-visibility: hidden;
+    border-radius: 24px; 
     overflow: hidden; 
-    
-    /* Layout Lado a Lado */
     display: flex;
     flex-direction: row; 
-    align-items: stretch; 
-    
-    /* Estilo Visual */
+    align-items: stretch;
     background: #fff;
-    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.3);
-    border: none !important; 
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border: none !important; /* Garante zero bordas extras */
 }
 
 .card-front { z-index: 2; transform: rotateY(0deg); }
 .card-back { transform: rotateY(180deg); z-index: 1; background: #fff; }
 
-/* AS METADES (Verde e Branco):
-   - Flex: 1 força tamanhos matematicamente iguais (50%/50%).
-*/
+/* SEÇÕES INTERNAS (50% / 50%) */
 .card-section {
-    flex: 1; /* Força 50% de largura */
-    width: 50%;
+    flex: 1; 
     display: flex; flex-direction: column;
-    justify-content: center; /* Centraliza verticalmente */
-    align-items: center;     /* Centraliza horizontalmente */
+    justify-content: center; 
+    align-items: center;     
     padding: 40px;
     height: 100%;
 }
@@ -116,84 +92,81 @@ body.dark {
 .welcome-section {
     background: linear-gradient(160deg, #077b23 0%, #00a651 95%) !important;
     color: #fff !important;
-    /* Remove qualquer borda interna */
-    border: none !important; 
 }
 
 /* LADO BRANCO */
 .form-section {
     background: #ffffff !important;
     color: #1f2937;
-    /* Remove qualquer borda interna */
-    border: none !important; 
 }
 
-/* CONTEÚDO DO FORMULÁRIO */
+/* Formulário e Inputs */
 .form-content { 
-    width: 100%; max-width: 360px;
-    display: flex; flex-direction: column; 
-    gap: 12px; /* Espaçamento ajustado */
-    justify-content: center;
+    width: 100%; max-width: 380px; 
+    display: flex; flex-direction: column; gap: 15px;
 }
-
 .form-header { text-align: center; margin-bottom: 20px; }
-.form-title { font-size: 1.8rem; font-weight: 700; color: #0f7c3a; margin-bottom: 5px; }
-.form-subtitle { font-size: 0.9rem; color: #666; }
+.form-title { font-size: 2rem; font-weight: 700; color: #0f7c3a; margin-bottom: 5px; }
+.form-subtitle { font-size: 0.95rem; color: #666; }
 
-/* ELEMENTOS VISUAIS */
-.welcome-content { display: flex; flex-direction: column; align-items: center; gap: 15px; margin-bottom: 30px; }
-.welcome-title { font-size: 2.2rem; font-weight: 700; color: #fff; margin-bottom: 5px; text-align: center; }
-.welcome-subtitle { font-size: 1rem; opacity: 0.9; text-align: center; }
-
-.logo-container {
-    background: white; padding: 12px; border-radius: 16px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15); margin-bottom: 15px; cursor: pointer;
-    transition: transform 0.2s;
-}
-.logo-container:hover { transform: scale(1.05); }
-.logo-img { width: 80px; height: auto; display: block; }
-
-/* INPUTS */
-.floating-input-group { position: relative; margin-bottom: 12px; width: 100%; }
+.floating-input-group { position: relative; margin-bottom: 15px; width: 100%; }
 .floating-input {
-    width: 100%; padding: 12px 14px; border: 1px solid #e0e0e0; border-radius: 10px;
-    background: #f9f9f9; font-size: 0.9rem; outline: none; transition: 0.2s;
+    width: 100%; padding: 14px; border: 1px solid #e0e0e0; border-radius: 10px;
+    background: #f9f9f9; font-size: 0.95rem; outline: none; transition: 0.2s;
 }
 .floating-input:focus { background: #fff; border-color: #009739; box-shadow: 0 0 0 3px rgba(0, 151, 57, 0.1); }
-.floating-label { position: absolute; left: 14px; top: 12px; color: #888; pointer-events: none; transition: 0.2s; font-size: 0.9rem; }
+.floating-label { position: absolute; left: 14px; top: 14px; color: #888; pointer-events: none; transition: 0.2s; }
 .floating-input:focus ~ .floating-label,
 .floating-input:not(:placeholder-shown) ~ .floating-label,
 .floating-input[type='date'] ~ .floating-label {
-    top: -9px; left: 10px; font-size: 0.75rem; color: #00a651; background: #fff; padding: 0 5px; font-weight: 600;
+    top: -10px; left: 10px; font-size: 0.75rem; color: #00a651; background: #fff; padding: 0 5px; font-weight: 600;
 }
-.error-message { color: #d90429; font-size: 0.75rem; margin-top: 2px; display: block; text-align: left; }
-.dica-campo { display: block; font-size: 0.75rem; color: #6b8e6b; margin-top: -8px; margin-bottom: 10px; text-align: left; }
 
-/* BOTÕES */
+/* Botões */
 .holo-button {
-    width: 100%; padding: 12px; background: linear-gradient(90deg, #00a651, #00cc44);
-    color: white; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 600;
-    cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px rgba(0, 166, 81, 0.3); margin-top: 5px;
+    width: 100%; padding: 14px; background: linear-gradient(90deg, #00a651, #00cc44);
+    color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 600;
+    cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px rgba(0, 166, 81, 0.3); margin-top: 10px;
 }
-.holo-button:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0, 166, 81, 0.4); }
+.holo-button:hover { transform: translateY(-2px); }
 .holo-button.secondary-button {
-    background: #fff; color: #00a651; border: 2px solid #00a651; box-shadow: none; margin-top: 10px;
+    background: #fff; color: #00a651; border: 2px solid #00a651; box-shadow: none; margin-top: 15px;
 }
 .holo-button.secondary-button:hover { background: #f0fdf4; }
 
 .flip-button {
-    margin-top: 20px; padding: 12px 30px; border-radius: 50px; cursor: pointer; font-weight: 600;
+    margin-top: 25px; padding: 12px 35px; border-radius: 50px; cursor: pointer; font-weight: 600;
     border: 2px solid rgba(255, 255, 255, 0.6); color: #fff; background: rgba(255,255,255,0.1);
     text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; transition: 0.3s;
 }
 .flip-button:hover { background: white; color: #009739; }
 
-.form-link { display: block; text-align: center; margin-top: 15px; color: #666; font-size: 0.85rem; text-decoration: none; }
+/* Elementos Visuais */
+.welcome-content { display: flex; flex-direction: column; align-items: center; gap: 20px; margin-bottom: 30px; }
+.welcome-title { font-size: 2.2rem; font-weight: 700; color: #fff; }
+.welcome-subtitle { font-size: 1rem; opacity: 0.9; text-align: center; }
+.logo-container {
+    background: white; padding: 15px; border-radius: 18px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15); margin-bottom: 10px; cursor: pointer;
+}
+.logo-img { width: 90px; height: auto; display: block; }
+.form-link { display: block; text-align: center; margin-top: 15px; color: #666; font-size: 0.9rem; text-decoration: none; }
 .form-link:hover { color: #00a651; text-decoration: underline; }
+.error-message { color: #d90429; font-size: 0.8rem; margin-top: 5px; display: block; }
+.dica-campo { display: block; font-size: 0.75rem; color: #6b8e6b; margin-top: -10px; margin-bottom: 15px; }
 
 /* =========================================
    4. OUTROS ESTILOS (Mantidos)
    ========================================= */
+.header { display: flex; justify-content: space-between; align-items: center; padding: 15px 50px; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; height: 65px; }
+.header-right { display: flex; align-items: center; gap: 15px; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.logo-icon { width: 40px; height: 40px; background: #0f7c3a; border-radius: 6px; display: flex; justify-content: center; align-items: center; color: white; }
+.logo-text { font-weight: bold; font-size: 20px; color:#177517; }
+.menu { display: flex; gap: 30px; }
+.menu a { text-decoration: none; color: #555; font-weight: 500; transition: 0.2s; cursor: pointer; }
+.menu a:hover { color: #0f7c3a; }
+.btn-acesso { background: #0f7c3a; color: #fff; padding: 10px 24px; border-radius: 6px; font-size: 14px; text-decoration: none; font-weight: 600; border: none; cursor: pointer; }
 .btn-primary { background: #2f8a2f; color: #fff; padding: 8px 12px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; }
 .btn-secondary { background: #fff; color: #1a3d1a; padding: 8px 12px; border-radius: 6px; border: 1px solid #cddfcf; cursor: pointer; font-weight: 600; }
 .footer { text-align: center; padding: 25px 0; color: #ffffff; background: #0f7c3a; font-size: 1rem; font-weight: 600; margin-top: auto; width: 100%; }
@@ -202,7 +175,7 @@ body.dark {
 .fade-in-up { animation: fadeInUp 1.2s ease forwards; }
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-/* FIX Páginas Sem Sidebar */
+/* Fix Páginas Sem Sidebar */
 .page-content.sem-sidebar {
     margin-left: 0 !important; width: 90% !important; max-width: 1200px;
     margin: 0 auto !important; padding-top: 100px; padding-bottom: 40px;
@@ -211,7 +184,7 @@ body.dark {
 .sem-sidebar .page-text, .sem-sidebar .page-list { max-width: 800px; width: 100%; }
 .sem-sidebar .page-title { text-align: center; width: 100%; }
 
-/* Tabelas e Planos */
+/* Estilos de Tabelas e Cards */
 .texto-verde { color: #0f7c3a; }
 .dark .texto-verde { color: #4ade80; }
 .tabela-sobre { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
@@ -243,9 +216,7 @@ body.dark {
     .menu { gap: 15px; font-size: 0.9rem; margin: 15px 0; }
 
     .main-container { padding: 15px; align-items: flex-start; height: auto; }
-    
-    /* Remove 3D no mobile */
-    .innovative-card { height: auto; min-height: auto; transform: none !important; transition: none; }
+    .innovative-card { height: auto; width: 100%; transform: none !important; transition: none; }
     
     .card-face { 
         position: relative; flex-direction: column; height: auto; 
@@ -255,7 +226,6 @@ body.dark {
     .innovative-card:not(.flipped) .card-back { display: none; }
     .innovative-card.flipped .card-front { display: none; }
 
-    /* Ajuste de flex para mobile */
     .card-section { padding: 30px 20px; width: 100%; flex: auto; }
     .welcome-section { order: -1; border-radius: 20px 20px 0 0; padding: 40px 20px; }
     .form-section { border-radius: 0 0 20px 20px; }
