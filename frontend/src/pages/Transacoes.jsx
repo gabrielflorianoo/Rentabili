@@ -73,7 +73,7 @@ export default function Transacoes() {
             console.error('Erro ao criar transação:', err);
             alert(
                 'Erro ao salvar transação: ' +
-                    (err.response?.data?.error || err.message),
+                (err.response?.data?.error || err.message),
             );
         }
     };
@@ -169,7 +169,7 @@ export default function Transacoes() {
                                             />
                                             <span className="slider" />
                                         </label>
-                                      
+
                                     </div>
 
                                     <div style={{ marginLeft: 'auto' }}>
@@ -243,7 +243,7 @@ export default function Transacoes() {
                                                             className={`badge ${trans.type === 'income' ? 'badge-green' : 'badge-red'}`}
                                                         >
                                                             {trans.type ===
-                                                            'income'
+                                                                'income'
                                                                 ? 'Receita'
                                                                 : 'Despesa'}
                                                         </span>
@@ -251,7 +251,7 @@ export default function Transacoes() {
                                                     <td
                                                         className={
                                                             trans.type ===
-                                                            'income'
+                                                                'income'
                                                                 ? 'text-green'
                                                                 : 'text-red'
                                                         }
