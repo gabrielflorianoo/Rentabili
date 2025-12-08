@@ -44,6 +44,13 @@ body.dark {
     width: 100%;
     padding: 40px;
     margin-left: 280px;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+.page-content.sem-sidebar {
+    margin-left: 0;
+    margin-top: 65px;
 }
 
 @media (max-width: 1024px) {
@@ -56,6 +63,7 @@ body.dark {
 @media (max-width: 640px) {
     .page-content {
         padding: 16px 12px;
+        margin-top: 65px;
     }
 }
 
@@ -69,6 +77,8 @@ body.dark {
     color: #0f7c3a;
     margin-bottom: 20px;
     letter-spacing: -0.5px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .dark .page-title {
@@ -513,6 +523,8 @@ body.dark {
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    box-sizing: border-box;
+    max-width: 100%;
 }
 
 .dark .tabela-sobre {
@@ -551,6 +563,7 @@ body.dark {
     gap: 30px;
     flex-wrap: wrap;
     margin-top: 40px;
+    justify-content: center;
 }
 
 .card-plano {
@@ -561,10 +574,12 @@ body.dark {
     border: 2px solid #e5e7eb;
     flex: 1;
     min-width: 300px;
+    max-width: 450px;
     display: flex;
     flex-direction: column;
     align-items: center;
     transition: all 0.3s ease;
+    box-sizing: border-box;
 }
 
 .dark .card-plano {
@@ -669,6 +684,10 @@ body.dark {
         flex-wrap: wrap;
     }
 
+    .page-content {
+        padding: 20px 16px;
+    }
+
     .page-title {
         font-size: 2rem;
     }
@@ -683,6 +702,7 @@ body.dark {
 
     .card-plano {
         min-width: 100%;
+        max-width: 100%;
     }
 
     .destaque {
