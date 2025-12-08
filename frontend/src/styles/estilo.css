@@ -30,7 +30,7 @@ body.dark {
 }
 
 /* ==========================================================================
-   2. HEADER (Mantido)
+   2. HEADER
    ========================================================================== */
 .header {
   display: flex; justify-content: space-between; align-items: center;
@@ -56,15 +56,13 @@ body.dark {
     display: flex; align-items: center; justify-content: center; padding: 20px;
 }
 
-/* CORREÇÃO 1: Aumentei a altura para 680px para caber o formulário sem scroll.
-   CORREÇÃO 2: Forcei background transparent para sumir o quadrado branco de trás.
-*/
+
 .innovative-card {
     width: min(1000px, 100%);
-    height: 680px; /* Mais alto para caber tudo */
+    height: 680px; 
     position: relative;
     perspective: 1000px;
-    background-color: transparent !important; /* Transparência forçada */
+    background-color: transparent !important; 
     background: transparent !important;
     box-shadow: none !important;
     border: none !important;
@@ -81,7 +79,6 @@ body.dark {
     background: transparent !important; /* Garantia extra */
 }
 
-/* A FACE do cartão é a única que deve ter cor */
 .card-face {
     position: absolute; width: 100%; height: 100%;
     -webkit-backface-visibility: hidden; backface-visibility: hidden;
@@ -116,18 +113,17 @@ body.dark {
     align-items: center;
 }
 
-/* Conteúdo - COMPACTADO para caber */
+
 .form-content { 
     width: 100%; max-width: 380px; margin: 0 auto; 
     display: flex; flex-direction: column; 
-    gap: 10px; /* Menor espaço entre itens */
+    gap: 10px; 
 }
 
 .form-header { text-align: center; margin-bottom: 10px; } /* Menos margem */
 .form-title { font-size: 1.8rem; font-weight: 700; color: #0f7c3a; margin-bottom: 2px; }
 .form-subtitle { font-size: 0.9rem; color: #666; }
 
-/* Inputs - Mais compactos */
 .floating-input-group { position: relative; margin-bottom: 12px; width: 100%; }
 .floating-input {
     width: 100%; 
