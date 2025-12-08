@@ -2,242 +2,212 @@ import React, { useState } from 'react';
 import InputFlutuante from '../InputFlutuante';
 import { servicoAutenticacao } from '../../services/servicoAutenticacao';
 import imgLogo from '../../assets/logo.jpeg';
-import styles from './VersoCartao.module.css';
 
 const VersoCartao = ({ aoVirar }) => {
-    // Indica se o cadastro foi concluído com sucesso
     const [sucesso, setSucesso] = useState(false);
-
-    // Indica se o formulário está enviando dados
     const [carregando, setCarregando] = useState(false);
-
-    // Armazena os valores dos campos digitados
-    const [dadosForm, setDadosForm] = useState({
-        nome: '',
-        email: '',
-        nascimento: '',
-        senha: '',
-        confirmarSenha: '',
+    
+    // Estado dos dados
+    const [dadosForm, setDadosForm] = useState({ 
+        nome: '', 
+        email: '', 
+        nascimento: '', 
+        senha: '', 
+        confirmarSenha: '' 
     });
-
-    // Armazena erros de validação para exibir ao usuário
+    
+    // Estado dos erros
     const [erros, setErros] = useState({});
 
-    /**
-     * Atualiza os campos do formulário.
-     * Suporta dois formatos:
-     * - Evento padrão do input
-     * - Chamadas manuais como (id, valor)
-     */
     const lidarComMudanca = (eOrId, maybeValue) => {
         if (eOrId && eOrId.target) {
-            // Caso seja evento de input
             const { id, value } = eOrId.target;
             setDadosForm((prev) => ({ ...prev, [id]: value }));
-        } else if (typeof eOrId === 'string') {
-            // Caso seja chamado manualmente (id, valor)
+            // Limpa erro ao digitar
+            if (erros[id]) setErros((prev) => ({ ...prev, [id]: '' }));
+        } else {
             setDadosForm((prev) => ({ ...prev, [eOrId]: maybeValue }));
         }
     };
 
-    /**
-     * Verifica se todos os campos estão preenchidos corretamente.
-     * Retorna true/false e atualiza o estado de erros.
-     */
+    // --- VALIDAÇÃO REFORÇADA ---
     const validar = () => {
         const novosErros = {};
+        const regexEspecial = /[!@#$%^&*(),.?":{}|<>]/;
 
+        // 1. Campos obrigatórios básicos
         if (!dadosForm.nome) novosErros.nome = 'Nome é obrigatório';
         if (!dadosForm.email) novosErros.email = 'Email é obrigatório';
 
-        if (!dadosForm.senha || dadosForm.senha.length < 6)
-            novosErros.senha = 'Senha deve ter ao menos 6 caracteres';
+        // 2. Validação de Idade (Mínimo 18 anos)
+        if (!dadosForm.nascimento) {
+            novosErros.nascimento = 'Data de nascimento obrigatória';
+        } else {
+            const hoje = new Date();
+            const nascimento = new Date(dadosForm.nascimento);
+            let idade = hoje.getFullYear() - nascimento.getFullYear();
+            const mes = hoje.getMonth() - nascimento.getMonth();
+            
+            // Ajusta idade se ainda não fez aniversário este ano
+            if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) {
+                idade--;
+            }
 
-        if (dadosForm.senha !== dadosForm.confirmarSenha)
-            novosErros.confirmarSenha = 'Senhas não conferem';
+            if (idade < 18) {
+                novosErros.nascimento = 'Você precisa ter pelo menos 18 anos.';
+            }
+        }
 
+        // 3. Validação de Senha Forte
+        if (!dadosForm.senha) {
+            novosErros.senha = 'Senha é obrigatória';
+        } else if (dadosForm.senha.length < 6) {
+            novosErros.senha = 'A senha deve ter no mínimo 6 caracteres';
+        } else if (!regexEspecial.test(dadosForm.senha)) {
+            novosErros.senha = 'A senha deve conter um caractere especial (@, #, $, etc).';
+        }
+
+        // 4. Confirmação de Senha
+        if (dadosForm.senha !== dadosForm.confirmarSenha) {
+            novosErros.confirmarSenha = 'As senhas não conferem';
+        }
+        
         setErros(novosErros);
-
-        // Retorna true se não houver erros
+        // Retorna true se não houver erros (objeto vazio)
         return Object.keys(novosErros).length === 0;
     };
 
-    /**
-     * Envio do formulário de cadastro.
-     * Chama o serviço de autenticação e trata sucesso/erro.
-     */
-    const lidarComCadastro = async (ev) => {
-        ev.preventDefault();
-
-        // Se a validação falhar, não envia o formulário
+    const lidarComCadastro = async (e) => {
+        e.preventDefault();
+        
+        // Só prossegue se a validação passar
         if (!validar()) return;
 
         setCarregando(true);
+        const resposta = await servicoAutenticacao.cadastrar(dadosForm);
+        setCarregando(false);
 
-        try {
-            // Envia dados ao backend via serviço de autenticação
-            const resposta = await servicoAutenticacao.cadastrar(dadosForm);
-
-            console.log(resposta);
-
-            if (resposta.sucesso) {
-                // Mostra tela de sucesso
-                setSucesso(true);
-            } else {
-                // Exibe erro retornado pelo backend
-                setErros({ geral: resposta.erro });
-            }
-        } catch (err) {
-            // Tratamento de erros inesperados
-            setErros({ geral: 'Erro ao criar conta' });
-            console.error(err);
-        } finally {
-            setCarregando(false);
+        if (resposta.sucesso) {
+            setSucesso(true);
+        } else {
+            setErros({ geral: resposta.erro });
         }
     };
 
-    /**
-     * Após concluir o cadastro, usuário pode voltar ao login.
-     * Este método apenas chama a função de virar o cartão.
-     */
     const irParaLogin = () => {
         if (aoVirar) aoVirar();
     };
 
-    /**
-     * Preenche automaticamente os campos
-     * — ótimo para testes e demonstrações.
-     */
-    const preencherAutomaticamente = () => {
+    const preencherAuto = () => {
         setDadosForm({
-            nome: 'Banco do Bradesco2',
-            email: 'email2@example.com',
-            nascimento: '0001-01-01',
-            senha: '123123@',
-            confirmarSenha: '123123@',
+            nome: 'Usuário Teste',
+            email: `teste${Math.floor(Math.random()*1000)}@exemplo.com`,
+            nascimento: '2000-01-01', // Data válida (+18)
+            senha: '123123@', // Senha válida (6 chars + especial)
+            confirmarSenha: '123123@'
         });
-
         setErros({});
     };
 
     return (
-        <div className={`${styles.cardFace} ${styles.cardBack}`}>
-            <div className={styles.formArea}>
-
-                {/* Se o cadastro ainda não foi concluído, exibe o formulário */}
+        <div className="card-face card-back">
+            {/* LADO ESQUERDO: BRANCO (Formulário) */}
+            <div className="card-section form-section">
                 {!sucesso ? (
-                    <div className={`${styles.formContent} ${styles.fadeInUp}`}>
-                        <div className={styles.formHeader}>
-                            <h2 className={styles.formTitle}>Crie sua conta</h2>
-                            <p className={styles.formSubtitle}>Junte-se à inovação</p>
+                    <div className="form-content fade-in-up">
+                        <div className="form-header">
+                            <h2 className="form-title">Crie sua conta</h2>
+                            <p className="form-subtitle">Junte-se à inovação</p>
                         </div>
 
                         <form onSubmit={lidarComCadastro}>
-                            <InputFlutuante
-                                id="nome"
-                                type="text"
-                                rotulo="Nome Completo"
-                                valor={dadosForm.nome}
-                                aoMudar={lidarComMudanca}
-                                erro={erros.nome}
-                                required
+                            <InputFlutuante 
+                                id="nome" 
+                                type="text" 
+                                rotulo="Nome Completo" 
+                                valor={dadosForm.nome} 
+                                aoMudar={lidarComMudanca} 
+                                erro={erros.nome} 
+                                required 
+                            />
+                            
+                            <InputFlutuante 
+                                id="email" 
+                                type="email" 
+                                rotulo="E-mail" 
+                                valor={dadosForm.email} 
+                                aoMudar={lidarComMudanca} 
+                                erro={erros.email} 
+                                required 
+                            />
+                            
+                            <InputFlutuante 
+                                id="nascimento" 
+                                type="date" 
+                                rotulo="Data de Nascimento" 
+                                valor={dadosForm.nascimento} 
+                                aoMudar={lidarComMudanca} 
+                                erro={erros.nascimento} 
+                                required 
+                            />
+                            
+                            <InputFlutuante 
+                                id="senha" 
+                                type="password" 
+                                rotulo="Senha" 
+                                valor={dadosForm.senha} 
+                                aoMudar={lidarComMudanca} 
+                                erro={erros.senha} 
+                                required 
+                            />
+                            {/* Dica visual sobre a senha */}
+                            {!erros.senha && <span className="dica-campo">Mínimo de 6 caracteres e 1 especial (@, #, $).</span>}
+                            
+                            <InputFlutuante 
+                                id="confirmarSenha" 
+                                type="password" 
+                                rotulo="Confirmar Senha" 
+                                valor={dadosForm.confirmarSenha} 
+                                aoMudar={lidarComMudanca} 
+                                erro={erros.confirmarSenha} 
+                                required 
                             />
 
-                            <InputFlutuante
-                                id="email"
-                                type="email"
-                                rotulo="E-mail"
-                                valor={dadosForm.email}
-                                aoMudar={lidarComMudanca}
-                                erro={erros.email}
-                                required
-                            />
+                            {erros.geral && <div className="error-message">{erros.geral}</div>}
 
-                            <InputFlutuante
-                                id="nascimento"
-                                type="date"
-                                rotulo="Data de Nascimento"
-                                valor={dadosForm.nascimento}
-                                aoMudar={lidarComMudanca}
-                                erro={erros.nascimento}
-                                required
-                            />
-
-                            <InputFlutuante
-                                id="senha"
-                                type="password"
-                                rotulo="Senha"
-                                valor={dadosForm.senha}
-                                aoMudar={lidarComMudanca}
-                                erro={erros.senha}
-                                required
-                            />
-
-                            <span className={styles.dicaCampo}>
-                                Mínimo de 6 caracteres e 1 caractere especial (@, #, $, etc).
-                            </span>
-
-                            <InputFlutuante
-                                id="confirmarSenha"
-                                type="password"
-                                rotulo="Confirmar Senha"
-                                valor={dadosForm.confirmarSenha}
-                                aoMudar={lidarComMudanca}
-                                erro={erros.confirmarSenha}
-                                required
-                            />
-
-                            {/* Exibe erro geral retornado do servidor */}
-                            {erros.geral && (
-                                <div className={styles.errorMessage}>
-                                    {erros.geral}
-                                </div>
-                            )}
-
-                            <button type="submit" className={styles.holoButton}>
+                            <button type="submit" className="holo-button" disabled={carregando}>
                                 {carregando ? 'Enviando...' : 'Criar Conta'}
                             </button>
 
-                            {/* Botão para preencher dados automaticamente */}
-                            <button
-                                type="button"
-                                className={`${styles.holoButton} ${styles.secondaryButton}`}
-                                onClick={preencherAutomaticamente}
-                            >
+                            <button type="button" className="holo-button secondary-button" onClick={preencherAuto}>
                                 Preencher Automaticamente
                             </button>
                         </form>
                     </div>
                 ) : (
-                    // Tela exibida após cadastro bem-sucedido
-                    <div
-                        className={`${styles.formContent} ${styles.fadeInUp}`}
-                        style={{ textAlign: 'center' }}
-                    >
-                        <div className={styles.formHeader}>
-                            <h2 className={styles.formTitle}>Conta Criada!</h2>
-                            <p className={styles.formSubtitle}>
-                                Seja bem-vindo ao Rentabili Investidor.
-                            </p>
+                    // Tela de Sucesso
+                    <div className="form-content fade-in-up" style={{textAlign: 'center'}}>
+                        <div className="form-header">
+                            <h2 className="form-title" style={{color: '#00a651'}}>Sucesso!</h2>
+                            <p className="form-subtitle">Sua conta foi criada.</p>
                         </div>
-
-                        <button className={styles.holoButton} onClick={irParaLogin}>
-                            Fazer Login Agora
-                        </button>
+                        <button className="holo-button" onClick={irParaLogin}>Fazer Login Agora</button>
                     </div>
                 )}
             </div>
 
-            {/* Lado direito com branding e botão de voltar */}
-            <div className={`${styles.cardSection} ${styles.welcomeSection}`}>
-                <div className={`${styles.welcomeContent} ${styles.fadeInUp}`}>
-                    <img src={imgLogo} alt="Logo" className={styles.logoImgBack} />
-                    <h1 className={styles.welcomeTitle}>Controle seu investimento</h1>
+            {/* LADO DIREITO: VERDE (Branding) */}
+            <div className="card-section welcome-section">
+                <div className="welcome-content fade-in-up">
+                    <div className="logo-container">
+                        <img src={imgLogo} alt="Logo Rentabili" className="logo-img" />
+                    </div>
+                    <h1 className="welcome-title">Controle Total</h1>
+                    <p className="welcome-subtitle">Gerencie seus investimentos com facilidade.</p>
                 </div>
 
-                {/* Botão que vira o cartão (volta ao login) */}
-                <button className={styles.flipButton} onClick={aoVirar}>
-                    ← Voltar
+                <button className="flip-button" onClick={aoVirar}>
+                    ← Voltar ao Login
                 </button>
             </div>
         </div>
