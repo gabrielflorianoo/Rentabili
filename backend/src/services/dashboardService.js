@@ -237,10 +237,17 @@ class DashboardService {
                 0,
             );
 
-            // Ganho total e rentabilidade
+            // Total ganho em rendas (apenas do tipo 'Renda')
+            const totalRenda = investments
+                .filter((inv) => inv.kind === 'Renda')
+                .reduce((sum, inv) => sum + Number(inv.amount || 0), 0);
+
+            // Ganho total = patrimônio - investimento inicial
             const totalGain = totalBalance - totalInvested;
+            
+            // Rentabilidade = (rendas / investimento) × 100
             const profitability = totalInvested > 0 
-                ? parseFloat(((totalGain / totalInvested) * 100).toFixed(2))
+                ? parseFloat(((totalRenda / totalInvested) * 100).toFixed(2))
                 : 0;
 
             // Criar gráfico de alocação
@@ -279,7 +286,7 @@ class DashboardService {
                 },
                 totalBalance,
                 totalInvested,
-                totalGain,
+                totalGain: totalRenda,
                 profitability,
                 allocationChart,
                 historyChart: evolutionChart,

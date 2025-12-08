@@ -23,4 +23,10 @@ router.get(
     dashboardController.getDashboard,
 );
 
+router.get(
+    '/debug',
+    authenticateToken,
+    dashboardController.getDebug,
+);
+
 export default router;
