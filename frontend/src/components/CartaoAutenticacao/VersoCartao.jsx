@@ -3,8 +3,6 @@ import InputFlutuante from '../InputFlutuante';
 import { servicoAutenticacao } from '../../services/servicoAutenticacao';
 import imgLogo from '../../assets/logo.jpeg';
 
-// ⚠️ REMOVI O IMPORT DO 'VersoCartao.module.css' AQUI PARA NÃO DAR CONFLITO
-
 const VersoCartao = ({ aoVirar }) => {
     const [sucesso, setSucesso] = useState(false);
     const [carregando, setCarregando] = useState(false);
@@ -31,7 +29,6 @@ const VersoCartao = ({ aoVirar }) => {
         }
     };
 
-    // Validação Completa
     const validar = () => {
         const novosErros = {};
         const regexEspecial = /[!@#$%^&*(),.?":{}|<>]/;
@@ -48,7 +45,7 @@ const VersoCartao = ({ aoVirar }) => {
             const mes = hoje.getMonth() - nascimento.getMonth();
             if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) idade--;
 
-            if (idade < 18) novosErros.nascimento = 'Você precisa ter pelo menos 18 anos.';
+            if (idade < 18) novosErros.nascimento = 'Apenas maiores de 18 anos.';
         }
 
         if (!dadosForm.senha) novosErros.senha = 'Senha obrigatória';
@@ -76,10 +73,6 @@ const VersoCartao = ({ aoVirar }) => {
         }
     };
 
-    const irParaLogin = () => {
-        if (aoVirar) aoVirar();
-    };
-
     const preencherAuto = () => {
         setDadosForm({
             nome: 'Usuário Teste',
@@ -92,7 +85,6 @@ const VersoCartao = ({ aoVirar }) => {
     };
 
     return (
-        // USANDO CLASSES GLOBAIS DO estilo.css AGORA
         <div className="card-face card-back">
             
             {/* ESQUERDA: Formulário (Branco) */}
@@ -101,36 +93,18 @@ const VersoCartao = ({ aoVirar }) => {
                     <div className="form-content fade-in-up">
                         <div className="form-header">
                             <h2 className="form-title">Crie sua conta</h2>
-                            <p className="form-subtitle">Junte-se à inovação</p>
+                            <p className="form-subtitle">Preencha seus dados abaixo</p>
                         </div>
 
                         <form onSubmit={lidarComCadastro}>
-                            <InputFlutuante 
-                                id="nome" type="text" rotulo="Nome Completo" 
-                                valor={dadosForm.nome} aoMudar={lidarComMudanca} erro={erros.nome} required 
-                            />
+                            <InputFlutuante id="nome" type="text" rotulo="Nome Completo" valor={dadosForm.nome} aoMudar={lidarComMudanca} erro={erros.nome} required />
+                            <InputFlutuante id="email" type="email" rotulo="E-mail" valor={dadosForm.email} aoMudar={lidarComMudanca} erro={erros.email} required />
+                            <InputFlutuante id="nascimento" type="date" rotulo="Nascimento" valor={dadosForm.nascimento} aoMudar={lidarComMudanca} erro={erros.nascimento} required />
                             
-                            <InputFlutuante 
-                                id="email" type="email" rotulo="E-mail" 
-                                valor={dadosForm.email} aoMudar={lidarComMudanca} erro={erros.email} required 
-                            />
+                            <InputFlutuante id="senha" type="password" rotulo="Senha" valor={dadosForm.senha} aoMudar={lidarComMudanca} erro={erros.senha} required />
+                            {!erros.senha && <span className="dica-campo">6 dígitos + 1 especial (@#$)</span>}
                             
-                            <InputFlutuante 
-                                id="nascimento" type="date" rotulo="Nascimento" 
-                                valor={dadosForm.nascimento} aoMudar={lidarComMudanca} erro={erros.nascimento} required 
-                            />
-                            
-                            <InputFlutuante 
-                                id="senha" type="password" rotulo="Senha" 
-                                valor={dadosForm.senha} aoMudar={lidarComMudanca} erro={erros.senha} required 
-                            />
-                            {/* Dica visual */}
-                            {!erros.senha && <span className="dica-campo">Mínimo 6 dígitos e 1 especial.</span>}
-                            
-                            <InputFlutuante 
-                                id="confirmarSenha" type="password" rotulo="Confirmar Senha" 
-                                valor={dadosForm.confirmarSenha} aoMudar={lidarComMudanca} erro={erros.confirmarSenha} required 
-                            />
+                            <InputFlutuante id="confirmarSenha" type="password" rotulo="Confirmar Senha" valor={dadosForm.confirmarSenha} aoMudar={lidarComMudanca} erro={erros.confirmarSenha} required />
 
                             {erros.geral && <div className="error-message">{erros.geral}</div>}
 
@@ -150,7 +124,7 @@ const VersoCartao = ({ aoVirar }) => {
                             <h2 className="form-title" style={{color: '#00a651'}}>Sucesso!</h2>
                             <p className="form-subtitle">Sua conta foi criada.</p>
                         </div>
-                        <button className="holo-button" onClick={irParaLogin}>
+                        <button className="holo-button" onClick={() => aoVirar()}>
                             Fazer Login Agora
                         </button>
                     </div>
@@ -167,7 +141,7 @@ const VersoCartao = ({ aoVirar }) => {
                     <p className="welcome-subtitle">Comece a investir hoje mesmo.</p>
                 </div>
 
-                <button className="flip-button" onClick={aoVirar}>
+                <button className="flip-button" onClick={() => aoVirar()}>
                     ← Voltar ao Login
                 </button>
             </div>
