@@ -1,8 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-/* ==========================================================================
-   1. GLOBAIS E RESET
-   ========================================================================== */
+/* =========================================
+   1. GLOBAIS
+   ========================================= */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html, body { width: 100%; height: 100%; }
 
@@ -13,7 +13,6 @@ body {
     background: linear-gradient(135deg, #f8fafb 0%, #f3f4f6 100%);
     overflow-x: hidden;
     overflow-y: auto;
-    transition: background 0.3s ease, color 0.3s ease;
 }
 
 body.dark {
@@ -21,13 +20,9 @@ body.dark {
     color: #f3f4f6;
 }
 
-:root {
-    --card-shadow: rgba(5, 100, 40, 0.2);
-}
-
-/* ==========================================================================
-   2. HEADER E NAVEGAÇÃO
-   ========================================================================== */
+/* =========================================
+   2. HEADER (Mantido)
+   ========================================= */
 .header {
   display: flex; justify-content: space-between; align-items: center;
   padding: 15px 50px; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
@@ -43,25 +38,32 @@ body.dark {
 .btn-acesso { background: #0f7c3a; color: #fff; padding: 10px 24px; border-radius: 6px; font-size: 14px; text-decoration: none; font-weight: 600; border: none; cursor: pointer; }
 .btn-acesso:hover { background: #0a5c2b; }
 
-/* ==========================================================================
-   3. LOGIN (CORRIGIDO: Sem bordas, Tamanhos Iguais)
-   ========================================================================== */
+/* =========================================
+   3. CORREÇÃO VISUAL DEFINITIVA (Login)
+   ========================================= */
 
 .main-container {
     position: relative; z-index: 10; width: 100%; min-height: 100vh;
     display: flex; align-items: center; justify-content: center; padding: 20px;
 }
 
-/* Container Pai: Invisível */
+/* O PAI (Innovative Card):
+   - Totalmente transparente.
+   - Sem borda.
+   - Sem sombra.
+   - Apenas segura o espaço 3D.
+*/
 .innovative-card {
     width: 1000px;
     max-width: 95%;
-    height: 680px; /* Altura ajustada para caber form sem scroll */
+    height: 680px; /* Altura fixa para evitar scroll interno */
     position: relative;
     perspective: 1000px;
     background: transparent !important;
-    box-shadow: none !important;
     border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    
     margin: 0 auto;
     transition: transform 1s;
     transform-style: preserve-3d;
@@ -75,33 +77,38 @@ body.dark {
     transform-style: preserve-3d;
 }
 
-/* Faces do Cartão: Apenas fundo e sombra */
 .card-face {
     position: absolute; width: 100%; height: 100%;
     -webkit-backface-visibility: hidden; backface-visibility: hidden;
-    border-radius: 26px; overflow: hidden; display: flex;
-    background: #fff;
-    /* REMOVIDO: border: 1px solid rgba(255, 255, 255, 0.5); -> Isso causava a "camada" */
-    border: none; 
-    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.3); /* Sombra mais limpa */
     
-    flex-direction: row;
-    justify-content: center;
-    align-items: stretch;
+    /* Arredondamento e Corte */
+    border-radius: 26px; 
+    overflow: hidden; 
+    
+    /* Layout Lado a Lado */
+    display: flex;
+    flex-direction: row; 
+    align-items: stretch; 
+    
+    /* Estilo Visual */
+    background: #fff;
+    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.3);
+    border: none !important; 
 }
 
 .card-front { z-index: 2; transform: rotateY(0deg); }
 .card-back { transform: rotateY(180deg); z-index: 1; background: #fff; }
 
-/* SEÇÕES INTERNAS (50% / 50% Exatos) */
+/* AS METADES (Verde e Branco):
+   - Flex: 1 força tamanhos matematicamente iguais (50%/50%).
+*/
 .card-section {
-    flex: 1 1 0; /* O "0" aqui força tamanhos matematicamente iguais */
-    width: 50%;  /* Garantia extra */
+    flex: 1; /* Força 50% de largura */
+    width: 50%;
     display: flex; flex-direction: column;
-    justify-content: center; 
-    align-items: center;     
+    justify-content: center; /* Centraliza verticalmente */
+    align-items: center;     /* Centraliza horizontalmente */
     padding: 40px;
-    min-width: 0;
     height: 100%;
 }
 
@@ -109,63 +116,68 @@ body.dark {
 .welcome-section {
     background: linear-gradient(160deg, #077b23 0%, #00a651 95%) !important;
     color: #fff !important;
+    /* Remove qualquer borda interna */
+    border: none !important; 
 }
 
 /* LADO BRANCO */
 .form-section {
     background: #ffffff !important;
     color: #1f2937;
+    /* Remove qualquer borda interna */
+    border: none !important; 
 }
 
-/* Conteúdo Formulário */
+/* CONTEÚDO DO FORMULÁRIO */
 .form-content { 
     width: 100%; max-width: 360px;
-    display: flex; flex-direction: column; gap: 12px;
-    justify-content: center; 
+    display: flex; flex-direction: column; 
+    gap: 12px; /* Espaçamento ajustado */
+    justify-content: center;
 }
 
-.form-header { text-align: center; margin-bottom: 15px; }
+.form-header { text-align: center; margin-bottom: 20px; }
 .form-title { font-size: 1.8rem; font-weight: 700; color: #0f7c3a; margin-bottom: 5px; }
 .form-subtitle { font-size: 0.9rem; color: #666; }
 
-/* Elementos Visuais Lado Verde */
+/* ELEMENTOS VISUAIS */
 .welcome-content { display: flex; flex-direction: column; align-items: center; gap: 15px; margin-bottom: 30px; }
-.welcome-title { font-size: 2.2rem; font-weight: 700; color: #fff; margin-bottom: 5px; }
+.welcome-title { font-size: 2.2rem; font-weight: 700; color: #fff; margin-bottom: 5px; text-align: center; }
 .welcome-subtitle { font-size: 1rem; opacity: 0.9; text-align: center; }
 
 .logo-container {
-    background: white; padding: 10px; border-radius: 14px;
+    background: white; padding: 12px; border-radius: 16px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.15); margin-bottom: 15px; cursor: pointer;
     transition: transform 0.2s;
 }
 .logo-container:hover { transform: scale(1.05); }
 .logo-img { width: 80px; height: auto; display: block; }
 
-/* Inputs */
+/* INPUTS */
 .floating-input-group { position: relative; margin-bottom: 12px; width: 100%; }
 .floating-input {
-    width: 100%; padding: 11px 14px; border: 1px solid #e0e0e0; border-radius: 10px;
+    width: 100%; padding: 12px 14px; border: 1px solid #e0e0e0; border-radius: 10px;
     background: #f9f9f9; font-size: 0.9rem; outline: none; transition: 0.2s;
 }
 .floating-input:focus { background: #fff; border-color: #009739; box-shadow: 0 0 0 3px rgba(0, 151, 57, 0.1); }
-.floating-label { position: absolute; left: 14px; top: 11px; color: #888; pointer-events: none; transition: 0.2s; font-size: 0.9rem; }
+.floating-label { position: absolute; left: 14px; top: 12px; color: #888; pointer-events: none; transition: 0.2s; font-size: 0.9rem; }
 .floating-input:focus ~ .floating-label,
 .floating-input:not(:placeholder-shown) ~ .floating-label,
 .floating-input[type='date'] ~ .floating-label {
     top: -9px; left: 10px; font-size: 0.75rem; color: #00a651; background: #fff; padding: 0 5px; font-weight: 600;
 }
-.error-message { color: #d90429; font-size: 0.75rem; margin-top: 3px; display: block; text-align: left; }
+.error-message { color: #d90429; font-size: 0.75rem; margin-top: 2px; display: block; text-align: left; }
 .dica-campo { display: block; font-size: 0.75rem; color: #6b8e6b; margin-top: -8px; margin-bottom: 10px; text-align: left; }
 
-/* Botões */
+/* BOTÕES */
 .holo-button {
     width: 100%; padding: 12px; background: linear-gradient(90deg, #00a651, #00cc44);
     color: white; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 600;
-    cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(0, 166, 81, 0.3); margin-top: 8px;
+    cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px rgba(0, 166, 81, 0.3); margin-top: 5px;
 }
 .holo-button:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0, 166, 81, 0.4); }
 .holo-button.secondary-button {
-    background: #fff; color: #00a651; border: 2px solid #00a651; box-shadow: none; margin-top: 10px; padding: 10px;
+    background: #fff; color: #00a651; border: 2px solid #00a651; box-shadow: none; margin-top: 10px;
 }
 .holo-button.secondary-button:hover { background: #f0fdf4; }
 
@@ -174,7 +186,7 @@ body.dark {
     border: 2px solid rgba(255, 255, 255, 0.6); color: #fff; background: rgba(255,255,255,0.1);
     text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; transition: 0.3s;
 }
-.flip-button:hover { background: white; color: #009739; border-color: white; }
+.flip-button:hover { background: white; color: #009739; }
 
 .form-link { display: block; text-align: center; margin-top: 15px; color: #666; font-size: 0.85rem; text-decoration: none; }
 .form-link:hover { color: #00a651; text-decoration: underline; }
@@ -223,15 +235,17 @@ body.dark {
 .btn-plano { margin-top: auto; width: 100%; }
 .page-list li { margin-bottom: 10px; font-size: 1.05rem; }
 
-/* ==========================================================================
-   6. RESPONSIVIDADE (Mobile - FIX DE DUPLICAÇÃO)
-   ========================================================================== */
+/* =========================================
+   5. RESPONSIVIDADE (Mobile)
+   ========================================= */
 @media (max-width: 850px) {
     .header { flex-direction: column; height: auto; padding: 20px; }
     .menu { gap: 15px; font-size: 0.9rem; margin: 15px 0; }
 
     .main-container { padding: 15px; align-items: flex-start; height: auto; }
-    .innovative-card { height: auto; transform: none !important; transition: none; width: 100%; max-width: 400px; }
+    
+    /* Remove 3D no mobile */
+    .innovative-card { height: auto; min-height: auto; transform: none !important; transition: none; }
     
     .card-face { 
         position: relative; flex-direction: column; height: auto; 
@@ -241,8 +255,8 @@ body.dark {
     .innovative-card:not(.flipped) .card-back { display: none; }
     .innovative-card.flipped .card-front { display: none; }
 
-    /* No mobile, flex-basis automático */
-    .card-section { padding: 30px 20px; width: 100%; flex: auto; height: auto; }
+    /* Ajuste de flex para mobile */
+    .card-section { padding: 30px 20px; width: 100%; flex: auto; }
     .welcome-section { order: -1; border-radius: 20px 20px 0 0; padding: 40px 20px; }
     .form-section { border-radius: 0 0 20px 20px; }
 }
