@@ -1,8 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-/* =========================================
-   1. RESET E GLOBAIS
-   ========================================= */
+/* ==========================================================================
+   1. CONFIGURAÇÕES GERAIS (Mantidas)
+   ========================================================================== */
 * {
     margin: 0;
     padding: 0;
@@ -15,12 +15,13 @@ html, body {
 }
 
 body {
-    font-family: 'Poppins', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Poppins', sans-serif;
     min-height: 100vh;
     color: #1f2937;
-    background: linear-gradient(135deg, #f8fafb 0%, #f3f4f6 100%);
+    position: static;
     overflow-x: hidden;
     overflow-y: auto;
+    background: linear-gradient(135deg, #f8fafb 0%, #f3f4f6 100%);
     transition: background 0.3s ease, color 0.3s ease;
 }
 
@@ -37,9 +38,9 @@ body.dark {
     --card-shadow: rgba(5, 100, 40, 0.4);
 }
 
-/* =========================================
-   2. HEADER E MENU (Necessário para as outras páginas)
-   ========================================= */
+/* ==========================================================================
+   2. HEADER E NAVEGAÇÃO (Mantidos intactos para não quebrar outras páginas)
+   ========================================================================== */
 .header {
   display: flex;
   justify-content: space-between;
@@ -52,34 +53,13 @@ body.dark {
   left: 0;
   width: 100%;
   z-index: 1000;
-  height: 65px; /* Ajuste leve na altura */
+  height: 60px;
 }
 
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.logo-icon {
-    width: 40px;
-    height: 40px;
-    background: #0f7c3a;
-    border-radius: 6px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-}
-
+.header-right { display: flex; align-items: center; gap: 15px; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.logo-icon { width: 40px; height: 40px; background: #0f7c3a; border-radius: 6px; display: flex; justify-content: center; align-items: center; color: white; }
 .logo-text { font-weight: bold; font-size: 20px; color:#177517; }
-
 .menu { display: flex; gap: 30px; }
 .menu a { text-decoration: none; color: #555; font-weight: 500; transition: 0.2s; cursor: pointer; }
 .menu a:hover { color: #0f7c3a; }
@@ -95,15 +75,9 @@ body.dark {
     border: none;
     cursor: pointer;
 }
-.btn-acesso:hover {
-    background: #0a5c2b;
-}
+.btn-acesso:hover { background: #0a5c2b; }
 
-/* =========================================
-   3. CORREÇÃO DO LOGIN (Cartão 3D e Layout)
-   ========================================= */
-
-/* Container Centralizado */
+/* Container Principal */
 .main-container {
     position: relative;
     z-index: 10;
@@ -115,61 +89,56 @@ body.dark {
     padding: clamp(24px, 4vw, 48px);
 }
 
-/* Cartão 3D Principal */
 .innovative-card {
-    width: min(1000px, 100%);
-    height: 600px; /* Altura fixa */
+    width: min(1120px, 100%);
+    height: 600px; /* Altura fixa evita pulos */
     position: relative;
-    perspective: 1000px;
-    background: transparent;
     transition: transform 1s;
     transform-style: preserve-3d;
+    background: transparent; 
+    border: none;
+    box-shadow: none; 
 }
 
-/* Gatilho da rotação */
 .innovative-card.flipped {
     transform: rotateY(180deg);
 }
 
-/* Área que gira (Wrapper) */
+/* Wrapper para garantir o 3D */
 .card-wrapper {
+    position: relative;
     width: 100%;
     height: 100%;
-    position: relative;
-    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     transform-style: preserve-3d;
 }
 
-/* Configuração das Faces (Frente e Verso) */
 .card-face {
     position: absolute;
     width: 100%;
     height: 100%;
-    -webkit-backface-visibility: hidden; /* Safari */
-    backface-visibility: hidden; /* Esconde o verso */
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden; /* Safari fix */
     border-radius: 26px;
     overflow: hidden;
     display: flex;
-    box-shadow: 0 25px 55px var(--card-shadow);
-    background: #fff;
     border: 1px solid rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(24px);
+    background: #fff; /* Fundo base */
+    box-shadow: 0 25px 55px var(--card-shadow); /* Sombra aplicada aqui */
 }
 
-/* Face da Frente */
 .card-front {
-    background: #fff;
     z-index: 2;
     transform: rotateY(0deg);
 }
 
-/* Face de Trás (Já começa girada) */
 .card-back {
-    background: #fff;
     transform: rotateY(180deg);
     z-index: 1;
+    background: #fff;
 }
 
-/* Seções Internas (Metade Verde / Metade Branca) */
+/* Seções internas (Esquerda/Direita) */
 .card-section {
     flex: 1;
     display: flex;
@@ -180,29 +149,23 @@ body.dark {
     min-width: 0;
 }
 
-/* LADO VERDE (Boas Vindas) - CORRIGIDO */
+/* FIX: Forçar o verde para cobrir o branco */
 .welcome-section {
     flex: 1;
-    background: linear-gradient(135deg, #0db954 0%, #009739 100%) !important;
-    color: #ffffff !important;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    background: linear-gradient(160deg, #077b23 0%, #00a651 95%) !important;
+    color: #fff !important;
+    justify-content: center; 
     align-items: center;
     text-align: center;
-    position: relative;
 }
 
-/* LADO BRANCO (Formulário) */
 .form-section {
     flex: 1.2;
-    background: #ffffff;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    background: #fff;
+    border-left: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-/* Conteúdo interno */
+/* Conteúdo de Texto e Logo */
 .welcome-content {
     display: flex;
     flex-direction: column;
@@ -210,135 +173,103 @@ body.dark {
     gap: 14px;
     margin-bottom: 30px;
 }
-
 .welcome-title {
-    font-size: clamp(2rem, 3vw, 2.5rem);
+    font-size: clamp(2.2rem, 3vw, 3rem);
     font-weight: 700;
-    color: #ffffff;
-    margin-bottom: 5px;
+    letter-spacing: 0.03em;
+    color: #fff;
 }
-
 .welcome-subtitle {
     font-size: 1rem;
     color: rgba(255, 255, 255, 0.9);
-    max-width: 300px;
-    margin: 0 auto;
 }
 
-/* Logo */
 .logo-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 5px;
+    cursor: pointer; /* Indica que é clicável */
     background: white;
     padding: 10px;
     border-radius: 14px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-    margin-bottom: 15px;
-    cursor: pointer;
     transition: transform 0.2s;
 }
-.logo-container:hover {
-    transform: scale(1.05);
-}
+.logo-container:hover { transform: scale(1.05); }
 
-.logo-img { width: 80px; height: auto; display: block; }
-.logo-img-back { width: 68px; height: 68px; object-fit: cover; border-radius: 16px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25); }
+.logo-img { width: 96px; height: auto; }
+.logo-img-back { width: 68px; height: 68px; object-fit: cover; border-radius: 16px; }
 
-/* Inputs do Login */
-.form-content { width: 100%; max-width: 400px; margin: 0 auto; }
-.form-header { text-align: center; margin-bottom: 25px; }
-.form-title { font-size: 1.8rem; color: #1a3d1a; font-weight: 700; }
-.form-subtitle { color: #666; font-size: 0.95rem; }
+/* Formulários */
+.form-content { width: 100%; max-width: 420px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
+.form-header { text-align: center; margin-bottom: 16px; }
+.form-title { font-size: clamp(1.8rem, 3vw, 2.4rem); font-weight: 700; color: #0f7c3a; }
+.form-subtitle { font-size: 1rem; color: #5f6b6f; }
 
-.floating-input-group { position: relative; margin-bottom: 20px; }
-.floating-input {
-    width: 100%; padding: 14px 15px; border: 1px solid #e0e0e0;
-    border-radius: 10px; background: #f9f9f9; font-size: 0.95rem;
-    transition: all 0.2s; outline: none;
+.form-link {
+    display: block; text-align: center; font-size: 0.95rem; color: #6b7280;
+    text-decoration: none; font-weight: 500; transition: all 0.3s ease; margin-top: 6px;
 }
-.floating-input:focus {
-    background: #fff; border-color: #009739;
-    box-shadow: 0 0 0 3px rgba(0, 151, 57, 0.1);
-}
-.floating-label {
-    position: absolute; left: 15px; top: 14px; color: #888;
-    pointer-events: none; transition: all 0.2s; font-size: 0.95rem;
-}
-.floating-input:focus ~ .floating-label,
-.floating-input:not(:placeholder-shown) ~ .floating-label,
-.floating-input[type='date'] ~ .floating-label {
-    top: -10px; left: 10px; font-size: 0.75rem;
-    background: #fff; padding: 0 5px; color: #009739; font-weight: 600;
-}
-.error-message {
-    color: #d90429; font-size: 0.8rem; margin-top: 5px; display: block;
-}
+.form-link:hover { color: #00a651; }
 
-/* Botões Específicos do Login */
+/* Botões do Login */
 .holo-button {
-    width: 100%; padding: 14px;
-    background: linear-gradient(90deg, #00a651, #00cc44);
-    color: white; border: none; border-radius: 10px;
-    font-size: 1rem; font-weight: 600; cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s; margin-top: 10px;
-    box-shadow: 0 4px 15px rgba(0, 166, 81, 0.3);
+    margin-top: 22px; padding: 14px 34px; border-radius: 50px; cursor: pointer;
+    font-weight: 600; transition: all 0.3s ease; font-size: 0.95rem;
+    background: linear-gradient(90deg, #00a651, #00cc44); color: #fff; border: none;
+    box-shadow: 0 12px 24px rgba(0, 166, 81, 0.35);
 }
-.holo-button:hover {
-    transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0, 166, 81, 0.4);
-}
+.holo-button:hover { transform: translateY(-2px); }
 .holo-button.secondary-button {
-    background: transparent; border: 2px solid #e0e0e0; color: #555;
-    box-shadow: none; margin-top: 15px;
-}
-.holo-button.secondary-button:hover {
-    border-color: #00a651; color: #00a651; background: #f0fdf4;
+    background: #fff; color: var(--forest); border: 2px solid rgba(15, 124, 58, 0.12);
+    box-shadow: none; margin-top: 10px;
 }
 
 .flip-button {
-    background: rgba(255, 255, 255, 0.2);
-    border: 2px solid rgba(255, 255, 255, 0.6);
-    color: white; padding: 12px 30px; border-radius: 50px;
-    font-weight: 600; cursor: pointer; transition: all 0.3s;
-    text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px;
-    margin-top: 20px;
+    margin-top: 20px; padding: 12px 32px; border-radius: 50px; cursor: pointer;
+    font-weight: 600; transition: all 0.3s ease; font-size: 0.95rem;
+    border: 2px solid rgba(255, 255, 255, 0.6); color: #fff; background: rgba(255,255,255,0.1);
 }
-.flip-button:hover {
-    background: white; color: #009739; border-color: white;
-}
-.form-link {
-    display: block; text-align: center; margin-top: 15px; color: #666;
-    text-decoration: none; font-size: 0.9rem;
-}
-.form-link:hover { color: #00a651; text-decoration: underline; }
+.flip-button:hover { background: white; color: #009739; }
 
-/* =========================================
-   4. ESTILOS GERAIS DE BOTÕES (Usados no Dashboard/Ativos)
-   ========================================= */
-.btn-primary {
-    background: #2f8a2f; color: #fff; padding: 8px 12px;
-    border-radius: 6px; border: none; cursor: pointer; font-weight: 600;
+/* Inputs */
+.floating-input-group { position: relative; margin-bottom: 20px; }
+.floating-input {
+    width: 100%; padding: 12px 10px; border: 1px solid #b6e3b6; border-radius: 8px;
+    background: #f8fff8; font-size: 0.95rem; outline: none; transition: border-color 0.2s;
 }
-.btn-primary:hover { filter: brightness(0.95); }
-
-.btn-secondary {
-    background: #fff; color: #1a3d1a; padding: 8px 12px;
-    border-radius: 6px; border: 1px solid #cddfcf; cursor: pointer; font-weight: 600;
+.floating-label {
+    position: absolute; top: 12px; left: 12px; color: #7ba87b; font-size: 0.9rem;
+    pointer-events: none; transition: 0.2s;
 }
-.btn-secondary:hover { background: #f5fff7; }
+.floating-input:focus ~ .floating-label,
+.floating-input:not(:placeholder-shown) ~ .floating-label {
+    top: -10px; left: 8px; font-size: 0.75rem; color: #00a651; background: #fff; padding: 0 6px;
+}
+.error-message { display: block; color: #d90429; font-size: 0.8rem; margin-top: 5px; }
+.dica-campo { display: block; font-size: 0.75rem; color: #6b8e6b; margin-top: -15px; margin-bottom: 15px; }
 
+/* ==========================================================================
+   4. ESTILOS DAS PÁGINAS INTERNAS
+   ========================================================================== */
+.btn-primary { background: #2f8a2f; color: #fff; padding: 8px 12px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; }
+.btn-secondary { background: #fff; color: #1a3d1a; padding: 8px 12px; border-radius: 6px; border: 1px solid #cddfcf; cursor: pointer; font-weight: 600; }
 .btn-save { background: #0f7c3a; color: #fff; padding: 8px 12px; border-radius: 6px; border: none; cursor: pointer; }
 .btn-cancel { background: transparent; color: #333; padding: 8px 12px; border-radius: 6px; border: 1px solid #ddd; cursor: pointer; }
-
 .btn-edit { background: #ffd966; border: none; padding: 6px 8px; border-radius: 6px; cursor: pointer; }
 .btn-delete { background: #ffd6d6; border: none; padding: 6px 8px; border-radius: 6px; cursor: pointer; }
-.btn-simulate {
-    background: linear-gradient(90deg, #e6f4ea, #f0fff5);
-    border: 1px solid #cde9d0; padding: 6px 8px; border-radius: 6px;
-    cursor: pointer; margin-left: 6px;
-}
-.btn-simulate:hover { transform: translateY(-1px); }
+.btn-simulate { background: linear-gradient(90deg, #e6f4ea, #f0fff5); border: 1px solid #cde9d0; padding: 6px 8px; border-radius: 6px; cursor: pointer; margin-left: 6px; }
 
-/* =========================================
-   5. OUTROS COMPONENTES (Rodapé, Fundo, Tabelas)
-   ========================================= */
+.small-card {
+    display: flex; justify-content: space-between; align-items: center;
+    background: #fff; padding: 8px 10px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+}
+.small-label { color: #5a7a5a; font-weight: 600; font-size: 0.9rem; }
+.small-value { font-size: 1rem; }
+
+/* ==========================================================================
+   5. RODAPÉ E FUNDO 
+   ========================================================================== */
 .footer {
     text-align: center; padding: 25px 0; color: #ffffff;
     background: #0f7c3a; font-size: 1rem; font-weight: 600;
@@ -351,41 +282,28 @@ body.dark {
 }
 #animatedLines { width: 100%; height: 100%; display: block; pointer-events: none; }
 
-.loading {
-    margin-top: 20px; font-size: 1.1rem; font-weight: 600;
-    color: #0f7c3a; display: flex; align-items: center; gap: 10px;
-    animation: fadeIn 0.6s ease forwards;
-}
-.loading::before {
-    content: ""; width: 14px; height: 14px; border-radius: 50%;
-    background: linear-gradient(90deg, #00a651, #00cc44);
-    animation: pulse 0.9s infinite ease-in-out;
-}
-@keyframes pulse {
-    0% { transform: scale(0.8); opacity: 0.5; }
-    50% { transform: scale(1.2); opacity: 1; }
-    100% { transform: scale(0.8); opacity: 0.5; }
-}
+.loading { margin-top: 20px; font-size: 1.1rem; font-weight: 600; color: #0f7c3a; display: flex; align-items: center; gap: 10px; animation: fadeIn 0.6s ease forwards; }
+.loading::before { content: ""; width: 14px; height: 14px; border-radius: 50%; background: linear-gradient(90deg, #00a651, #00cc44); animation: pulse 0.9s infinite ease-in-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pulse { 0% { transform: scale(0.8); opacity: 0.5; } 50% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(0.8); opacity: 0.5; } }
+.fade-in-up { animation: fadeInUp 1.2s ease forwards; }
 
-/* Tabelas e Planos */
+/* ==========================================================================
+   6. PÁGINAS DE CONTEÚDO
+   ========================================================================== */
 .texto-verde { color: #0f7c3a; }
 .dark .texto-verde { color: #4ade80; }
 
 .tabela-sobre { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
 .tabela-head { background: #0f7c3a; color: white; padding: 12px; text-align: left; }
 .tabela-cell { border: 1px solid #494646ff; padding: 12px; }
-
 .dark .tabela-sobre { background: #161616 !important; color: white !important; }
 .dark .tabela-cell { border-color: #3a3a3a !important; }
 .dark .tabela-head { background: #15803d !important; }
 
 .titulo-centralizado { text-align: center; }
 .planos-container { display: flex; gap: 30px; flex-wrap: wrap; margin-top: 40px; }
-.card-plano {
-    background: rgb(194, 192, 192); padding: 30px; border-radius: 15px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.05); flex: 1; min-width: 300px;
-    display: flex; flex-direction: column; align-items: center;
-}
+.card-plano { background: rgb(194, 192, 192); padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); flex: 1; min-width: 300px; display: flex; flex-direction: column; align-items: center; }
 .dark .card-plano { background: #111; box-shadow: 0 5px 20px rgba(255,255,255,0.05); }
 .destaque { border: 2px solid #0f7c3a; }
 .dark .destaque { border-color: #4ade80; }
@@ -396,47 +314,46 @@ body.dark {
 .plano-lista { text-align: left; width: 100%; }
 .dark .plano-lista li { color: #e5e5e5; }
 .btn-plano { margin-top: auto; width: 100%; }
+.page-list li { margin-bottom: 10px; font-size: 1.05rem; }
 
-/* =========================================
-   6. RESPONSIVIDADE (Mobile)
-   ========================================= */
+/* ==========================================================================
+   7. RESPONSIVIDADE DO LOGIN 
+   ========================================================================== */
 @media (max-width: 850px) {
-    /* Header Mobile */
     .header { flex-direction: column; height: auto; padding: 20px; }
     .menu { gap: 15px; font-size: 0.9rem; margin: 15px 0; }
 
-    /* Login Mobile (Correção da Duplicação) */
-    .main-container {
-        padding: 15px;
-        height: auto;
-        min-height: 100vh;
-        align-items: flex-start;
-    }
-    .innovative-card {
-        height: auto;
-        min-height: auto;
-        transform: none !important; /* Remove 3D no mobile */
-        transition: none;
-    }
-    .card-face {
-        position: relative;
-        flex-direction: column;
-        height: auto;
-        min-height: 0;
-        backface-visibility: visible;
-        transform: none !important;
-        margin-bottom: 20px;
+    .main-container { padding: 15px; height: auto; min-height: 100vh; align-items: flex-start; }
+    
+    /* Remove o 3D no mobile para evitar bugs visuais */
+    .innovative-card { height: auto; min-height: auto; transform: none !important; transition: none; }
+    
+    /* Configura as faces para aparecerem empilhadas, mas... */
+    .card-face { 
+        position: relative; flex-direction: column; height: auto; 
+        min-height: 0; backface-visibility: visible; transform: none !important; margin-bottom: 20px; 
     }
 
-    /* Esconde a face inativa */
+    /* ...Esconde a face que não está ativa usando display:none */
     .innovative-card:not(.flipped) .card-back { display: none; }
     .innovative-card.flipped .card-front { display: none; }
 
     .card-section { padding: 30px 20px; width: 100%; }
-    .welcome-section {
-        order: -1; /* Joga boas-vindas para o topo */
-        border-radius: 20px 20px 0 0;
-        padding: 40px 20px;
-    }
+    
+    /* Joga a seção verde para o topo no mobile */
+    .welcome-section { order: -1; border-radius: 20px 20px 0 0; padding: 40px 20px; }
     .form-section { border-radius: 0 0 20px 20px; }
+}
+.page-content.sem-sidebar {
+    margin-left: 0 !important;   
+    width: 100% !important;  
+    max-width: 1200px;           
+    margin: 0 auto;              
+    padding-top: 100px;          
+    padding-bottom: 40px;
+}
+
+.sem-sidebar .page-title {
+    text-align: center;
+    margin-bottom: 40px;
 }
