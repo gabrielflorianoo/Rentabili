@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { servicoAutenticacao } from '../services/servicoAutenticacao';
 import { dashboardApi } from '../services/apis';
-import Sidebar from '../components/Sidebar'; 
+import Sidebar from '../components/Sidebar';
+import CurrencyTicker from '../components/CurrencyTicker';
 import {
     EvolutionLineChart,
     AllocationPieChart,
@@ -12,30 +13,30 @@ import './DashBoard.css';
 
 // --- IMPORTAÇÃO DAS BIBLIOTECAS GRÁFICAS ---
 import {
-  Chart as ChartJS,
-  ArcElement,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
+    Chart as ChartJS,
+    ArcElement,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend,
+    Filler
 } from 'chart.js';
 import { Doughnut, Line } from 'react-chartjs-2';
 
 // Registra os componentes do gráfico para eles funcionarem
 ChartJS.register(
-  ArcElement,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
+    ArcElement,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend,
+    Filler
 );
 
 export default function Dashboard() {
@@ -43,7 +44,7 @@ export default function Dashboard() {
     const [userData, setUserData] = useState({ name: 'Investidor' });
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
-    
+
     // Estado para Interatividade (Filtro ao clicar no gráfico)
     const [selectedCategory, setSelectedCategory] = useState(null);
 
@@ -121,7 +122,7 @@ export default function Dashboard() {
     };
 
     if (loading) return <div className="loading">Carregando inteligência financeira...</div>;
-    
+
     // Se não tem dados após carregar, mostrar estado vazio
     if (!data) {
         return (
@@ -137,8 +138,9 @@ export default function Dashboard() {
     return (
         <div className="dashboard-wrap">
             <Sidebar aoSair={handleLogout} paginaAtiva="dashboard" />
-            
+
             <div className="content">
+                <CurrencyTicker />
                 <header className="content-head">
                     <div>
                         <h2>Olá, {userData.name}</h2>
@@ -158,7 +160,7 @@ export default function Dashboard() {
                             <h3>{formatBRL(data?.totalBalance || data?.summary?.totalBalance || 0)}</h3>
                         </div>
                     </div>
-                    
+
                     <div className="kpi-card">
                         <div className="kpi-icon">📥</div>
                         <div>
@@ -171,7 +173,7 @@ export default function Dashboard() {
                         <div className="kpi-icon">📈</div>
                         <div>
                             <span>Rentabilidade</span>
-                            <h3 style={{color: (data?.totalGain || 0) >= 0 ? '#00a651' : '#d90429'}}>
+                            <h3 style={{ color: (data?.totalGain || 0) >= 0 ? '#00a651' : '#d90429' }}>
                                 {(data?.totalGain || 0) >= 0 ? '+' : ''}{data?.profitability || 0}%
                             </h3>
                             <small>{formatBRL(data?.totalGain || 0)} de lucro real</small>
@@ -180,12 +182,12 @@ export default function Dashboard() {
                 </div>
 
                 <div className="dashboard-split">
-                    
+
                     {/* 2. GRÁFICO DE ALOCAÇÃO */}
                     <section className="chart-section glass-panel">
                         <div className="section-header">
                             <h3>Alocação de Ativos</h3>
-                            {selectedCategory && 
+                            {selectedCategory &&
                                 <button className="btn-reset" onClick={() => setSelectedCategory(null)}>Ver Todos</button>
                             }
                         </div>
@@ -204,7 +206,7 @@ export default function Dashboard() {
                     {/* 3. DETALHES DINÂMICOS */}
                     <section className="details-section glass-panel">
                         <h3>{selectedCategory ? `Detalhes: ${selectedCategory}` : 'Evolução & Destaques'}</h3>
-                        
+
                         {selectedCategory ? (
                             <div className="category-detail-view">
                                 <div className="detail-box">
@@ -218,8 +220,8 @@ export default function Dashboard() {
                                     </strong>
                                 </div>
                                 <div className="progress-bar">
-                                    <div 
-                                        className="fill" 
+                                    <div
+                                        className="fill"
                                         style={{
                                             width: `${(() => {
                                                 const item = allocationData?.find(a => a.type === selectedCategory || a.name === selectedCategory);
