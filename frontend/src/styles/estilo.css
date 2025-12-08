@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 /* ==========================================================================
-   1. CONFIGURAÇÕES GERAIS (Mantidas)
+   1. CONFIGURAÇÕES GERAIS
    ========================================================================== */
 * {
     margin: 0;
@@ -18,10 +18,9 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Poppins', sans-serif;
     min-height: 100vh;
     color: #1f2937;
-    position: static;
+    background: linear-gradient(135deg, #f8fafb 0%, #f3f4f6 100%);
     overflow-x: hidden;
     overflow-y: auto;
-    background: linear-gradient(135deg, #f8fafb 0%, #f3f4f6 100%);
     transition: background 0.3s ease, color 0.3s ease;
 }
 
@@ -33,13 +32,11 @@ body.dark {
 :root {
     --forest: #0b5c23;
     --emerald: #00c56f;
-    --mint-glow: #c8ffd7;
-    --cloud: #fdfdfd;
-    --card-shadow: rgba(5, 100, 40, 0.4);
+    --card-shadow: rgba(5, 100, 40, 0.25);
 }
 
 /* ==========================================================================
-   2. HEADER E NAVEGAÇÃO (Mantidos intactos para não quebrar outras páginas)
+   2. HEADER (Mantido)
    ========================================================================== */
 .header {
   display: flex;
@@ -48,14 +45,8 @@ body.dark {
   padding: 15px 50px;
   background: #fff;
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  position: fixed; 
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 1000;
-  height: 60px;
+  position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; height: 65px;
 }
-
 .header-right { display: flex; align-items: center; gap: 15px; }
 .brand { display: flex; align-items: center; gap: 10px; }
 .logo-icon { width: 40px; height: 40px; background: #0f7c3a; border-radius: 6px; display: flex; justify-content: center; align-items: center; color: white; }
@@ -63,68 +54,54 @@ body.dark {
 .menu { display: flex; gap: 30px; }
 .menu a { text-decoration: none; color: #555; font-weight: 500; transition: 0.2s; cursor: pointer; }
 .menu a:hover { color: #0f7c3a; }
-
-.btn-acesso {
-    background: #0f7c3a;
-    color: #fff;
-    padding: 10px 24px;
-    border-radius: 6px;
-    font-size: 14px;
-    text-decoration: none;
-    font-weight: 600;
-    border: none;
-    cursor: pointer;
-}
+.btn-acesso { background: #0f7c3a; color: #fff; padding: 10px 24px; border-radius: 6px; font-size: 14px; text-decoration: none; font-weight: 600; border: none; cursor: pointer; }
 .btn-acesso:hover { background: #0a5c2b; }
 
-/* Container Principal */
+/* ==========================================================================
+   3. CORREÇÃO DEFINITIVA DO LOGIN (Frente e Verso)
+   ========================================================================== */
+
 .main-container {
-    position: relative;
-    z-index: 10;
-    width: 100%;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: clamp(24px, 4vw, 48px);
+    position: relative; z-index: 10; width: 100%; min-height: 100vh;
+    display: flex; align-items: center; justify-content: center; padding: clamp(24px, 4vw, 48px);
 }
 
+/* CONTAINER PAI: Transparente para não criar fundo branco atrás */
 .innovative-card {
-    width: min(1120px, 100%);
-    height: 600px; /* Altura fixa evita pulos */
+    width: min(1000px, 100%);
+    height: 600px;
     position: relative;
-    transition: transform 1s;
-    transform-style: preserve-3d;
-    background: transparent; 
-    border: none;
-    box-shadow: none; 
+    perspective: 1000px;
+    background: transparent !important; /* IMPORTANTE */
+    box-shadow: none !important;        /* IMPORTANTE */
+    border: none !important;            /* IMPORTANTE */
 }
 
-.innovative-card.flipped {
+.innovative-card.flipped .card-wrapper {
     transform: rotateY(180deg);
 }
 
-/* Wrapper para garantir o 3D */
 .card-wrapper {
-    position: relative;
     width: 100%;
     height: 100%;
+    position: relative;
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     transform-style: preserve-3d;
 }
 
+/* FACES DO CARTÃO: Aqui fica o fundo branco e a sombra */
 .card-face {
     position: absolute;
     width: 100%;
     height: 100%;
+    -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
-    -webkit-backface-visibility: hidden; /* Safari fix */
     border-radius: 26px;
     overflow: hidden;
     display: flex;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    backdrop-filter: blur(24px);
     background: #fff; /* Fundo base */
-    box-shadow: 0 25px 55px var(--card-shadow); /* Sombra aplicada aqui */
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 .card-front {
@@ -135,10 +112,9 @@ body.dark {
 .card-back {
     transform: rotateY(180deg);
     z-index: 1;
-    background: #fff;
 }
 
-/* Seções internas (Esquerda/Direita) */
+/* SEÇÕES INTERNAS (Esquerda/Direita) */
 .card-section {
     flex: 1;
     display: flex;
@@ -149,108 +125,92 @@ body.dark {
     min-width: 0;
 }
 
-/* FIX: Forçar o verde para cobrir o branco */
+/* LADO VERDE (Boas Vindas) - Usado na Frente (Esq) e no Verso (Dir) */
 .welcome-section {
     flex: 1;
     background: linear-gradient(160deg, #077b23 0%, #00a651 95%) !important;
     color: #fff !important;
-    justify-content: center; 
     align-items: center;
     text-align: center;
 }
 
+/* LADO BRANCO (Formulário) - Usado na Frente (Dir) e no Verso (Esq) */
 .form-section {
     flex: 1.2;
-    background: #fff;
-    border-left: 1px solid rgba(0, 0, 0, 0.05);
+    background: #ffffff !important;
+    color: #1f2937;
 }
 
-/* Conteúdo de Texto e Logo */
+/* Estilos de Texto e Logo */
 .welcome-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 30px;
+    display: flex; flex-direction: column; align-items: center; gap: 14px; margin-bottom: 30px;
 }
 .welcome-title {
-    font-size: clamp(2.2rem, 3vw, 3rem);
-    font-weight: 700;
-    letter-spacing: 0.03em;
-    color: #fff;
+    font-size: clamp(2rem, 3vw, 2.5rem); font-weight: 700; color: #fff; margin-bottom: 5px;
 }
 .welcome-subtitle {
-    font-size: 1rem;
-    color: rgba(255, 255, 255, 0.9);
+    font-size: 1rem; color: rgba(255, 255, 255, 0.9); max-width: 300px; margin: 0 auto;
 }
 
 .logo-container {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 5px;
-    cursor: pointer; /* Indica que é clicável */
-    background: white;
-    padding: 10px;
-    border-radius: 14px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    background: white; padding: 10px; border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15); margin-bottom: 15px; cursor: pointer;
     transition: transform 0.2s;
 }
 .logo-container:hover { transform: scale(1.05); }
-
-.logo-img { width: 96px; height: auto; }
+.logo-img { width: 80px; height: auto; display: block; }
 .logo-img-back { width: 68px; height: 68px; object-fit: cover; border-radius: 16px; }
 
 /* Formulários */
-.form-content { width: 100%; max-width: 420px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
-.form-header { text-align: center; margin-bottom: 16px; }
-.form-title { font-size: clamp(1.8rem, 3vw, 2.4rem); font-weight: 700; color: #0f7c3a; }
-.form-subtitle { font-size: 1rem; color: #5f6b6f; }
-
-.form-link {
-    display: block; text-align: center; font-size: 0.95rem; color: #6b7280;
-    text-decoration: none; font-weight: 500; transition: all 0.3s ease; margin-top: 6px;
-}
-.form-link:hover { color: #00a651; }
-
-/* Botões do Login */
-.holo-button {
-    margin-top: 22px; padding: 14px 34px; border-radius: 50px; cursor: pointer;
-    font-weight: 600; transition: all 0.3s ease; font-size: 0.95rem;
-    background: linear-gradient(90deg, #00a651, #00cc44); color: #fff; border: none;
-    box-shadow: 0 12px 24px rgba(0, 166, 81, 0.35);
-}
-.holo-button:hover { transform: translateY(-2px); }
-.holo-button.secondary-button {
-    background: #fff; color: var(--forest); border: 2px solid rgba(15, 124, 58, 0.12);
-    box-shadow: none; margin-top: 10px;
-}
-
-.flip-button {
-    margin-top: 20px; padding: 12px 32px; border-radius: 50px; cursor: pointer;
-    font-weight: 600; transition: all 0.3s ease; font-size: 0.95rem;
-    border: 2px solid rgba(255, 255, 255, 0.6); color: #fff; background: rgba(255,255,255,0.1);
-}
-.flip-button:hover { background: white; color: #009739; }
+.form-content { width: 100%; max-width: 400px; margin: 0 auto; }
+.form-header { text-align: center; margin-bottom: 25px; }
+.form-title { font-size: 1.8rem; color: #1a3d1a; font-weight: 700; }
+.form-subtitle { color: #666; font-size: 0.95rem; }
 
 /* Inputs */
 .floating-input-group { position: relative; margin-bottom: 20px; }
 .floating-input {
-    width: 100%; padding: 12px 10px; border: 1px solid #b6e3b6; border-radius: 8px;
-    background: #f8fff8; font-size: 0.95rem; outline: none; transition: border-color 0.2s;
+    width: 100%; padding: 14px 15px; border: 1px solid #e0e0e0; border-radius: 10px;
+    background: #f9f9f9; font-size: 0.95rem; transition: all 0.2s; outline: none;
+}
+.floating-input:focus {
+    background: #fff; border-color: #009739; box-shadow: 0 0 0 3px rgba(0, 151, 57, 0.1);
 }
 .floating-label {
-    position: absolute; top: 12px; left: 12px; color: #7ba87b; font-size: 0.9rem;
-    pointer-events: none; transition: 0.2s;
+    position: absolute; left: 15px; top: 14px; color: #888; pointer-events: none; transition: 0.2s;
 }
 .floating-input:focus ~ .floating-label,
-.floating-input:not(:placeholder-shown) ~ .floating-label {
-    top: -10px; left: 8px; font-size: 0.75rem; color: #00a651; background: #fff; padding: 0 6px;
+.floating-input:not(:placeholder-shown) ~ .floating-label,
+.floating-input[type='date'] ~ .floating-label {
+    top: -10px; left: 10px; font-size: 0.75rem; color: #00a651; background: #fff; padding: 0 5px; font-weight: 600;
 }
-.error-message { display: block; color: #d90429; font-size: 0.8rem; margin-top: 5px; }
+
+/* Botões */
+.holo-button {
+    width: 100%; padding: 14px; background: linear-gradient(90deg, #00a651, #00cc44);
+    color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s; margin-top: 10px; box-shadow: 0 4px 15px rgba(0, 166, 81, 0.3);
+}
+.holo-button:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0, 166, 81, 0.4); }
+.holo-button.secondary-button {
+    background: #fff; color: var(--forest); border: 2px solid rgba(15, 124, 58, 0.12); box-shadow: none; margin-top: 15px;
+}
+.holo-button.secondary-button:hover { border-color: #00a651; color: #00a651; background: #f0fdf4; }
+
+.flip-button {
+    margin-top: 20px; padding: 12px 32px; border-radius: 50px; cursor: pointer; font-weight: 600; transition: all 0.3s;
+    font-size: 0.85rem; letter-spacing: 1px; text-transform: uppercase;
+    border: 2px solid rgba(255, 255, 255, 0.6); color: #fff; background: rgba(255,255,255,0.1);
+}
+.flip-button:hover { background: white; color: #009739; border-color: white; }
+
+.form-link { display: block; text-align: center; margin-top: 15px; color: #666; text-decoration: none; font-size: 0.9rem; }
+.form-link:hover { color: #00a651; text-decoration: underline; }
+.error-message { color: #d90429; font-size: 0.8rem; margin-top: 5px; display: block; }
 .dica-campo { display: block; font-size: 0.75rem; color: #6b8e6b; margin-top: -15px; margin-bottom: 15px; }
 
 /* ==========================================================================
-   4. ESTILOS DAS PÁGINAS INTERNAS
+   4. OUTROS ESTILOS (Mantidos)
    ========================================================================== */
 .btn-primary { background: #2f8a2f; color: #fff; padding: 8px 12px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; }
 .btn-secondary { background: #fff; color: #1a3d1a; padding: 8px 12px; border-radius: 6px; border: 1px solid #cddfcf; cursor: pointer; font-weight: 600; }
@@ -260,26 +220,8 @@ body.dark {
 .btn-delete { background: #ffd6d6; border: none; padding: 6px 8px; border-radius: 6px; cursor: pointer; }
 .btn-simulate { background: linear-gradient(90deg, #e6f4ea, #f0fff5); border: 1px solid #cde9d0; padding: 6px 8px; border-radius: 6px; cursor: pointer; margin-left: 6px; }
 
-.small-card {
-    display: flex; justify-content: space-between; align-items: center;
-    background: #fff; padding: 8px 10px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
-}
-.small-label { color: #5a7a5a; font-weight: 600; font-size: 0.9rem; }
-.small-value { font-size: 1rem; }
-
-/* ==========================================================================
-   5. RODAPÉ E FUNDO 
-   ========================================================================== */
-.footer {
-    text-align: center; padding: 25px 0; color: #ffffff;
-    background: #0f7c3a; font-size: 1rem; font-weight: 600;
-    margin-top: auto; width: 100%;
-}
-
-.futuristic-background {
-    position: fixed; inset: 0; z-index: 0;
-    background: linear-gradient(to top, #eaffea, #ffffff);
-}
+.footer { text-align: center; padding: 25px 0; color: #ffffff; background: #0f7c3a; font-size: 1rem; font-weight: 600; margin-top: auto; width: 100%; }
+.futuristic-background { position: fixed; inset: 0; z-index: 0; background: linear-gradient(to top, #eaffea, #ffffff); }
 #animatedLines { width: 100%; height: 100%; display: block; pointer-events: none; }
 
 .loading { margin-top: 20px; font-size: 1.1rem; font-weight: 600; color: #0f7c3a; display: flex; align-items: center; gap: 10px; animation: fadeIn 0.6s ease forwards; }
@@ -288,19 +230,24 @@ body.dark {
 @keyframes pulse { 0% { transform: scale(0.8); opacity: 0.5; } 50% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(0.8); opacity: 0.5; } }
 .fade-in-up { animation: fadeInUp 1.2s ease forwards; }
 
-/* ==========================================================================
-   6. PÁGINAS DE CONTEÚDO
-   ========================================================================== */
+/* FIX PARA PÁGINAS SEM SIDEBAR */
+.page-content.sem-sidebar {
+    margin-left: 0 !important; width: 90% !important; max-width: 1200px;
+    margin: 0 auto !important; padding-top: 100px; padding-bottom: 40px;
+    display: flex; flex-direction: column; align-items: center;
+}
+.sem-sidebar .page-text, .sem-sidebar .page-list { max-width: 800px; width: 100%; }
+.sem-sidebar .page-title, .sem-sidebar .section-title { text-align: center; width: 100%; }
+
+/* Tabelas e Planos */
 .texto-verde { color: #0f7c3a; }
 .dark .texto-verde { color: #4ade80; }
-
 .tabela-sobre { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
 .tabela-head { background: #0f7c3a; color: white; padding: 12px; text-align: left; }
 .tabela-cell { border: 1px solid #494646ff; padding: 12px; }
 .dark .tabela-sobre { background: #161616 !important; color: white !important; }
 .dark .tabela-cell { border-color: #3a3a3a !important; }
 .dark .tabela-head { background: #15803d !important; }
-
 .titulo-centralizado { text-align: center; }
 .planos-container { display: flex; gap: 30px; flex-wrap: wrap; margin-top: 40px; }
 .card-plano { background: rgb(194, 192, 192); padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); flex: 1; min-width: 300px; display: flex; flex-direction: column; align-items: center; }
@@ -317,7 +264,7 @@ body.dark {
 .page-list li { margin-bottom: 10px; font-size: 1.05rem; }
 
 /* ==========================================================================
-   7. RESPONSIVIDADE DO LOGIN 
+   5. RESPONSIVIDADE (Mobile - FIX DE DUPLICAÇÃO)
    ========================================================================== */
 @media (max-width: 850px) {
     .header { flex-direction: column; height: auto; padding: 20px; }
@@ -325,16 +272,15 @@ body.dark {
 
     .main-container { padding: 15px; height: auto; min-height: 100vh; align-items: flex-start; }
     
-    /* Remove o 3D no mobile para evitar bugs visuais */
+    /* Remove 3D no mobile para evitar bugs visuais */
     .innovative-card { height: auto; min-height: auto; transform: none !important; transition: none; }
     
-    /* Configura as faces para aparecerem empilhadas, mas... */
     .card-face { 
         position: relative; flex-direction: column; height: auto; 
         min-height: 0; backface-visibility: visible; transform: none !important; margin-bottom: 20px; 
     }
 
-    /* ...Esconde a face que não está ativa usando display:none */
+    /* Esconde a face inativa */
     .innovative-card:not(.flipped) .card-back { display: none; }
     .innovative-card.flipped .card-front { display: none; }
 
@@ -343,28 +289,4 @@ body.dark {
     /* Joga a seção verde para o topo no mobile */
     .welcome-section { order: -1; border-radius: 20px 20px 0 0; padding: 40px 20px; }
     .form-section { border-radius: 0 0 20px 20px; }
-}
-.page-content.sem-sidebar {
-    margin-left: 0 !important; 
-    width: 90% !important;      
-    max-width: 1200px;          
-    margin: 0 auto !important;  
-    padding-top: 100px;         
-    padding-bottom: 40px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;        
-}
-
-/* Centraliza os textos dessas páginas */
-.sem-sidebar .page-text, 
-.sem-sidebar .page-list {
-    max-width: 800px;  
-    width: 100%;
-}
-
-.sem-sidebar .page-title,
-.sem-sidebar .section-title {
-    text-align: center;
-    width: 100%;
 }
