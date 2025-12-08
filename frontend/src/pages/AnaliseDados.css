@@ -7,12 +7,12 @@
 
 /* ===== HEADER ===== */
 .analise-header {
-    background: linear-gradient(135deg, #7209b7 0%, #f72585 100%);
+    background: linear-gradient(135deg, #0f7c3a 0%, #059669 100%);
     border-radius: 16px;
     padding: 2.5rem 2rem;
     margin-bottom: 2.5rem;
     color: white;
-    box-shadow: 0 8px 32px rgba(114, 9, 183, 0.15);
+    box-shadow: 0 8px 32px rgba(15, 124, 58, 0.15);
 }
 
 .analise-header h1 {
@@ -49,7 +49,7 @@
 
 .performance-geral h3 {
     font-size: 1.3rem;
-    color: #7209b7;
+    color: #0f7c3a;
     margin: 0 0 1.5rem 0;
     font-weight: 700;
 }
@@ -66,14 +66,14 @@
     background: linear-gradient(135deg, #f8fafb 0%, #f1f5f9 100%);
     border-radius: 12px;
     padding: 1.5rem;
-    border-top: 4px solid #7209b7;
+    border-top: 4px solid #0f7c3a;
     transition: all 0.3s ease;
 }
 
 .resumo-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(114, 9, 183, 0.15);
-    background: linear-gradient(135deg, #f3e5ff 0%, #ede9fe 100%);
+    box-shadow: 0 8px 24px rgba(15, 124, 58, 0.15);
+    background: linear-gradient(135deg, #e8f5e9 0%, #f1f5f9 100%);
 }
 
 .resumo-card.positive {
@@ -169,7 +169,7 @@
 
 .top-performers h3 {
     font-size: 1.3rem;
-    color: #7209b7;
+    color: #0f7c3a;
     margin: 0 0 1.5rem 0;
     font-weight: 700;
     display: flex;
@@ -260,18 +260,18 @@
 
 .analise-detalhada h3 {
     font-size: 1.3rem;
-    color: #7209b7;
+    color: #0f7c3a;
     margin: 0 0 1.5rem 0;
     font-weight: 700;
 }
 
 .analise-ativo-selecionado {
-    background: linear-gradient(135deg, #7209b7 0%, #3a0ca3 100%);
+    background: linear-gradient(135deg, #0f7c3a 0%, #059669 100%);
     border-radius: 16px;
     padding: 2rem;
     color: white;
     margin-bottom: 2rem;
-    box-shadow: 0 8px 24px rgba(114, 9, 183, 0.2);
+    box-shadow: 0 8px 24px rgba(15, 124, 58, 0.2);
 }
 
 .ativo-header {
@@ -340,7 +340,7 @@
     border-radius: 12px;
     padding: 1.5rem;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-    border-top: 4px solid #7209b7;
+    border-top: 4px solid #0f7c3a;
 }
 
 .grafico-container h4 {
@@ -362,7 +362,7 @@
 .tabela-header {
     display: grid;
     grid-template-columns: 1.5fr 1fr 1fr 1fr;
-    background: linear-gradient(135deg, #7209b7 0%, #3a0ca3 100%);
+    background: linear-gradient(135deg, #0f7c3a 0%, #059669 100%);
     color: white;
     font-weight: 700;
     padding: 1rem;
