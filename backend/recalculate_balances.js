@@ -34,57 +34,62 @@ async function recalculateBalances() {
 
         console.log(`📦 Ativos com investimentos: ${Object.keys(investmentsByActive).length}\n`);
 
-        // Para cada ativo, calcular saldos acumulados
+        // Para cada ativo, calcular saldos acumulados CORRETAMENTE
         for (const [activeId, data] of Object.entries(investmentsByActive)) {
             const { activeName, investments } = data;
             console.log(`\n💼 Processando: ${activeName} (ID: ${activeId})`);
             console.log(`   Total de transações: ${investments.length}`);
 
-            // Agrupar por data
-            const balancesByDate = {};
-            let saldoAcumulado = 0;
+            // Separar investimentos (aportes) de rendas (lucros/perdas)
+            const aportes = investments.filter(inv => inv.kind !== 'Renda');
+            const rendas = investments.filter(inv => inv.kind === 'Renda');
 
-            investments.forEach(inv => {
-                const dateKey = new Date(inv.date).toISOString().split('T')[0];
-                const amount = Number(inv.amount);
+            console.log(`   📊 Aportes: ${aportes.length} | Rendas: ${rendas.length}`);
 
-                // Acumular o saldo
-                saldoAcumulado += amount;
+            // Calcular total aportado (apenas dinheiro colocado pelo usuário)
+            const totalAportado = aportes.reduce((sum, inv) => sum + Number(inv.amount), 0);
+            
+            // Calcular total de rendas acumuladas (ganhos/perdas ao longo do tempo)
+            const totalRendas = rendas.reduce((sum, inv) => sum + Number(inv.amount), 0);
+            
+            // Patrimônio atual = aportes + rendas acumuladas
+            const patrimonioAtual = totalAportado + totalRendas;
 
-                // Guardar o saldo naquela data (sobrescrever se já existe)
-                balancesByDate[dateKey] = saldoAcumulado;
+            console.log(`   💰 Total Aportado: R$ ${totalAportado.toFixed(2)}`);
+            console.log(`   📈 Total Rendas: R$ ${totalRendas.toFixed(2)}`);
+            console.log(`   💎 Patrimônio Atual: R$ ${patrimonioAtual.toFixed(2)}`);
 
-                console.log(`   ${dateKey}: ${inv.kind} = R$ ${amount.toFixed(2)} → Saldo: R$ ${saldoAcumulado.toFixed(2)}`);
-            });
+            // Usar a data mais recente (última transação) para o balance atual
+            const todasTransacoes = [...aportes, ...rendas].sort((a, b) => new Date(b.date) - new Date(a.date));
+            const dataUltimaTransacao = todasTransacoes.length > 0 
+                ? new Date(todasTransacoes[0].date).toISOString().split('T')[0]
+                : new Date().toISOString().split('T')[0];
 
-            // Agora criar/atualizar os HistoricalBalances
-            for (const [dateKey, balance] of Object.entries(balancesByDate)) {
-                const date = new Date(dateKey);
-                
-                try {
-                    // Tentar atualizar ou criar
-                    await prisma.historicalBalance.upsert({
-                        where: {
-                            activeId_date: {
-                                activeId: parseInt(activeId),
-                                date: date
-                            }
-                        },
-                        update: {
-                            value: balance
-                        },
-                        create: {
+            // Criar/atualizar o HistoricalBalance mais recente
+            try {
+                const date = new Date(dataUltimaTransacao);
+                // Tentar atualizar ou criar o balance mais recente
+                await prisma.historicalBalance.upsert({
+                    where: {
+                        activeId_date: {
                             activeId: parseInt(activeId),
-                            date: date,
-                            value: balance
+                            date: date
                         }
-                    });
-                } catch (error) {
-                    console.error(`   ❌ Erro ao salvar balance para ${dateKey}:`, error.message);
-                }
+                    },
+                    update: {
+                        value: patrimonioAtual
+                    },
+                    create: {
+                        activeId: parseInt(activeId),
+                        date: date,
+                        value: patrimonioAtual
+                    }
+                });
+                
+                console.log(`   ✅ Balance histórico atualizado para ${dataUltimaTransacao}`);
+            } catch (error) {
+                console.error(`   ❌ Erro ao salvar balance:`, error.message);
             }
-
-            console.log(`   ✅ Saldo final do ativo: R$ ${saldoAcumulado.toFixed(2)}`);
         }
 
         console.log('\n✅ Recálculo concluído com sucesso!');
