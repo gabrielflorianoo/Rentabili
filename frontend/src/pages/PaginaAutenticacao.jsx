@@ -1,20 +1,19 @@
 import React from 'react';
-import FundoAnimado from '../components/FundoAnimado'; // Componente que renderiza um fundo animado da página
-import CartaoAutenticacao from '../components/CartaoAutenticacao'; // Componente do card de login/cadastro
+import FundoAnimado from '../components/FundoAnimado'; // O fundo canvas
+import CartaoAutenticacao from '../components/CartaoAutenticacao'; // O cartão 3D
 
-// Componente principal da página de autenticação
 const PaginaAutenticacao = () => {
     return (
-        <>
-            {/* Fundo animado da página, pode incluir efeitos visuais ou partículas */}
-            <FundoAnimado />
 
-            {/* Conteúdo principal centralizado */}
+        <div style={{ position: 'relative', width: '100%', minHeight: '100vh', overflow: 'hidden' }}>
+            
+            {/* CAMADA 1: Fundo (Fica fixo atrás) */}
+            <FundoAnimado />
             <main className="main-container">
-                {/* Card de autenticação que contém o formulário de login ou cadastro */}
                 <CartaoAutenticacao />
             </main>
-        </>
+            
+        </div>
     );
 };
 
