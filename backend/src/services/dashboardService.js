@@ -184,41 +184,88 @@ class DashboardService {
                 };
             }
 
-            const [actives, wallets, transactions, investments] =
+            const [investments, wallets, transactions, balanceHistory] =
                 await Promise.all([
-                    dashboardRepository.findActivesWithLatestBalances(userId),
+                    dashboardRepository.findInvestments(userId),
                     dashboardRepository.findWallets(userId),
                     dashboardRepository.findTransactions(userId),
-                    dashboardRepository.findInvestments(userId),
+                    dashboardRepository.findBalanceHistory(userId, 6),
                 ]);
 
-            const totalActives = actives.reduce(
-                (s, a) => s + a.latestBalance,
-                0,
-            );
-            const walletsTotal = wallets.reduce(
-                (s, w) => s + Number(w.balance || 0),
-                0,
-            );
+            // Calcular saldo de cada ativo a partir dos investimentos
+            const activesMap = new Map();
+            
+            investments.forEach((inv) => {
+                if (!activesMap.has(inv.activeId)) {
+                    activesMap.set(inv.activeId, {
+                        id: inv.activeId,
+                        name: inv.active.name,
+                        type: inv.active.type,
+                        totalBalance: 0,
+                        totalInvested: 0,
+                    });
+                }
+                
+                const active = activesMap.get(inv.activeId);
+                const amount = Number(inv.amount || 0);
+                
+                // Adicionar ao saldo total (investimentos + rendas)
+                active.totalBalance += amount;
+                
+                // Se não é renda, adicionar ao investido
+                if (inv.kind !== 'Renda') {
+                    active.totalInvested += amount;
+                }
+            });
+
+            // Converter map em array e formatar
+            const actives = Array.from(activesMap.values()).map((a) => ({
+                id: a.id,
+                name: a.name,
+                type: a.type,
+                latestBalance: a.totalBalance,
+            }));
+
+            // Calcular totais
+            const totalActives = actives.reduce((s, a) => s + a.latestBalance, 0);
+            const walletsTotal = wallets.reduce((s, w) => s + Number(w.balance || 0), 0);
             const totalBalance = totalActives + walletsTotal;
 
-            // Criar gráfico de alocação
-            const allocationChart = actives.map((a) => ({
-                name: a.name,
-                value: totalBalance > 0 ? ((a.latestBalance / totalBalance) * 100).toFixed(2) : 0,
-            }));
+            // Total investido (sem rendas)
+            const totalInvested = Array.from(activesMap.values()).reduce(
+                (sum, a) => sum + a.totalInvested,
+                0,
+            );
 
-            // Criar gráfico de evolução (mock simples)
-            const evolutionChart = Array.from({ length: 6 }, (_, i) => ({
-                month: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'][i],
-                value: Math.round(totalBalance * (0.8 + (i * 0.04))),
-            }));
-
-            // Contar apenas investimentos (não rendas)
-            const investmentsOnly = investments.filter((inv) => inv.kind !== 'Renda');
-            const totalInvested = investmentsOnly.reduce((sum, inv) => sum + Number(inv.amount || 0), 0);
+            // Ganho total e rentabilidade
             const totalGain = totalBalance - totalInvested;
-            const profitability = totalInvested > 0 ? ((totalGain / totalInvested) * 100).toFixed(2) : 0;
+            const profitability = totalInvested > 0 
+                ? parseFloat(((totalGain / totalInvested) * 100).toFixed(2))
+                : 0;
+
+            // Criar gráfico de alocação
+            const allocationChart = actives
+                .filter((a) => a.latestBalance > 0)
+                .map((a) => ({
+                    name: a.name,
+                    value: a.latestBalance,
+                    percentage: totalBalance > 0 
+                        ? parseFloat(((a.latestBalance / totalBalance) * 100).toFixed(2))
+                        : 0,
+                }))
+                .sort((a, b) => b.value - a.value);
+
+            // Criar gráfico de evolução
+            let evolutionChart = [];
+            if (balanceHistory && balanceHistory.length > 0) {
+                evolutionChart = this._buildEvolutionChartFromHistory(balanceHistory);
+            } else {
+                // Se não há histórico, reconstruir a partir dos investimentos
+                evolutionChart = this._buildEvolutionChartFromInvestments(investments);
+            }
+
+            // Apenas investimentos (sem rendas)
+            const investmentsOnly = investments.filter((inv) => inv.kind !== 'Renda');
             
             // Obter número de ativos diferentes com investimentos
             const activesCountWithInvestments = await investmentService.getDifferentActivesCount(userId);
@@ -246,6 +293,92 @@ class DashboardService {
             console.error('DashboardService - getDashboard:', error);
             throw new Error(error.message || 'Erro ao processar dados financeiros');
         }
+    }
+
+    _buildEvolutionChartFromHistory(balanceHistory) {
+        // Se não há histórico, retorna gráfico vazio
+        if (!balanceHistory || balanceHistory.length === 0) {
+            return [];
+        }
+
+        // Agrupar por data (um saldo por data)
+        const balanceByDate = {};
+        balanceHistory.forEach((balance) => {
+            const dateKey = balance.date.toISOString().split('T')[0];
+            if (!balanceByDate[dateKey]) {
+                balanceByDate[dateKey] = 0;
+            }
+            balanceByDate[dateKey] += Number(balance.value || 0);
+        });
+
+        // Ordenar datas
+        const sortedDates = Object.keys(balanceByDate).sort();
+
+        // Converter para array com dados de evolução
+        const monthlyData = {};
+        sortedDates.forEach((date) => {
+            const d = new Date(date);
+            const monthKey = d.toLocaleString('pt-BR', { month: 'short' });
+            const yearMonth = `${monthKey}`;
+            
+            if (!monthlyData[yearMonth]) {
+                monthlyData[yearMonth] = 0;
+            }
+            monthlyData[yearMonth] = Math.max(monthlyData[yearMonth], balanceByDate[date]);
+        });
+
+        // Converter em array e retornar
+        return Object.entries(monthlyData).map(([month, value]) => ({
+            month,
+            value: Math.round(value),
+        }));
+    }
+
+    _buildEvolutionChartFromInvestments(investments) {
+        // Se não há investimentos, retorna gráfico vazio
+        if (!investments || investments.length === 0) {
+            return [];
+        }
+
+        // Agrupar investimentos por mês/ano com suas somas acumuladas por ativo
+        const monthlyBalanceByActive = {};
+        
+        investments.forEach((inv) => {
+            const date = new Date(inv.date);
+            const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+            const monthLabel = date.toLocaleString('pt-BR', { month: 'short', year: '2-digit' });
+            
+            if (!monthlyBalanceByActive[monthKey]) {
+                monthlyBalanceByActive[monthKey] = {
+                    label: monthLabel,
+                    activeBalances: {},
+                };
+            }
+            
+            const month = monthlyBalanceByActive[monthKey];
+            const activeId = inv.activeId;
+            
+            if (!month.activeBalances[activeId]) {
+                month.activeBalances[activeId] = 0;
+            }
+            
+            // Somar todos os investimentos deste ativo (incluindo rendas)
+            month.activeBalances[activeId] += Number(inv.amount || 0);
+        });
+
+        // Converter para array e calcular saldos acumulados
+        const sortedMonths = Object.keys(monthlyBalanceByActive)
+            .sort()
+            .map((monthKey) => {
+                const month = monthlyBalanceByActive[monthKey];
+                const totalMonth = Object.values(month.activeBalances).reduce((a, b) => a + b, 0);
+                return {
+                    month: month.label,
+                    value: Math.round(totalMonth),
+                };
+            });
+
+        return sortedMonths;
     }
 }
 

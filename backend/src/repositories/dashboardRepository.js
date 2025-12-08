@@ -40,18 +40,37 @@ class DashboardRepository {
                         orderBy: { date: 'desc' }, 
                         take: 1 
                     },
+                    investments: true,
                 },
             });
 
-            return actives.map((a) => ({
-                id: a.id,
-                name: a.name,
-                type: a.type,
-                latestBalance:
-                    a.balances && a.balances.length
-                        ? Number(a.balances[0].value)
-                        : 0,
-            }));
+            return actives.map((a) => {
+                // Se tem saldo histórico, usar isso
+                if (a.balances && a.balances.length > 0) {
+                    return {
+                        id: a.id,
+                        name: a.name,
+                        type: a.type,
+                        latestBalance: Number(a.balances[0].value),
+                    };
+                }
+                
+                // Senão, calcular baseado nos investimentos
+                const totalInvested = (a.investments || [])
+                    .filter(inv => inv.kind !== 'Renda')
+                    .reduce((sum, inv) => sum + Number(inv.amount || 0), 0);
+                
+                const totalRenda = (a.investments || [])
+                    .filter(inv => inv.kind === 'Renda')
+                    .reduce((sum, inv) => sum + Number(inv.amount || 0), 0);
+                
+                return {
+                    id: a.id,
+                    name: a.name,
+                    type: a.type,
+                    latestBalance: totalInvested + totalRenda,
+                };
+            });
         } catch (error) {
             console.error('Dashboard Repository - findActivesWithLatestBalances:', error);
             throw new Error(error.message || 'Erro ao buscar saldos atualizados');
@@ -113,6 +132,34 @@ class DashboardRepository {
         } catch (error) {
             console.error('Dashboard Repository - findInvestments:', error);
             throw new Error(error.message || 'Erro ao buscar investimentos');
+        }
+    }
+
+    async findBalanceHistory(userId, months = 6) {
+        try {
+            if (!prisma) {
+                console.warn('[Dashboard Repository] Prisma not initialized, returning empty array');
+                return [];
+            }
+            
+            const dateFrom = new Date();
+            dateFrom.setMonth(dateFrom.getMonth() - months);
+            
+            const balances = await prisma.historicalBalance.findMany({
+                where: {
+                    active: { userId },
+                    date: { gte: dateFrom },
+                },
+                orderBy: { date: 'asc' },
+                include: {
+                    active: true,
+                },
+            });
+            
+            return balances;
+        } catch (error) {
+            console.error('Dashboard Repository - findBalanceHistory:', error);
+            throw new Error(error.message || 'Erro ao buscar histórico de balances');
         }
     }
 }

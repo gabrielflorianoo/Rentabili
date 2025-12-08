@@ -4,15 +4,9 @@ import { servicoAutenticacao } from '../services/servicoAutenticacao';
 import { dashboardApi } from '../services/apis';
 import Sidebar from '../components/Sidebar'; 
 import {
-    useTopPerformers,
-    usePortfolioEvolution,
-    useAllocation,
-} from '../hooks/usePerformanceHooks';
-import {
     EvolutionLineChart,
     AllocationPieChart,
     TopPerformersWidget,
-    PerformanceBarChart,
 } from '../components/PerformanceCharts';
 import './DashBoard.css';
 
@@ -53,11 +47,6 @@ export default function Dashboard() {
     // Estado para Interatividade (Filtro ao clicar no gráfico)
     const [selectedCategory, setSelectedCategory] = useState(null);
 
-    // Custom hooks para performance
-    const { topPerformers, loading: topLoading } = useTopPerformers(5);
-    const { evolution, loading: evolutionLoading } = usePortfolioEvolution(12);
-    const { allocation, loading: allocationLoading } = useAllocation();
-
     useEffect(() => {
         const user = servicoAutenticacao.obterUsuarioAtual();
         const token = servicoAutenticacao.obterToken();
@@ -89,14 +78,14 @@ export default function Dashboard() {
 
     const formatBRL = (val) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val || 0);
 
-    // Usar allocation do dashboard data ou do hook
-    const allocationData = data?.allocationChart || allocation || [];
+    // Usar allocation do dashboard data
+    const allocationData = data?.allocationChart || [];
 
     // Prepara dados para o Gráfico de Rosca (Doughnut)
     const doughnutData = {
         labels: allocationData?.map(i => i.name || i.type) || [],
         datasets: [{
-            data: allocationData?.map(i => i.value || i.percentage) || [],
+            data: allocationData?.map(i => i.percentage || 0) || [],
             backgroundColor: ['#00a651', '#0077b6', '#9b5de5', '#f15bb5', '#fee440', '#ff9f43'],
             borderWidth: 0,
         }]
@@ -117,11 +106,12 @@ export default function Dashboard() {
     };
 
     // Prepara dados para o Gráfico de Linha (Line)
+    const lineChartData = data?.evolutionChart || [];
     const lineData = {
-        labels: evolution?.map(e => e.month) || [],
+        labels: lineChartData?.map(e => e.month) || [],
         datasets: [{
             label: 'Evolução Patrimonial',
-            data: evolution?.map(e => e.value) || [],
+            data: lineChartData?.map(e => e.value) || [],
             fill: true,
             backgroundColor: 'rgba(0, 166, 81, 0.1)',
             borderColor: '#00a651',
@@ -260,15 +250,10 @@ export default function Dashboard() {
                                     data={data.evolutionChart}
                                     title="Evolução Patrimonial (12 meses)"
                                 />
-                            ) : evolutionLoading ? (
-                                <div className="flex items-center justify-center h-80 bg-gray-50 rounded-lg">
-                                    <p className="text-gray-400">Carregando evolução...</p>
-                                </div>
                             ) : (
-                                <EvolutionLineChart
-                                    data={evolution}
-                                    title="Evolução Patrimonial (12 meses)"
-                                />
+                                <div className="flex items-center justify-center h-80 bg-gray-50 rounded-lg">
+                                    <p className="text-gray-400">Sem dados de evolução</p>
+                                </div>
                             )}
                         </div>
                         <div className="chart-wrapper">
@@ -277,15 +262,10 @@ export default function Dashboard() {
                                     data={data.allocationChart}
                                     title="Distribuição de Ativos"
                                 />
-                            ) : allocationLoading ? (
-                                <div className="flex items-center justify-center h-80 bg-gray-50 rounded-lg">
-                                    <p className="text-gray-400">Carregando alocação...</p>
-                                </div>
                             ) : (
-                                <AllocationPieChart
-                                    data={allocation}
-                                    title="Distribuição de Ativos"
-                                />
+                                <div className="flex items-center justify-center h-80 bg-gray-50 rounded-lg">
+                                    <p className="text-gray-400">Sem dados de alocação</p>
+                                </div>
                             )}
                         </div>
                     </div>
@@ -299,16 +279,10 @@ export default function Dashboard() {
                             loading={false}
                             error={null}
                         />
-                    ) : topLoading ? (
-                        <div className="bg-white rounded-lg shadow p-6">
-                            <p className="text-center text-gray-400">Carregando performers...</p>
-                        </div>
                     ) : (
-                        <TopPerformersWidget
-                            topPerformers={topPerformers}
-                            loading={topLoading}
-                            error={null}
-                        />
+                        <div className="bg-white rounded-lg shadow p-6">
+                            <p className="text-center text-gray-400">Sem ativos para exibir</p>
+                        </div>
                     )}
                 </section>
 
