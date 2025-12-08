@@ -66,9 +66,9 @@ export default function Simulador() {
         let totalInvestido = Number(novoCenario.aporteInicial);
         const evolucao = [montante];
 
-        // Cálculo mês a mês
+        // Cálculo mês a mês (juros aplicados ANTES do novo aporte)
         for (let i = 1; i <= Number(novoCenario.prazoMeses); i++) {
-            montante = (montante + Number(novoCenario.aporteMensal)) * (1 + taxaMensal);
+            montante = montante * (1 + taxaMensal) + Number(novoCenario.aporteMensal);
             totalInvestido += Number(novoCenario.aporteMensal);
             evolucao.push(montante);
         }
