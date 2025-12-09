@@ -1,7 +1,30 @@
 import dashboardRepository from '../repositories/dashboardRepository.js';
 import investmentService from './investmentService.js';
+import walletService from './walletService.js';
 
 class DashboardService {
+    /**
+     * Converte valores Decimal do Prisma para Number, com validação
+     * 
+     * @param {number|string|Decimal} value - Valor para converter
+     * @returns {number} Número validado ou 0
+     */
+    _safeNumber(value) {
+        if (value === null || value === undefined) return 0;
+        const num = Number(value);
+        return isNaN(num) ? 0 : num;
+    }
+
+    /**
+     * Formata número para 2 casas decimais
+     * 
+     * @param {number} value - Valor para formatar
+     * @returns {number} Número com 2 casas decimais
+     */
+    _toFixed2(value) {
+        return parseFloat(this._safeNumber(value).toFixed(2));
+    }
+
     async getSummary(userId) {
         try {
             if (!userId) {
@@ -18,22 +41,40 @@ class DashboardService {
                 };
             }
 
-            const actives =
-                await dashboardRepository.findActivesWithBalances(userId);
+            const [actives, wallets, investments] = await Promise.all([
+                dashboardRepository.findActivesWithBalances(userId),
+                walletService.getAll(userId), // Use walletService to get dynamic balance
+                dashboardRepository.findInvestments(userId),
+            ]);
 
+            // Calcular patrimônio total dos ativos
             let totalBalance = 0;
             actives.forEach((active) => {
                 if (active.balances.length > 0) {
-                    totalBalance += Number(active.balances[0].value);
+                    totalBalance += this._safeNumber(active.balances[0].value);
                 }
             });
+
+            // Somar saldo disponível nas carteiras (já calculado dinamicamente)
+            const walletsTotal = wallets.reduce(
+                (acc, wallet) => acc + this._safeNumber(wallet.balance),
+                0
+            );
+
+            // Patrimônio Total = Ativos + Caixa
+            totalBalance += walletsTotal;
+
+            // Contar apenas investimentos que não são rendas
+            const investmentsCount = investments.filter(inv => inv.kind !== 'Renda').length;
 
             // Obter número de ativos diferentes com investimentos
             const activesCount = await investmentService.getDifferentActivesCount(userId);
 
             return {
-                totalBalance,
+                totalBalance: this._toFixed2(totalBalance),
                 activesCount,
+                walletsTotal: this._toFixed2(walletsTotal),
+                investmentsCount,
             };
         } catch (error) {
             console.error('DashboardService - getSummary:', error);
@@ -187,10 +228,13 @@ class DashboardService {
             const [investments, wallets, transactions, balanceHistory] =
                 await Promise.all([
                     dashboardRepository.findInvestments(userId),
-                    dashboardRepository.findWallets(userId),
+                    walletService.getAll(userId), // Use walletService to get dynamic balance
                     dashboardRepository.findTransactions(userId),
                     dashboardRepository.findBalanceHistory(userId, 6),
                 ]);
+
+            // Filtrar investimentos sem rendas uma vez para reutilizar
+            const investmentsOnly = investments.filter((inv) => inv.kind !== 'Renda');
 
             // Calcular saldo de cada ativo a partir dos investimentos e saldos históricos
             const activesMap = new Map();
@@ -229,34 +273,34 @@ class DashboardService {
 
             // Calcular totais
             let totalAportado = 0; // Total investido SEM rendas
-            let totalPatrimonio = 0; // Patrimônio atual total
+            let totalPatrimonio = 0; // Patrimônio atual dos ativos
             
             const actives = Array.from(activesMap.values()).map((a) => {
                 totalAportado += a.totalAportado;
-                totalPatrimonio += a.currentBalance;
+                totalPatrimonio += this._safeNumber(a.currentBalance);
                 
                 return {
                     id: a.id,
                     name: a.name,
                     type: a.type,
-                    latestBalance: a.currentBalance,
-                    totalAportado: a.totalAportado,
+                    latestBalance: this._toFixed2(a.currentBalance),
+                    totalAportado: this._toFixed2(a.totalAportado),
                 };
             });
 
-            // Somar carteiras ao patrimônio total
-            const walletsTotal = wallets.reduce((s, w) => s + Number(w.balance || 0), 0);
+            // Somar carteiras ao patrimônio total (saldo já calculado dinamicamente)
+            const walletsTotal = wallets.reduce((s, w) => s + this._safeNumber(w.balance), 0);
             const totalBalance = totalPatrimonio + walletsTotal;
 
             // Total investido = apenas aportes (sem rendas)
             const totalInvested = totalAportado;
             
-            // Ganho total = patrimônio atual - total aportado
-            const totalGain = totalPatrimonio - totalAportado;
+            // CORREÇÃO: Ganho total = patrimônio total (incluindo carteiras) - total aportado
+            const totalGain = totalBalance - totalAportado;
             
-            // Rentabilidade = ((patrimônio atual - total aportado) / total aportado) × 100
+            // Rentabilidade = ((patrimônio total - total aportado) / total aportado) × 100
             const profitability = totalAportado > 0 
-                ? parseFloat(((totalGain / totalAportado) * 100).toFixed(2))
+                ? this._toFixed2((totalGain / totalAportado) * 100)
                 : 0;
 
             // Criar gráfico de alocação
@@ -266,7 +310,7 @@ class DashboardService {
                     name: a.name,
                     value: a.latestBalance,
                     percentage: totalBalance > 0 
-                        ? parseFloat(((a.latestBalance / totalBalance) * 100).toFixed(2))
+                        ? this._toFixed2((a.latestBalance / totalBalance) * 100)
                         : 0,
                 }))
                 .sort((a, b) => b.value - a.value);
@@ -280,22 +324,19 @@ class DashboardService {
                 evolutionChart = this._buildEvolutionChartFromInvestments(investments);
             }
 
-            // Apenas investimentos (sem rendas)
-            const investmentsOnly = investments.filter((inv) => inv.kind !== 'Renda');
-            
             // Obter número de ativos diferentes com investimentos
             const activesCountWithInvestments = await investmentService.getDifferentActivesCount(userId);
 
             return {
                 summary: {
-                    totalBalance,
+                    totalBalance: this._toFixed2(totalBalance),
                     activesCount: activesCountWithInvestments,
-                    walletsTotal,
+                    walletsTotal: this._toFixed2(walletsTotal),
                     investmentsCount: investmentsOnly.length,
                 },
-                totalBalance,
-                totalInvested,
-                totalGain,
+                totalBalance: this._toFixed2(totalBalance),
+                totalInvested: this._toFixed2(totalInvested),
+                totalGain: this._toFixed2(totalGain),
                 profitability,
                 allocationChart,
                 historyChart: evolutionChart,
@@ -324,7 +365,7 @@ class DashboardService {
             if (!balanceByDate[dateKey]) {
                 balanceByDate[dateKey] = 0;
             }
-            balanceByDate[dateKey] += Number(balance.value || 0);
+            balanceByDate[dateKey] += this._safeNumber(balance.value);
         });
 
         // Ordenar datas
@@ -379,7 +420,7 @@ class DashboardService {
             }
             
             // Somar todos os investimentos deste ativo (incluindo rendas)
-            month.activeBalances[activeId] += Number(inv.amount || 0);
+            month.activeBalances[activeId] += this._safeNumber(inv.amount);
         });
 
         // Converter para array e calcular saldos acumulados

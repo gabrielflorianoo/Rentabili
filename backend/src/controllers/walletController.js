@@ -37,7 +37,8 @@ class WalletController {
     async getById(req, res) {
         try {
             const id = Number(req.params.id);
-            const wallet = await walletService.getById(id);
+            const userId = req.userId;
+            const wallet = await walletService.getById(id, userId);
             if (!wallet)
                 return res
                     .status(404)
