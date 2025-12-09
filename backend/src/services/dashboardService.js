@@ -41,18 +41,15 @@ class DashboardService {
                 };
             }
 
-            const [actives, wallets, investments] = await Promise.all([
-                dashboardRepository.findActivesWithBalances(userId),
+            const [wallets, investments] = await Promise.all([
                 walletService.getAll(userId), // Use walletService to get dynamic balance
                 dashboardRepository.findInvestments(userId),
             ]);
 
-            // Calcular patrimônio total dos ativos
+            // Calcular patrimônio total dos ativos a partir dos investimentos
             let totalBalance = 0;
-            actives.forEach((active) => {
-                if (active.balances.length > 0) {
-                    totalBalance += this._safeNumber(active.balances[0].value);
-                }
+            investments.forEach((inv) => {
+                totalBalance += this._safeNumber(inv.amount);
             });
 
             // Somar saldo disponível nas carteiras (já calculado dinamicamente)
@@ -225,12 +222,11 @@ class DashboardService {
                 };
             }
 
-            const [investments, wallets, transactions, balanceHistory] =
+            const [investments, wallets, transactions] =
                 await Promise.all([
                     dashboardRepository.findInvestments(userId),
                     walletService.getAll(userId), // Use walletService to get dynamic balance
                     dashboardRepository.findTransactions(userId),
-                    dashboardRepository.findBalanceHistory(userId, 6),
                 ]);
 
             // Filtrar investimentos sem rendas uma vez para reutilizar
@@ -260,14 +256,12 @@ class DashboardService {
                 }
             });
 
-            // Buscar saldo mais recente de cada ativo usando balances históricos
-            const activesWithBalances = await dashboardRepository.findActivesWithLatestBalances(userId);
-            
-            // Atualizar saldos atuais baseado nos balances históricos
-            activesWithBalances.forEach((activeData) => {
-                if (activesMap.has(activeData.id)) {
-                    const active = activesMap.get(activeData.id);
-                    active.currentBalance = activeData.latestBalance || 0;
+            // Calcular saldo atual de cada ativo a partir dos investimentos
+            // (somando todos os investimentos, incluindo rendas)
+            investments.forEach((inv) => {
+                if (activesMap.has(inv.activeId)) {
+                    const active = activesMap.get(inv.activeId);
+                    active.currentBalance += this._safeNumber(inv.amount);
                 }
             });
 
@@ -315,14 +309,8 @@ class DashboardService {
                 }))
                 .sort((a, b) => b.value - a.value);
 
-            // Criar gráfico de evolução
-            let evolutionChart = [];
-            if (balanceHistory && balanceHistory.length > 0) {
-                evolutionChart = this._buildEvolutionChartFromHistory(balanceHistory);
-            } else {
-                // Se não há histórico, reconstruir a partir dos investimentos
-                evolutionChart = this._buildEvolutionChartFromInvestments(investments);
-            }
+            // Criar gráfico de evolução a partir dos investimentos
+            const evolutionChart = this._buildEvolutionChartFromInvestments(investments);
 
             // Obter número de ativos diferentes com investimentos
             const activesCountWithInvestments = await investmentService.getDifferentActivesCount(userId);
@@ -350,45 +338,6 @@ class DashboardService {
             console.error('DashboardService - getDashboard:', error);
             throw new Error(error.message || 'Erro ao processar dados financeiros');
         }
-    }
-
-    _buildEvolutionChartFromHistory(balanceHistory) {
-        // Se não há histórico, retorna gráfico vazio
-        if (!balanceHistory || balanceHistory.length === 0) {
-            return [];
-        }
-
-        // Agrupar por data (um saldo por data)
-        const balanceByDate = {};
-        balanceHistory.forEach((balance) => {
-            const dateKey = balance.date.toISOString().split('T')[0];
-            if (!balanceByDate[dateKey]) {
-                balanceByDate[dateKey] = 0;
-            }
-            balanceByDate[dateKey] += this._safeNumber(balance.value);
-        });
-
-        // Ordenar datas
-        const sortedDates = Object.keys(balanceByDate).sort();
-
-        // Converter para array com dados de evolução
-        const monthlyData = {};
-        sortedDates.forEach((date) => {
-            const d = new Date(date);
-            const monthKey = d.toLocaleString('pt-BR', { month: 'short' });
-            const yearMonth = `${monthKey}`;
-            
-            if (!monthlyData[yearMonth]) {
-                monthlyData[yearMonth] = 0;
-            }
-            monthlyData[yearMonth] = Math.max(monthlyData[yearMonth], balanceByDate[date]);
-        });
-
-        // Converter em array e retornar
-        return Object.entries(monthlyData).map(([month, value]) => ({
-            month,
-            value: Math.round(value),
-        }));
     }
 
     _buildEvolutionChartFromInvestments(investments) {
