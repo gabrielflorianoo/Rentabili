@@ -1,5 +1,6 @@
 import dashboardRepository from '../repositories/dashboardRepository.js';
 import investmentService from './investmentService.js';
+import walletService from './walletService.js';
 
 class DashboardService {
     /**
@@ -42,7 +43,7 @@ class DashboardService {
 
             const [actives, wallets, investments] = await Promise.all([
                 dashboardRepository.findActivesWithBalances(userId),
-                dashboardRepository.findWallets(userId),
+                walletService.getAll(userId), // Use walletService to get dynamic balance
                 dashboardRepository.findInvestments(userId),
             ]);
 
@@ -54,7 +55,7 @@ class DashboardService {
                 }
             });
 
-            // Somar saldo disponível nas carteiras
+            // Somar saldo disponível nas carteiras (já calculado dinamicamente)
             const walletsTotal = wallets.reduce(
                 (acc, wallet) => acc + this._safeNumber(wallet.balance),
                 0
@@ -227,7 +228,7 @@ class DashboardService {
             const [investments, wallets, transactions, balanceHistory] =
                 await Promise.all([
                     dashboardRepository.findInvestments(userId),
-                    dashboardRepository.findWallets(userId),
+                    walletService.getAll(userId), // Use walletService to get dynamic balance
                     dashboardRepository.findTransactions(userId),
                     dashboardRepository.findBalanceHistory(userId, 6),
                 ]);
@@ -287,7 +288,7 @@ class DashboardService {
                 };
             });
 
-            // Somar carteiras ao patrimônio total
+            // Somar carteiras ao patrimônio total (saldo já calculado dinamicamente)
             const walletsTotal = wallets.reduce((s, w) => s + this._safeNumber(w.balance), 0);
             const totalBalance = totalPatrimonio + walletsTotal;
 
