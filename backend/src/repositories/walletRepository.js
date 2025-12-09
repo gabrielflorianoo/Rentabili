@@ -14,10 +14,11 @@ class WalletRepository {
         }
     }
 
-    async findById(id) {
+    async findById(id, userId) {
         try {
-            return await prisma.wallet.findUnique({
-                where: { id },
+            const where = userId ? { id, userId } : { id };
+            return await prisma.wallet.findFirst({
+                where,
             });
         } catch (error) {
             console.error(error);
