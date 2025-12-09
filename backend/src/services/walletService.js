@@ -9,12 +9,27 @@ class WalletService {
      * Calcula o saldo dinâmico de uma carteira
      * Saldo = Soma de transações (income - expense)
      * Note: Negative balances are prevented (returns 0) to avoid overdraft situations
+     * @param {number} walletId - ID da carteira
+     * @param {number} userId - ID do usuário (opcional, para validação adicional)
      */
-    async calculateWalletBalance(walletId) {
+    async calculateWalletBalance(walletId, userId = null) {
         try {
+            // Build where clause with optional userId for additional security
+            const where = { walletId };
+            if (userId) {
+                // Validate wallet belongs to user if userId provided
+                const wallet = await prisma.wallet.findFirst({
+                    where: { id: walletId, userId }
+                });
+                if (!wallet) {
+                    console.warn(`Wallet ${walletId} not found or doesn't belong to user ${userId}`);
+                    return 0;
+                }
+            }
+
             // Buscar transações da carteira
             const transactions = await prisma.transaction.findMany({
-                where: { walletId }
+                where
             });
 
             // Calcular saldo a partir das transações
@@ -43,7 +58,7 @@ class WalletService {
             const walletsWithBalance = await Promise.all(
                 wallets.map(async (wallet) => ({
                     ...wallet,
-                    balance: await this.calculateWalletBalance(wallet.id)
+                    balance: await this.calculateWalletBalance(wallet.id, userId)
                 }))
             );
             
@@ -65,7 +80,7 @@ class WalletService {
             }
             
             // Calcular saldo dinâmico
-            const balance = await this.calculateWalletBalance(id);
+            const balance = await this.calculateWalletBalance(id, userId);
             
             return {
                 ...wallet,
@@ -91,7 +106,7 @@ class WalletService {
             );
             
             // Retornar com o saldo calculado
-            const calculatedBalance = await this.calculateWalletBalance(newWallet.id);
+            const calculatedBalance = await this.calculateWalletBalance(newWallet.id, userId);
             return {
                 ...newWallet,
                 balance: calculatedBalance
@@ -123,7 +138,7 @@ class WalletService {
             );
             
             // Retornar com o saldo calculado
-            const calculatedBalance = await this.calculateWalletBalance(id);
+            const calculatedBalance = await this.calculateWalletBalance(id, userId);
             return {
                 ...updatedWallet,
                 balance: calculatedBalance
