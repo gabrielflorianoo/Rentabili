@@ -232,6 +232,9 @@ class DashboardService {
                     dashboardRepository.findBalanceHistory(userId, 6),
                 ]);
 
+            // Filtrar investimentos sem rendas uma vez para reutilizar
+            const investmentsOnly = investments.filter((inv) => inv.kind !== 'Renda');
+
             // Calcular saldo de cada ativo a partir dos investimentos e saldos históricos
             const activesMap = new Map();
             
@@ -320,9 +323,6 @@ class DashboardService {
                 evolutionChart = this._buildEvolutionChartFromInvestments(investments);
             }
 
-            // Apenas investimentos (sem rendas)
-            const investmentsOnly = investments.filter((inv) => inv.kind !== 'Renda');
-            
             // Obter número de ativos diferentes com investimentos
             const activesCountWithInvestments = await investmentService.getDifferentActivesCount(userId);
 

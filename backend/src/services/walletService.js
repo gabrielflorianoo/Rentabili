@@ -8,6 +8,7 @@ class WalletService {
     /**
      * Calcula o saldo dinâmico de uma carteira
      * Saldo = Soma de transações (income - expense)
+     * Note: Negative balances are prevented (returns 0) to avoid overdraft situations
      */
     async calculateWalletBalance(walletId) {
         try {
@@ -22,6 +23,7 @@ class WalletService {
                 return sum + (trans.type === 'income' ? amount : -amount);
             }, 0);
 
+            // Prevent negative balances - wallets cannot be overdrawn
             return Math.max(balanceFromTransactions, 0);
         } catch (error) {
             console.error('Erro ao calcular saldo da carteira:', error);
@@ -37,6 +39,7 @@ class WalletService {
             const wallets = await walletRepository.findAll(userId);
             
             // Enriquecer cada carteira com o saldo dinâmico
+            // TODO: Optimize to avoid N+1 queries - fetch all transactions in one query
             const walletsWithBalance = await Promise.all(
                 wallets.map(async (wallet) => ({
                     ...wallet,
